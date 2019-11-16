@@ -18,7 +18,7 @@ namespace Bot
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            string inp = (args != null && args.Length > 0) ? args[0] : File.Exists("Token.txt") ? File.ReadAllText("Token.txt") : null;
+            string inp = (args != null && args.Length > 0) ? args[0] : (Config.data.Key != null) ? Config.data.Key : File.Exists("Token.txt") ? File.ReadAllText("Token.txt") : null;
             cfg = null;
             int i = 0;
             while (cfg == null)
@@ -35,6 +35,7 @@ namespace Bot
                 }
                 i++;
             }
+            Config.data.Key = inp;
             Application.Run(new Form());
         }
     }

@@ -2,51 +2,37 @@
 
 namespace Bot
 {
-    public struct BotGuild
+    public interface IBotStruct
+    {
+        ulong Id { get; }
+    }
+    public struct BotGuild : IBotStruct
     {
         public DiscordGuild Guild { get; }
-        public ulong Id => this.Guild.Id;
+        public ulong Id => Guild.Id;
 
-        public BotGuild(DiscordGuild gld)
-        {
-            this.Guild = gld;
-        }
+        public BotGuild(DiscordGuild gld) => Guild = gld;
 
-        public override string ToString()
-        {
-            return this.Guild.Name;
-        }
+        public override string ToString() => Guild.Name;
     }
 
-    public struct BotChannel
+    public struct BotChannel : IBotStruct
     {
         public DiscordChannel Channel { get; }
-        public ulong Id => this.Channel.Id;
+        public ulong Id => Channel.Id;
 
-        public BotChannel(DiscordChannel chn)
-        {
-            this.Channel = chn;
-        }
+        public BotChannel(DiscordChannel chn) => Channel = chn;
 
-        public override string ToString()
-        {
-            return $"#{this.Channel.Name}";
-        }
+        public override string ToString() => $"#{Channel.Name}";
     }
 
-    public struct BotMessage
+    public struct BotMessage : IBotStruct
     {
         public DiscordMessage Message { get; }
-        public ulong Id => this.Message.Id;
+        public ulong Id => Message.Id;
 
-        public BotMessage(DiscordMessage msg)
-        {
-            this.Message = msg;
-        }
+        public BotMessage(DiscordMessage msg) => Message = msg;
 
-        public override string ToString()
-        {
-            return this.Message.Content;
-        }
+        public override string ToString() => Message.Content;
     }
 }

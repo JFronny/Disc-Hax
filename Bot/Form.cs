@@ -47,6 +47,10 @@ namespace Bot
             chatBox.Enabled = true;
             chatSend.Enabled = true;
             Instance = this;
+            booruBox.Checked = Config.data.Booru;
+            chanBox.Checked = Config.data.Chan;
+            playBox.Checked = Config.data.Play;
+            waifuBox.Checked = Config.data.Waifu;
         }
 
         private async Task BotThreadCallback()
@@ -117,12 +121,13 @@ namespace Bot
             TreeNode node = new TreeNode
             {
                 Text = gld.Guild.Name,
-                Tag = gld
+                Tag = gld,
+                Checked = Config.data.CheckedMatrix[gld.Id]
             };
             IEnumerable<BotChannel> chns = gld.Guild.Channels.Where(xc => xc.Type == ChannelType.Text).OrderBy(xc => xc.Position).Select(xc => new BotChannel(xc));
             chns.ToList().ForEach(s =>
             {
-                node.Nodes.Add(new TreeNode { Text = s.Channel.Name, Tag = s, Checked = false });
+                node.Nodes.Add(new TreeNode { Text = s.Channel.Name, Tag = s, Checked = Config.data.CheckedMatrix[s.Id] });
             });
             channelTree.TopNode.Nodes.Add(node);
             channelTree.TopNode.ExpandAll();
@@ -200,43 +205,24 @@ namespace Bot
                 : Task.Run(() => BotSendMessageCallback(message, channel)).ContinueWith(continuationAction);
         }
 
-        void SendMessage(Uri image, string imageTitle, BotChannel channel, Action<Task> continuationAction = null)
-        {
-            using (WebClient client = new WebClient())
-            {
-                try
-                {
-                    using (Stream s = client.OpenRead(image))
-                    {
-                        using (Bitmap img = (Bitmap)Image.FromStream(s))
-                        {
-                            img.Width.ToString();
-                        }
-                    }
-                }
-                catch
-                {
-                    Console.WriteLine("Failed to test image");
-                    return;
-                }
-            }
-            _ = continuationAction == null
-                ? Task.Run(() => BotSendMessageCallback(image, imageTitle, channel))
-                : Task.Run(() => BotSendMessageCallback(image, imageTitle, channel)).ContinueWith(continuationAction);
-        }
-
         bool busy = false;
         private void channelTree_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            if (busy) return;
-            busy = true;
             try
             {
-                checkNodes(e.Node, e.Node.Checked);
+                if (!busy)
+                {
+                    busy = true;
+                    checkNodes(e.Node, e.Node.Checked);
+                }
             }
             finally
             {
                 busy = false;
+                if (e.Node.Tag != null)
+                {
+                    Config.data.CheckedMatrix[((IBotStruct)e.Node.Tag).Id] = e.Node.Checked;
+                }
             }
         }
 
@@ -248,5 +234,15 @@ namespace Bot
                 checkNodes(child, check);
             }
         }
+
+        private void chanBox_CheckedChanged(object sender, EventArgs e) => Config.data.Chan = chanBox.Checked;
+
+        private void playBox_CheckedChanged(object sender, EventArgs e) => Config.data.Play = playBox.Checked;
+
+        private void waifuBox_CheckedChanged(object sender, EventArgs e) => Config.data.Waifu = waifuBox.Checked;
+
+        private void booruBox_CheckedChanged(object sender, EventArgs e) => Config.data.Booru = booruBox.Checked;
+
+        private void debugButton_Click(object sender, EventArgs e) => new System.Threading.Thread(() => MessageBox.Show(Config.data.ToString())).Start();
     }
 }

@@ -48,11 +48,11 @@ namespace Bot
         }
 
         [Command("waifu"), Description("Shows you a random waifu from thiswaifudoesnotexist.net")]
-        public async Task Waifu(CommandContext ctx)
+        public async Task Waifu(CommandContext ctx, [Description("Use \"f\" to force execution, even on non-NSFW channels")] params string[] args)
         {
             if (Form.Instance.waifuBox.Checked)
             {
-                if (ctx.Channel.IsNSFW)
+                if (ctx.Channel.IsNSFW || args.Contains("f"))
                     await ctx.RespondAsync(embed: new DiscordEmbedBuilder { Title = "There.", ImageUrl = "https://www.thiswaifudoesnotexist.net/example-" + Form.Instance.rnd.Next(6000).ToString() + ".jpg" });
                 else
                     await ctx.RespondAsync("The generated waifus might not be something you want to be looking at at work.");
@@ -71,16 +71,16 @@ namespace Bot
 
 
         [Command("booru"), Description("Shows a random Image from danbooru")]
-        public async Task Waifu(CommandContext ctx, [Description("Tags for image to select image from")] params string[] args)
+        public async Task Booru(CommandContext ctx, [Description("Tags for image selection")] params string[] args)
         {
-            if (Form.Instance.waifuBox.Checked)
+            if (Form.Instance.booruBox.Checked)
             {
-                SearchResult result = new Gelbooru().GetRandomImage(args).GetAwaiter().GetResult();
+                SearchResult result = (ctx.Channel.IsNSFW ? (Booru)new Rule34() : new Gelbooru()).GetRandomImage(args).GetAwaiter().GetResult();
                 while (result.rating != (ctx.Channel.IsNSFW ? Rating.Safe : Rating.Explicit))
                 {
                     result = new Gelbooru().GetRandomImage(args).GetAwaiter().GetResult();
                 }
-                await ctx.RespondAsync(embed: new DiscordEmbedBuilder { Title = "There.", Description = string.Join("", result.tags), ImageUrl = result.fileUrl.AbsoluteUri });
+                await ctx.RespondAsync(embed: new DiscordEmbedBuilder { Title = "There.", Description = string.Join(", ", result.tags), ImageUrl = result.fileUrl.AbsoluteUri });
             }
         }
     }

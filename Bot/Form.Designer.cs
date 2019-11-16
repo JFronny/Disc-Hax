@@ -28,15 +28,17 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Guilds");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Guilds");
             this.channelTree = new System.Windows.Forms.TreeView();
             this.chatBox = new System.Windows.Forms.ListBox();
             this.chatPanel = new System.Windows.Forms.Panel();
             this.chatSend = new System.Windows.Forms.TextBox();
             this.settingsPanel = new System.Windows.Forms.Panel();
+            this.booruBox = new System.Windows.Forms.CheckBox();
+            this.waifuBox = new System.Windows.Forms.CheckBox();
             this.playBox = new System.Windows.Forms.CheckBox();
             this.chanBox = new System.Windows.Forms.CheckBox();
-            this.waifuBox = new System.Windows.Forms.CheckBox();
+            this.debugButton = new System.Windows.Forms.Button();
             this.chatPanel.SuspendLayout();
             this.settingsPanel.SuspendLayout();
             this.SuspendLayout();
@@ -48,10 +50,10 @@
             this.channelTree.Enabled = false;
             this.channelTree.Location = new System.Drawing.Point(0, 0);
             this.channelTree.Name = "channelTree";
-            treeNode2.Name = "Guilds";
-            treeNode2.Text = "Guilds";
+            treeNode3.Name = "Guilds";
+            treeNode3.Text = "Guilds";
             this.channelTree.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode2});
+            treeNode3});
             this.channelTree.Size = new System.Drawing.Size(166, 310);
             this.channelTree.TabIndex = 0;
             this.channelTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.channelTree_AfterCheck);
@@ -89,6 +91,8 @@
             // 
             // settingsPanel
             // 
+            this.settingsPanel.Controls.Add(this.debugButton);
+            this.settingsPanel.Controls.Add(this.booruBox);
             this.settingsPanel.Controls.Add(this.waifuBox);
             this.settingsPanel.Controls.Add(this.playBox);
             this.settingsPanel.Controls.Add(this.chanBox);
@@ -98,25 +102,16 @@
             this.settingsPanel.Size = new System.Drawing.Size(200, 310);
             this.settingsPanel.TabIndex = 3;
             // 
-            // playBox
+            // booruBox
             // 
-            this.playBox.AutoSize = true;
-            this.playBox.Location = new System.Drawing.Point(6, 35);
-            this.playBox.Name = "playBox";
-            this.playBox.Size = new System.Drawing.Size(97, 17);
-            this.playBox.TabIndex = 1;
-            this.playBox.Text = "!play command";
-            this.playBox.UseVisualStyleBackColor = true;
-            // 
-            // chanBox
-            // 
-            this.chanBox.AutoSize = true;
-            this.chanBox.Location = new System.Drawing.Point(6, 12);
-            this.chanBox.Name = "chanBox";
-            this.chanBox.Size = new System.Drawing.Size(108, 17);
-            this.chanBox.TabIndex = 0;
-            this.chanBox.Text = "!4chan command";
-            this.chanBox.UseVisualStyleBackColor = true;
+            this.booruBox.AutoSize = true;
+            this.booruBox.Location = new System.Drawing.Point(6, 81);
+            this.booruBox.Name = "booruBox";
+            this.booruBox.Size = new System.Drawing.Size(105, 17);
+            this.booruBox.TabIndex = 3;
+            this.booruBox.Text = "!booru command";
+            this.booruBox.UseVisualStyleBackColor = true;
+            this.booruBox.CheckedChanged += new System.EventHandler(this.booruBox_CheckedChanged);
             // 
             // waifuBox
             // 
@@ -127,6 +122,39 @@
             this.waifuBox.TabIndex = 2;
             this.waifuBox.Text = "!waifu command";
             this.waifuBox.UseVisualStyleBackColor = true;
+            this.waifuBox.CheckedChanged += new System.EventHandler(this.waifuBox_CheckedChanged);
+            // 
+            // playBox
+            // 
+            this.playBox.AutoSize = true;
+            this.playBox.Location = new System.Drawing.Point(6, 35);
+            this.playBox.Name = "playBox";
+            this.playBox.Size = new System.Drawing.Size(97, 17);
+            this.playBox.TabIndex = 1;
+            this.playBox.Text = "!play command";
+            this.playBox.UseVisualStyleBackColor = true;
+            this.playBox.CheckedChanged += new System.EventHandler(this.playBox_CheckedChanged);
+            // 
+            // chanBox
+            // 
+            this.chanBox.AutoSize = true;
+            this.chanBox.Location = new System.Drawing.Point(6, 12);
+            this.chanBox.Name = "chanBox";
+            this.chanBox.Size = new System.Drawing.Size(108, 17);
+            this.chanBox.TabIndex = 0;
+            this.chanBox.Text = "!4chan command";
+            this.chanBox.UseVisualStyleBackColor = true;
+            this.chanBox.CheckedChanged += new System.EventHandler(this.chanBox_CheckedChanged);
+            // 
+            // debugButton
+            // 
+            this.debugButton.Location = new System.Drawing.Point(132, 284);
+            this.debugButton.Name = "debugButton";
+            this.debugButton.Size = new System.Drawing.Size(65, 23);
+            this.debugButton.TabIndex = 4;
+            this.debugButton.Text = "SaveEx";
+            this.debugButton.UseVisualStyleBackColor = true;
+            this.debugButton.Click += new System.EventHandler(this.debugButton_Click);
             // 
             // Form
             // 
@@ -159,6 +187,8 @@
         public System.Windows.Forms.CheckBox chanBox;
         public System.Windows.Forms.CheckBox playBox;
         public System.Windows.Forms.CheckBox waifuBox;
+        public System.Windows.Forms.CheckBox booruBox;
+        private System.Windows.Forms.Button debugButton;
     }
 }
 
