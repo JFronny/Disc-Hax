@@ -13,6 +13,8 @@ namespace Bot
             private bool waifu;
             private bool booru;
             private string key;
+            private bool nsfw;
+            private bool config;
 
             public bool Chan
             {
@@ -85,13 +87,43 @@ namespace Bot
                 }
             }
 
-            public override string ToString() =>
-                "Chan: " + Chan.ToString() +
-                "\r\nPlay: " + Play.ToString() +
-                "\r\rWaifu: " + Waifu.ToString() +
-                "\r\nBooru: " + Booru.ToString() +
-                "\r\nKey: " + Key +
-                "\r\nCheckedMatrix: " + CheckedMatrix.ToString();
+            public bool Nsfw
+            {
+                get {
+                    return nsfw;
+                }
+                set {
+                    nsfw = value;
+                    Save();
+                }
+            }
+
+            public bool Config
+            {
+                get {
+                    return config;
+                }
+                set {
+                    config = value;
+                    Save();
+                }
+            }
+
+            public override string ToString() => ToString(true);
+
+            public string ToString(bool hideSensitiveInfo)
+            {
+                string msg = "Chan: " + Chan.ToString() +
+                    "\r\nPlay: " + Play.ToString() +
+                    "\r\nWaifu: " + Waifu.ToString() +
+                    "\r\nBooru: " + Booru.ToString() +
+                    "\r\nNSFW: " + Nsfw.ToString() +
+                    "\r\nConfig: " + Config.ToString();
+                if (!hideSensitiveInfo)
+                    msg += "\r\nKey: " + new string('*', Key.Length - 4) + Key.Substring(Key.Length - 5, 4) +
+                    "\r\nCheckedMatrix: " + CheckedMatrix.ToString();
+                return msg;
+            }
         }
     }
 }

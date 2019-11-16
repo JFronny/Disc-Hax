@@ -4,6 +4,7 @@ using Chan.Net.JsonModel;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -51,6 +52,8 @@ namespace Bot
             chanBox.Checked = Config.data.Chan;
             playBox.Checked = Config.data.Play;
             waifuBox.Checked = Config.data.Waifu;
+            nsfwBox.Checked = Config.data.Nsfw;
+            configBox.Checked = Config.data.Config;
         }
 
         private async Task BotThreadCallback()
@@ -130,6 +133,7 @@ namespace Bot
                 node.Nodes.Add(new TreeNode { Text = s.Channel.Name, Tag = s, Checked = Config.data.CheckedMatrix[s.Id] });
             });
             channelTree.TopNode.Nodes.Add(node);
+            channelTree.Sort();
             channelTree.TopNode.ExpandAll();
         }
 
@@ -196,15 +200,6 @@ namespace Bot
             }
         }
 
-        void SendMessage(string message, BotChannel channel, Action<Task> continuationAction = null)
-        {
-            if (string.IsNullOrWhiteSpace(message))
-                return;
-            _ = continuationAction == null
-                ? Task.Run(() => BotSendMessageCallback(message, channel))
-                : Task.Run(() => BotSendMessageCallback(message, channel)).ContinueWith(continuationAction);
-        }
-
         bool busy = false;
         private void channelTree_AfterCheck(object sender, TreeViewEventArgs e)
         {
@@ -243,25 +238,62 @@ namespace Bot
 
         private void booruBox_CheckedChanged(object sender, EventArgs e) => Config.data.Booru = booruBox.Checked;
 
-        private void debugButton_Click(object sender, EventArgs e) => new System.Threading.Thread(() => MessageBox.Show(Config.data.ToString())).Start();
+        private void nsfwBox_CheckedChanged(object sender, EventArgs e) => Config.data.Nsfw = nsfwBox.Checked;
+
+        private void configBox_CheckedChanged(object sender, EventArgs e) => Config.data.Config = configBox.Checked;
+
+        private void debugButton_Click(object sender, EventArgs e) => new System.Threading.Thread(() => MessageBox.Show(Config.data.ToString(false))).Start();
+
+        void SendMessage(string message, BotChannel channel, Action<Task> continuationAction = null)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+            _ = continuationAction == null
+                ? Task.Run(() => BotSendMessageCallback(message, channel))
+                : Task.Run(() => BotSendMessageCallback(message, channel)).ContinueWith(continuationAction);
+        }
+
+        void SendMessage(Uri image, string imageTitle, BotChannel channel, Action<Task> continuationAction = null)
+        {
+            _ = continuationAction == null
+                ? Task.Run(() => BotSendMessageCallback(image, imageTitle, channel))
+                : Task.Run(() => BotSendMessageCallback(image, imageTitle, channel)).ContinueWith(continuationAction);
+        }
 
         private void chanButton_Click(object sender, EventArgs e)
         {
+            if (ChannelDefined)
+                Commands.Chan(new string[] { Interaction.InputBox("Please select a channel") }, SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
         }
 
         private void playButton_Click(object sender, EventArgs e)
         {
-
+            if (ChannelDefined)
+                Commands.Play((c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
         }
 
         private void waifuButton_Click(object sender, EventArgs e)
         {
-
+            if (ChannelDefined)
+                Commands.Waifu(new string[] { "f" }, SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
         }
 
         private void booruButton_Click(object sender, EventArgs e)
         {
+            if (ChannelDefined)
+                Commands.Booru(new string[] { Interaction.InputBox("Please select categories") }, SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
+        }
 
+        private void configButton_Click(object sender, EventArgs e)
+        {
+            if (ChannelDefined)
+                Commands.ConfigCmd((c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
+        }
+
+        private void pingButton_Click(object sender, EventArgs e)
+        {
+            if (ChannelDefined)
+                Commands.Ping((c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
         }
     }
 }

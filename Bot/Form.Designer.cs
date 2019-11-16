@@ -43,6 +43,10 @@
             this.waifuBox = new System.Windows.Forms.CheckBox();
             this.playBox = new System.Windows.Forms.CheckBox();
             this.chanBox = new System.Windows.Forms.CheckBox();
+            this.nsfwBox = new System.Windows.Forms.CheckBox();
+            this.configButton = new System.Windows.Forms.Button();
+            this.configBox = new System.Windows.Forms.CheckBox();
+            this.pingButton = new System.Windows.Forms.Button();
             this.chatPanel.SuspendLayout();
             this.settingsPanel.SuspendLayout();
             this.SuspendLayout();
@@ -95,11 +99,15 @@
             // 
             // settingsPanel
             // 
+            this.settingsPanel.Controls.Add(this.pingButton);
+            this.settingsPanel.Controls.Add(this.debugButton);
+            this.settingsPanel.Controls.Add(this.configButton);
+            this.settingsPanel.Controls.Add(this.configBox);
+            this.settingsPanel.Controls.Add(this.nsfwBox);
             this.settingsPanel.Controls.Add(this.booruButton);
             this.settingsPanel.Controls.Add(this.waifuButton);
             this.settingsPanel.Controls.Add(this.playButton);
             this.settingsPanel.Controls.Add(this.chanButton);
-            this.settingsPanel.Controls.Add(this.debugButton);
             this.settingsPanel.Controls.Add(this.booruBox);
             this.settingsPanel.Controls.Add(this.waifuBox);
             this.settingsPanel.Controls.Add(this.playBox);
@@ -153,9 +161,9 @@
             // debugButton
             // 
             this.debugButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.debugButton.Location = new System.Drawing.Point(132, 284);
+            this.debugButton.Location = new System.Drawing.Point(145, 284);
             this.debugButton.Name = "debugButton";
-            this.debugButton.Size = new System.Drawing.Size(65, 23);
+            this.debugButton.Size = new System.Drawing.Size(52, 23);
             this.debugButton.TabIndex = 4;
             this.debugButton.Text = "SaveEx";
             this.debugButton.UseVisualStyleBackColor = true;
@@ -205,6 +213,49 @@
             this.chanBox.UseVisualStyleBackColor = true;
             this.chanBox.CheckedChanged += new System.EventHandler(this.chanBox_CheckedChanged);
             // 
+            // nsfwBox
+            // 
+            this.nsfwBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.nsfwBox.AutoSize = true;
+            this.nsfwBox.Location = new System.Drawing.Point(6, 288);
+            this.nsfwBox.Name = "nsfwBox";
+            this.nsfwBox.Size = new System.Drawing.Size(144, 17);
+            this.nsfwBox.TabIndex = 9;
+            this.nsfwBox.Text = "Allow NSFW everywhere";
+            this.nsfwBox.UseVisualStyleBackColor = true;
+            this.nsfwBox.CheckedChanged += new System.EventHandler(this.nsfwBox_CheckedChanged);
+            // 
+            // configButton
+            // 
+            this.configButton.Location = new System.Drawing.Point(136, 100);
+            this.configButton.Name = "configButton";
+            this.configButton.Size = new System.Drawing.Size(52, 23);
+            this.configButton.TabIndex = 11;
+            this.configButton.Text = "Run";
+            this.configButton.UseVisualStyleBackColor = true;
+            this.configButton.Click += new System.EventHandler(this.configButton_Click);
+            // 
+            // configBox
+            // 
+            this.configBox.AutoSize = true;
+            this.configBox.Location = new System.Drawing.Point(6, 104);
+            this.configBox.Name = "configBox";
+            this.configBox.Size = new System.Drawing.Size(107, 17);
+            this.configBox.TabIndex = 10;
+            this.configBox.Text = "!config command";
+            this.configBox.UseVisualStyleBackColor = true;
+            this.configBox.CheckedChanged += new System.EventHandler(this.configBox_CheckedChanged);
+            // 
+            // pingButton
+            // 
+            this.pingButton.Location = new System.Drawing.Point(136, 123);
+            this.pingButton.Name = "pingButton";
+            this.pingButton.Size = new System.Drawing.Size(52, 23);
+            this.pingButton.TabIndex = 12;
+            this.pingButton.Text = "Ping";
+            this.pingButton.UseVisualStyleBackColor = true;
+            this.pingButton.Click += new System.EventHandler(this.pingButton_Click);
+            // 
             // Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -242,6 +293,10 @@
         private System.Windows.Forms.Button booruButton;
         private System.Windows.Forms.Button waifuButton;
         private System.Windows.Forms.Button playButton;
+        private System.Windows.Forms.CheckBox nsfwBox;
+        private System.Windows.Forms.Button configButton;
+        public System.Windows.Forms.CheckBox configBox;
+        private System.Windows.Forms.Button pingButton;
     }
 }
 
