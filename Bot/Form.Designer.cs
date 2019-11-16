@@ -33,6 +33,7 @@
             this.chatBox = new System.Windows.Forms.ListBox();
             this.chatPanel = new System.Windows.Forms.Panel();
             this.chatSend = new System.Windows.Forms.TextBox();
+            this.settingsPanel = new System.Windows.Forms.Panel();
             this.chatPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -59,7 +60,7 @@
             this.chatBox.FormattingEnabled = true;
             this.chatBox.Location = new System.Drawing.Point(0, 0);
             this.chatBox.Name = "chatBox";
-            this.chatBox.Size = new System.Drawing.Size(712, 310);
+            this.chatBox.Size = new System.Drawing.Size(512, 310);
             this.chatBox.TabIndex = 1;
             // 
             // chatPanel
@@ -69,7 +70,7 @@
             this.chatPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.chatPanel.Location = new System.Drawing.Point(166, 0);
             this.chatPanel.Name = "chatPanel";
-            this.chatPanel.Size = new System.Drawing.Size(712, 310);
+            this.chatPanel.Size = new System.Drawing.Size(512, 310);
             this.chatPanel.TabIndex = 2;
             // 
             // chatSend
@@ -78,9 +79,17 @@
             this.chatSend.Enabled = false;
             this.chatSend.Location = new System.Drawing.Point(0, 290);
             this.chatSend.Name = "chatSend";
-            this.chatSend.Size = new System.Drawing.Size(712, 20);
+            this.chatSend.Size = new System.Drawing.Size(512, 20);
             this.chatSend.TabIndex = 2;
             this.chatSend.KeyDown += new System.Windows.Forms.KeyEventHandler(this.chatSend_KeyDown);
+            // 
+            // settingsPanel
+            // 
+            this.settingsPanel.Dock = System.Windows.Forms.DockStyle.Right;
+            this.settingsPanel.Location = new System.Drawing.Point(678, 0);
+            this.settingsPanel.Name = "settingsPanel";
+            this.settingsPanel.Size = new System.Drawing.Size(200, 310);
+            this.settingsPanel.TabIndex = 3;
             // 
             // Form
             // 
@@ -89,6 +98,7 @@
             this.ClientSize = new System.Drawing.Size(878, 310);
             this.Controls.Add(this.chatPanel);
             this.Controls.Add(this.channelTree);
+            this.Controls.Add(this.settingsPanel);
             this.MaximizeBox = false;
             this.Name = "Form";
             this.Text = "DiscHax Bot Menu";
@@ -105,6 +115,7 @@
         private System.Windows.Forms.ListBox chatBox;
         private System.Windows.Forms.Panel chatPanel;
         private System.Windows.Forms.TextBox chatSend;
+        private System.Windows.Forms.Panel settingsPanel;
     }
 }
 

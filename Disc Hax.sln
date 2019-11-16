@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29509.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bot", "Bot\Bot.csproj", "{28566F75-5BA5-481F-95A6-B1773A78F3FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleverbot", "Cleverbot\Cleverbot.csproj", "{4458C81F-8E8F-47B8-BADF-8D583DCD02FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageBoardScraper", "Cleverbot\ImageBoardScraper.csproj", "{4458C81F-8E8F-47B8-BADF-8D583DCD02FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

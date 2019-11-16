@@ -140,13 +140,17 @@ namespace Bot
                 chatBox.Items.Add(logMsg);
                 chatBox.SelectedItem = logMsg;
             }
-            switch (msg.Message.Content.Split(' ')[0])
-            {
-                case "!play":
-                    SendMessage("No.", channel);
-                    break;
-            }
-
+            TreeNode tmp1 = channelTree.TopNode;
+            IEnumerable<TreeNode> tmp2 = tmp1.Nodes.OfType<TreeNode>();
+            IEnumerable<TreeNode> tmp3 = tmp2.SelectMany(s => s.Nodes.OfType<TreeNode>());
+            IEnumerable<TreeNode> tmp4 = tmp3.Where(s => ((BotChannel)s.Tag).Id == channel.Id && s.Checked);
+            if (tmp4.Count() > 0)
+                switch (msg.Message.Content.Split(' ')[0])
+                {
+                    case "!play":
+                        SendMessage("No.", channel);
+                        break;
+                }
         }
 
         private void Form_FormClosed(object sender, FormClosedEventArgs e) => TokenSource.Cancel();
