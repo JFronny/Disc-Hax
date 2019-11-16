@@ -28,17 +28,21 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Guilds");
+            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Guilds");
             this.channelTree = new System.Windows.Forms.TreeView();
             this.chatBox = new System.Windows.Forms.ListBox();
             this.chatPanel = new System.Windows.Forms.Panel();
             this.chatSend = new System.Windows.Forms.TextBox();
             this.settingsPanel = new System.Windows.Forms.Panel();
+            this.debugButton = new System.Windows.Forms.Button();
             this.booruBox = new System.Windows.Forms.CheckBox();
             this.waifuBox = new System.Windows.Forms.CheckBox();
             this.playBox = new System.Windows.Forms.CheckBox();
             this.chanBox = new System.Windows.Forms.CheckBox();
-            this.debugButton = new System.Windows.Forms.Button();
+            this.chanButton = new System.Windows.Forms.Button();
+            this.playButton = new System.Windows.Forms.Button();
+            this.waifuButton = new System.Windows.Forms.Button();
+            this.booruButton = new System.Windows.Forms.Button();
             this.chatPanel.SuspendLayout();
             this.settingsPanel.SuspendLayout();
             this.SuspendLayout();
@@ -50,10 +54,10 @@
             this.channelTree.Enabled = false;
             this.channelTree.Location = new System.Drawing.Point(0, 0);
             this.channelTree.Name = "channelTree";
-            treeNode3.Name = "Guilds";
-            treeNode3.Text = "Guilds";
+            treeNode5.Name = "Guilds";
+            treeNode5.Text = "Guilds";
             this.channelTree.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode3});
+            treeNode5});
             this.channelTree.Size = new System.Drawing.Size(166, 310);
             this.channelTree.TabIndex = 0;
             this.channelTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.channelTree_AfterCheck);
@@ -91,6 +95,10 @@
             // 
             // settingsPanel
             // 
+            this.settingsPanel.Controls.Add(this.booruButton);
+            this.settingsPanel.Controls.Add(this.waifuButton);
+            this.settingsPanel.Controls.Add(this.playButton);
+            this.settingsPanel.Controls.Add(this.chanButton);
             this.settingsPanel.Controls.Add(this.debugButton);
             this.settingsPanel.Controls.Add(this.booruBox);
             this.settingsPanel.Controls.Add(this.waifuBox);
@@ -101,6 +109,16 @@
             this.settingsPanel.Name = "settingsPanel";
             this.settingsPanel.Size = new System.Drawing.Size(200, 310);
             this.settingsPanel.TabIndex = 3;
+            // 
+            // debugButton
+            // 
+            this.debugButton.Location = new System.Drawing.Point(132, 284);
+            this.debugButton.Name = "debugButton";
+            this.debugButton.Size = new System.Drawing.Size(65, 23);
+            this.debugButton.TabIndex = 4;
+            this.debugButton.Text = "SaveEx";
+            this.debugButton.UseVisualStyleBackColor = true;
+            this.debugButton.Click += new System.EventHandler(this.debugButton_Click);
             // 
             // booruBox
             // 
@@ -146,15 +164,45 @@
             this.chanBox.UseVisualStyleBackColor = true;
             this.chanBox.CheckedChanged += new System.EventHandler(this.chanBox_CheckedChanged);
             // 
-            // debugButton
+            // chanButton
             // 
-            this.debugButton.Location = new System.Drawing.Point(132, 284);
-            this.debugButton.Name = "debugButton";
-            this.debugButton.Size = new System.Drawing.Size(65, 23);
-            this.debugButton.TabIndex = 4;
-            this.debugButton.Text = "SaveEx";
-            this.debugButton.UseVisualStyleBackColor = true;
-            this.debugButton.Click += new System.EventHandler(this.debugButton_Click);
+            this.chanButton.Location = new System.Drawing.Point(136, 8);
+            this.chanButton.Name = "chanButton";
+            this.chanButton.Size = new System.Drawing.Size(52, 23);
+            this.chanButton.TabIndex = 5;
+            this.chanButton.Text = "Run";
+            this.chanButton.UseVisualStyleBackColor = true;
+            this.chanButton.Click += new System.EventHandler(this.chanButton_Click);
+            // 
+            // playButton
+            // 
+            this.playButton.Location = new System.Drawing.Point(136, 31);
+            this.playButton.Name = "playButton";
+            this.playButton.Size = new System.Drawing.Size(52, 23);
+            this.playButton.TabIndex = 6;
+            this.playButton.Text = "Run";
+            this.playButton.UseVisualStyleBackColor = true;
+            this.playButton.Click += new System.EventHandler(this.playButton_Click);
+            // 
+            // waifuButton
+            // 
+            this.waifuButton.Location = new System.Drawing.Point(136, 54);
+            this.waifuButton.Name = "waifuButton";
+            this.waifuButton.Size = new System.Drawing.Size(52, 23);
+            this.waifuButton.TabIndex = 7;
+            this.waifuButton.Text = "Run";
+            this.waifuButton.UseVisualStyleBackColor = true;
+            this.waifuButton.Click += new System.EventHandler(this.waifuButton_Click);
+            // 
+            // booruButton
+            // 
+            this.booruButton.Location = new System.Drawing.Point(136, 77);
+            this.booruButton.Name = "booruButton";
+            this.booruButton.Size = new System.Drawing.Size(52, 23);
+            this.booruButton.TabIndex = 8;
+            this.booruButton.Text = "Run";
+            this.booruButton.UseVisualStyleBackColor = true;
+            this.booruButton.Click += new System.EventHandler(this.booruButton_Click);
             // 
             // Form
             // 
@@ -189,6 +237,10 @@
         public System.Windows.Forms.CheckBox waifuBox;
         public System.Windows.Forms.CheckBox booruBox;
         private System.Windows.Forms.Button debugButton;
+        private System.Windows.Forms.Button chanButton;
+        private System.Windows.Forms.Button booruButton;
+        private System.Windows.Forms.Button waifuButton;
+        private System.Windows.Forms.Button playButton;
     }
 }
 

@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System;
+using System.Security.Cryptography;
 
 namespace Bot
 {
@@ -9,19 +11,21 @@ namespace Bot
     {
         public static void Save()
         {
+            MemoryStream ms = new MemoryStream();
             BinaryFormatter bf = new BinaryFormatter();
-            FileStream st = new FileStream("config.dat", FileMode.OpenOrCreate);
-            bf.Serialize(st, data);
-            st.Dispose();
+            bf.Serialize(ms, _data);
+            File.WriteAllBytes("config.dat", ProtectedData.Protect(ms.ToArray(), HID.Value(), DataProtectionScope.CurrentUser));
+            ms.Dispose();
         }
         public static void Load()
         {
             if (File.Exists("config.dat"))
             {
-                BinaryFormatter bf = new BinaryFormatter();
-                FileStream st = new FileStream("config.dat", FileMode.OpenOrCreate);
-                _data = (Data)bf.Deserialize(st);
-                st.Dispose();
+                using (MemoryStream ms = new MemoryStream(ProtectedData.Unprotect(File.ReadAllBytes("config.dat"), HID.Value(), DataProtectionScope.CurrentUser)))
+                {
+                    BinaryFormatter bf = new BinaryFormatter();
+                    _data = (Data)bf.Deserialize(ms);
+                }
             }
             else
             {
@@ -38,6 +42,12 @@ namespace Bot
                     Load();
                 return _data;
             }
+        }
+
+        internal class Protected
+        {
+            protected byte[] Protect(byte[] data) => ProtectedData.Protect(data, HID.Value(), DataProtectionScope.CurrentUser);
+            protected byte[] Unprotect(byte[] data) => ProtectedData.Unprotect(data, HID.Value(), DataProtectionScope.CurrentUser);
         }
     }
 }

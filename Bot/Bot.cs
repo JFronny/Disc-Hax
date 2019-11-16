@@ -11,10 +11,12 @@ namespace Bot
 {
     public class Bot
     {
+        public Bot instance;
         public DiscordClient Client { get; }
         public CommandsNextModule Commands { get; set; }
         public Bot(DiscordConfiguration cfg)
         {
+            instance = this;
             Client = new DiscordClient(cfg);
             Commands = Client.UseCommandsNext(new CommandsNextConfiguration
             {

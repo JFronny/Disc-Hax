@@ -54,6 +54,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -69,6 +71,7 @@
     <Compile Include="Commands.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Config.Data.cs" />
+    <Compile Include="Config.HID.cs" />
     <Compile Include="Config.IDMatrix.cs" />
     <Compile Include="Config.ULongBoolPair.cs" />
     <Compile Include="DataClasses.cs" />
@@ -107,6 +110,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HIDClasses.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

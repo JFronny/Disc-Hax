@@ -244,5 +244,24 @@ namespace Bot
         private void booruBox_CheckedChanged(object sender, EventArgs e) => Config.data.Booru = booruBox.Checked;
 
         private void debugButton_Click(object sender, EventArgs e) => new System.Threading.Thread(() => MessageBox.Show(Config.data.ToString())).Start();
+
+        private void chanButton_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void playButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void waifuButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void booruButton_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

@@ -11,11 +11,19 @@ namespace Bot
         public class IDMatrix : IEnumerable<ULongBoolPair>
         {
             List<ULongBoolPair> values = new List<ULongBoolPair>();
-            void Remove(ulong ID) => values = values.Where(s => s.Key != ID).ToList();
+
+            void Remove(ulong ID)
+            {
+                values = values.Distinct().ToList();
+                values = values.Where(s => s.Key != ID).ToList();
+                Save();
+            }
+
             void Add(ulong ID, bool field)
             {
                 values.Add(new ULongBoolPair(ID, field));
-                Console.WriteLine(ID);
+                values = values.Distinct().ToList();
+                Save();
             }
 
             public IEnumerator<ULongBoolPair> GetEnumerator() => values.GetEnumerator();
@@ -31,9 +39,9 @@ namespace Bot
             public bool this[ulong ID, bool defalutval]
             {
                 get {
-                    if (values.Where(s => s.Key == ID).Count() == 0)
+                    if (values.Where(s => s.Equals(ID)).Count() == 0)
                         Add(ID, defalutval);
-                    return values.First(s => s.Key == ID).Value;
+                    return values.First(s => s.Equals(ID)).Value;
                 }
                 set {
                     Remove(ID);
