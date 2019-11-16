@@ -39,6 +39,9 @@
     <Reference Include="BooruSharp, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\BooruSharp.1.4.6\lib\net45\BooruSharp.dll</HintPath>
     </Reference>
+    <Reference Include="CC_Functions.Misc, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CC-Functions.Misc.1.0.0\lib\CC_Functions.Misc.dll</HintPath>
+    </Reference>
     <Reference Include="Chan.Net, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Chan.Net.0.0.15\lib\net45\Chan.Net.dll</HintPath>
     </Reference>
@@ -109,15 +112,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\HIDClasses.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\CC-Functions\Misc\Misc.csproj">
-      <Project>{b80d5e09-b935-4602-a173-baf7c1974999}</Project>
-      <Name>Misc</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
