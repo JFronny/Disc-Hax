@@ -71,7 +71,6 @@
     <Compile Include="Commands.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Config.Data.cs" />
-    <Compile Include="Config.HID.cs" />
     <Compile Include="Config.IDMatrix.cs" />
     <Compile Include="Config.ULongBoolPair.cs" />
     <Compile Include="DataClasses.cs" />
@@ -113,6 +112,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\HIDClasses.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\CC-Functions\Misc\Misc.csproj">
+      <Project>{b80d5e09-b935-4602-a173-baf7c1974999}</Project>
+      <Name>Misc</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
