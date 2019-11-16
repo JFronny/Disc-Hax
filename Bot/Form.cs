@@ -1,4 +1,7 @@
-﻿using DSharpPlus;
+﻿using Bot.Properties;
+using Chan.Net;
+using Chan.Net.JsonModel;
+using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using System;
@@ -6,7 +9,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,6 +21,8 @@ namespace Bot
 {
     public partial class Form : System.Windows.Forms.Form
     {
+        public static Form Instance;
+        public Random rnd = new Random();
         Dictionary<BotChannel, List<string>> messageSave = new Dictionary<BotChannel, List<string>>();
         private Task BotThread { get; set; }
         private Bot Bot { get; set; }
@@ -39,6 +46,7 @@ namespace Bot
             channelTree.Enabled = true;
             chatBox.Enabled = true;
             chatSend.Enabled = true;
+            Instance = this;
         }
 
         private async Task BotThreadCallback()
@@ -60,6 +68,8 @@ namespace Bot
         }
 
         private Task BotSendMessageCallback(string text, BotChannel chn) => chn.Channel.SendMessageAsync(text);
+        private Task BotSendMessageCallback(Uri image, string imageTitle, BotChannel chn) => chn.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder { Title = imageTitle, ImageUrl = image.AbsoluteUri });
+
         private Task Bot_Ready(ReadyEventArgs e)
         {
             this.SetProperty(xf => xf.Text, "DiscHax Bot Menu (connected)");
@@ -125,32 +135,28 @@ namespace Bot
 
         private void AddMessage(BotMessage msg, BotChannel channel)
         {
-            string logMsg = "";
-            if (msg.Message.Author.IsCurrent)
-                logMsg = "<SELF>" + msg.Message.Content;
-            else if (msg.Message.Author.IsBot)
-                logMsg = "<BOT>[" + msg.Message.Author.Username + "]" + msg.Message.Content;
-            else
-                logMsg = "<USER>[" + msg.Message.Author.Username + "]" + msg.Message.Content;
-            if (!messageSave.ContainsKey(channel))
-                messageSave.Add(channel, new List<string>());
-            messageSave[channel].Add(logMsg);
-            if ((!ChannelDefined) || channel.Id == SelectedChannel.Id)
+            try
             {
-                chatBox.Items.Add(logMsg);
-                chatBox.SelectedItem = logMsg;
-            }
-            TreeNode tmp1 = channelTree.TopNode;
-            IEnumerable<TreeNode> tmp2 = tmp1.Nodes.OfType<TreeNode>();
-            IEnumerable<TreeNode> tmp3 = tmp2.SelectMany(s => s.Nodes.OfType<TreeNode>());
-            IEnumerable<TreeNode> tmp4 = tmp3.Where(s => ((BotChannel)s.Tag).Id == channel.Id && s.Checked);
-            if (tmp4.Count() > 0)
-                switch (msg.Message.Content.Split(' ')[0])
+                string logMsg = "";
+                if (msg.Message.Author.IsCurrent)
+                    logMsg = "<SELF>" + msg.Message.Content;
+                else if (msg.Message.Author.IsBot)
+                    logMsg = "<BOT>[" + msg.Message.Author.Username + "]" + msg.Message.Content;
+                else
+                    logMsg = "<USER>[" + msg.Message.Author.Username + "]" + msg.Message.Content;
+                if (!messageSave.ContainsKey(channel))
+                    messageSave.Add(channel, new List<string>());
+                messageSave[channel].Add(logMsg);
+                if ((!ChannelDefined) || channel.Id == SelectedChannel.Id)
                 {
-                    case "!play":
-                        SendMessage("No.", channel);
-                        break;
+                    chatBox.Items.Add(logMsg);
+                    chatBox.SelectedItem = logMsg;
                 }
+            }
+            catch (Exception e)
+            {
+                SendMessage("Failed: " + e.Message, channel);
+            }
         }
 
         private void Form_FormClosed(object sender, FormClosedEventArgs e) => TokenSource.Cancel();
@@ -192,6 +198,31 @@ namespace Bot
             _ = continuationAction == null
                 ? Task.Run(() => BotSendMessageCallback(message, channel))
                 : Task.Run(() => BotSendMessageCallback(message, channel)).ContinueWith(continuationAction);
+        }
+
+        void SendMessage(Uri image, string imageTitle, BotChannel channel, Action<Task> continuationAction = null)
+        {
+            using (WebClient client = new WebClient())
+            {
+                try
+                {
+                    using (Stream s = client.OpenRead(image))
+                    {
+                        using (Bitmap img = (Bitmap)Image.FromStream(s))
+                        {
+                            img.Width.ToString();
+                        }
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine("Failed to test image");
+                    return;
+                }
+            }
+            _ = continuationAction == null
+                ? Task.Run(() => BotSendMessageCallback(image, imageTitle, channel))
+                : Task.Run(() => BotSendMessageCallback(image, imageTitle, channel)).ContinueWith(continuationAction);
         }
 
         bool busy = false;

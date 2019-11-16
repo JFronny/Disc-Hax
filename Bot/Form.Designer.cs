@@ -28,13 +28,17 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Guilds");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Guilds");
             this.channelTree = new System.Windows.Forms.TreeView();
             this.chatBox = new System.Windows.Forms.ListBox();
             this.chatPanel = new System.Windows.Forms.Panel();
             this.chatSend = new System.Windows.Forms.TextBox();
             this.settingsPanel = new System.Windows.Forms.Panel();
+            this.playBox = new System.Windows.Forms.CheckBox();
+            this.chanBox = new System.Windows.Forms.CheckBox();
+            this.waifuBox = new System.Windows.Forms.CheckBox();
             this.chatPanel.SuspendLayout();
+            this.settingsPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // channelTree
@@ -44,10 +48,10 @@
             this.channelTree.Enabled = false;
             this.channelTree.Location = new System.Drawing.Point(0, 0);
             this.channelTree.Name = "channelTree";
-            treeNode1.Name = "Guilds";
-            treeNode1.Text = "Guilds";
+            treeNode2.Name = "Guilds";
+            treeNode2.Text = "Guilds";
             this.channelTree.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1});
+            treeNode2});
             this.channelTree.Size = new System.Drawing.Size(166, 310);
             this.channelTree.TabIndex = 0;
             this.channelTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.channelTree_AfterCheck);
@@ -85,16 +89,50 @@
             // 
             // settingsPanel
             // 
+            this.settingsPanel.Controls.Add(this.waifuBox);
+            this.settingsPanel.Controls.Add(this.playBox);
+            this.settingsPanel.Controls.Add(this.chanBox);
             this.settingsPanel.Dock = System.Windows.Forms.DockStyle.Right;
             this.settingsPanel.Location = new System.Drawing.Point(678, 0);
             this.settingsPanel.Name = "settingsPanel";
             this.settingsPanel.Size = new System.Drawing.Size(200, 310);
             this.settingsPanel.TabIndex = 3;
             // 
+            // playBox
+            // 
+            this.playBox.AutoSize = true;
+            this.playBox.Location = new System.Drawing.Point(6, 35);
+            this.playBox.Name = "playBox";
+            this.playBox.Size = new System.Drawing.Size(97, 17);
+            this.playBox.TabIndex = 1;
+            this.playBox.Text = "!play command";
+            this.playBox.UseVisualStyleBackColor = true;
+            // 
+            // chanBox
+            // 
+            this.chanBox.AutoSize = true;
+            this.chanBox.Location = new System.Drawing.Point(6, 12);
+            this.chanBox.Name = "chanBox";
+            this.chanBox.Size = new System.Drawing.Size(108, 17);
+            this.chanBox.TabIndex = 0;
+            this.chanBox.Text = "!4chan command";
+            this.chanBox.UseVisualStyleBackColor = true;
+            // 
+            // waifuBox
+            // 
+            this.waifuBox.AutoSize = true;
+            this.waifuBox.Location = new System.Drawing.Point(6, 58);
+            this.waifuBox.Name = "waifuBox";
+            this.waifuBox.Size = new System.Drawing.Size(103, 17);
+            this.waifuBox.TabIndex = 2;
+            this.waifuBox.Text = "!waifu command";
+            this.waifuBox.UseVisualStyleBackColor = true;
+            // 
             // Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(878, 310);
             this.Controls.Add(this.chatPanel);
             this.Controls.Add(this.channelTree);
@@ -105,17 +143,22 @@
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form_FormClosed);
             this.chatPanel.ResumeLayout(false);
             this.chatPanel.PerformLayout();
+            this.settingsPanel.ResumeLayout(false);
+            this.settingsPanel.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.TreeView channelTree;
-        private System.Windows.Forms.ListBox chatBox;
-        private System.Windows.Forms.Panel chatPanel;
-        private System.Windows.Forms.TextBox chatSend;
-        private System.Windows.Forms.Panel settingsPanel;
+        public System.Windows.Forms.TreeView channelTree;
+        public System.Windows.Forms.ListBox chatBox;
+        public System.Windows.Forms.Panel chatPanel;
+        public System.Windows.Forms.TextBox chatSend;
+        public System.Windows.Forms.Panel settingsPanel;
+        public System.Windows.Forms.CheckBox chanBox;
+        public System.Windows.Forms.CheckBox playBox;
+        public System.Windows.Forms.CheckBox waifuBox;
     }
 }
 
