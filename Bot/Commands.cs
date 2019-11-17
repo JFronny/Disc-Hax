@@ -69,7 +69,7 @@ namespace Bot
                 await postMessage.Invoke("No.", false, null);
         }
 
-        [Command("beemovie"), Description("Sends the a quote from the bee movie script as TTS.")]
+        [Command("beemovie"), Description("Sends a quote from the bee movie script as TTS")]
         public async Task Bees(CommandContext ctx) => await Bees((c1, c2, c3) => ctx.RespondAsync(c1, c2, c3));
 
         public static async Task Bees(Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
@@ -95,7 +95,7 @@ namespace Bot
         public static async Task Ping(Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage) => await postMessage.Invoke("Pong", false, null);
 
 
-        [Command("booru"), Description("Shows a random Image from danbooru")]
+        [Command("booru"), Description("Shows a random Image from danbooru or rule34.xxx")]
         public async Task Booru(CommandContext ctx, [Description("Tags for image selection")] params string[] args) => await Booru(args, ctx.Channel, (c1, c2, c3) => ctx.RespondAsync(c1, c2, c3));
 
         public static async Task Booru(string[] args, DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
