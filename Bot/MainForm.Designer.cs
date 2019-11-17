@@ -1,6 +1,6 @@
 ﻿namespace Bot
 {
-    partial class Form
+    partial class MainForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,25 +28,27 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Guilds");
+            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Guilds");
             this.channelTree = new System.Windows.Forms.TreeView();
             this.chatBox = new System.Windows.Forms.ListBox();
             this.chatPanel = new System.Windows.Forms.Panel();
             this.chatSend = new System.Windows.Forms.TextBox();
             this.settingsPanel = new System.Windows.Forms.Panel();
+            this.pingButton = new System.Windows.Forms.Button();
+            this.debugButton = new System.Windows.Forms.Button();
+            this.configButton = new System.Windows.Forms.Button();
+            this.configBox = new System.Windows.Forms.CheckBox();
+            this.nsfwBox = new System.Windows.Forms.CheckBox();
             this.booruButton = new System.Windows.Forms.Button();
             this.waifuButton = new System.Windows.Forms.Button();
             this.playButton = new System.Windows.Forms.Button();
             this.chanButton = new System.Windows.Forms.Button();
-            this.debugButton = new System.Windows.Forms.Button();
             this.booruBox = new System.Windows.Forms.CheckBox();
             this.waifuBox = new System.Windows.Forms.CheckBox();
             this.playBox = new System.Windows.Forms.CheckBox();
             this.chanBox = new System.Windows.Forms.CheckBox();
-            this.nsfwBox = new System.Windows.Forms.CheckBox();
-            this.configButton = new System.Windows.Forms.Button();
-            this.configBox = new System.Windows.Forms.CheckBox();
-            this.pingButton = new System.Windows.Forms.Button();
+            this.beemovieBox = new System.Windows.Forms.CheckBox();
+            this.beemovieButton = new System.Windows.Forms.Button();
             this.chatPanel.SuspendLayout();
             this.settingsPanel.SuspendLayout();
             this.SuspendLayout();
@@ -58,10 +60,10 @@
             this.channelTree.Enabled = false;
             this.channelTree.Location = new System.Drawing.Point(0, 0);
             this.channelTree.Name = "channelTree";
-            treeNode1.Name = "Guilds";
-            treeNode1.Text = "Guilds";
+            treeNode4.Name = "Guilds";
+            treeNode4.Text = "Guilds";
             this.channelTree.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1});
+            treeNode4});
             this.channelTree.Size = new System.Drawing.Size(166, 310);
             this.channelTree.TabIndex = 0;
             this.channelTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.channelTree_AfterCheck);
@@ -99,6 +101,8 @@
             // 
             // settingsPanel
             // 
+            this.settingsPanel.Controls.Add(this.beemovieButton);
+            this.settingsPanel.Controls.Add(this.beemovieBox);
             this.settingsPanel.Controls.Add(this.pingButton);
             this.settingsPanel.Controls.Add(this.debugButton);
             this.settingsPanel.Controls.Add(this.configButton);
@@ -117,6 +121,60 @@
             this.settingsPanel.Name = "settingsPanel";
             this.settingsPanel.Size = new System.Drawing.Size(200, 310);
             this.settingsPanel.TabIndex = 3;
+            // 
+            // pingButton
+            // 
+            this.pingButton.Location = new System.Drawing.Point(136, 150);
+            this.pingButton.Name = "pingButton";
+            this.pingButton.Size = new System.Drawing.Size(52, 23);
+            this.pingButton.TabIndex = 12;
+            this.pingButton.Text = "Ping";
+            this.pingButton.UseVisualStyleBackColor = true;
+            this.pingButton.Click += new System.EventHandler(this.pingButton_Click);
+            // 
+            // debugButton
+            // 
+            this.debugButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.debugButton.Location = new System.Drawing.Point(145, 284);
+            this.debugButton.Name = "debugButton";
+            this.debugButton.Size = new System.Drawing.Size(52, 23);
+            this.debugButton.TabIndex = 4;
+            this.debugButton.Text = "SaveEx";
+            this.debugButton.UseVisualStyleBackColor = true;
+            this.debugButton.Click += new System.EventHandler(this.debugButton_Click);
+            // 
+            // configButton
+            // 
+            this.configButton.Location = new System.Drawing.Point(136, 123);
+            this.configButton.Name = "configButton";
+            this.configButton.Size = new System.Drawing.Size(52, 23);
+            this.configButton.TabIndex = 11;
+            this.configButton.Text = "Run";
+            this.configButton.UseVisualStyleBackColor = true;
+            this.configButton.Click += new System.EventHandler(this.configButton_Click);
+            // 
+            // configBox
+            // 
+            this.configBox.AutoSize = true;
+            this.configBox.Location = new System.Drawing.Point(6, 127);
+            this.configBox.Name = "configBox";
+            this.configBox.Size = new System.Drawing.Size(107, 17);
+            this.configBox.TabIndex = 10;
+            this.configBox.Text = "!config command";
+            this.configBox.UseVisualStyleBackColor = true;
+            this.configBox.CheckedChanged += new System.EventHandler(this.configBox_CheckedChanged);
+            // 
+            // nsfwBox
+            // 
+            this.nsfwBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.nsfwBox.AutoSize = true;
+            this.nsfwBox.Location = new System.Drawing.Point(6, 288);
+            this.nsfwBox.Name = "nsfwBox";
+            this.nsfwBox.Size = new System.Drawing.Size(144, 17);
+            this.nsfwBox.TabIndex = 9;
+            this.nsfwBox.Text = "Allow NSFW everywhere";
+            this.nsfwBox.UseVisualStyleBackColor = true;
+            this.nsfwBox.CheckedChanged += new System.EventHandler(this.nsfwBox_CheckedChanged);
             // 
             // booruButton
             // 
@@ -157,17 +215,6 @@
             this.chanButton.Text = "Run";
             this.chanButton.UseVisualStyleBackColor = true;
             this.chanButton.Click += new System.EventHandler(this.chanButton_Click);
-            // 
-            // debugButton
-            // 
-            this.debugButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.debugButton.Location = new System.Drawing.Point(145, 284);
-            this.debugButton.Name = "debugButton";
-            this.debugButton.Size = new System.Drawing.Size(52, 23);
-            this.debugButton.TabIndex = 4;
-            this.debugButton.Text = "SaveEx";
-            this.debugButton.UseVisualStyleBackColor = true;
-            this.debugButton.Click += new System.EventHandler(this.debugButton_Click);
             // 
             // booruBox
             // 
@@ -213,50 +260,28 @@
             this.chanBox.UseVisualStyleBackColor = true;
             this.chanBox.CheckedChanged += new System.EventHandler(this.chanBox_CheckedChanged);
             // 
-            // nsfwBox
+            // beemovieBox
             // 
-            this.nsfwBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.nsfwBox.AutoSize = true;
-            this.nsfwBox.Location = new System.Drawing.Point(6, 288);
-            this.nsfwBox.Name = "nsfwBox";
-            this.nsfwBox.Size = new System.Drawing.Size(144, 17);
-            this.nsfwBox.TabIndex = 9;
-            this.nsfwBox.Text = "Allow NSFW everywhere";
-            this.nsfwBox.UseVisualStyleBackColor = true;
-            this.nsfwBox.CheckedChanged += new System.EventHandler(this.nsfwBox_CheckedChanged);
+            this.beemovieBox.AutoSize = true;
+            this.beemovieBox.Location = new System.Drawing.Point(6, 104);
+            this.beemovieBox.Name = "beemovieBox";
+            this.beemovieBox.Size = new System.Drawing.Size(124, 17);
+            this.beemovieBox.TabIndex = 13;
+            this.beemovieBox.Text = "!beemovie command";
+            this.beemovieBox.UseVisualStyleBackColor = true;
+            this.beemovieBox.CheckedChanged += new System.EventHandler(this.beemovieBox_CheckedChanged);
             // 
-            // configButton
+            // beemovieButton
             // 
-            this.configButton.Location = new System.Drawing.Point(136, 100);
-            this.configButton.Name = "configButton";
-            this.configButton.Size = new System.Drawing.Size(52, 23);
-            this.configButton.TabIndex = 11;
-            this.configButton.Text = "Run";
-            this.configButton.UseVisualStyleBackColor = true;
-            this.configButton.Click += new System.EventHandler(this.configButton_Click);
+            this.beemovieButton.Location = new System.Drawing.Point(136, 100);
+            this.beemovieButton.Name = "beemovieButton";
+            this.beemovieButton.Size = new System.Drawing.Size(52, 23);
+            this.beemovieButton.TabIndex = 14;
+            this.beemovieButton.Text = "Run";
+            this.beemovieButton.UseVisualStyleBackColor = true;
+            this.beemovieButton.Click += new System.EventHandler(this.beemovieButton_Click);
             // 
-            // configBox
-            // 
-            this.configBox.AutoSize = true;
-            this.configBox.Location = new System.Drawing.Point(6, 104);
-            this.configBox.Name = "configBox";
-            this.configBox.Size = new System.Drawing.Size(107, 17);
-            this.configBox.TabIndex = 10;
-            this.configBox.Text = "!config command";
-            this.configBox.UseVisualStyleBackColor = true;
-            this.configBox.CheckedChanged += new System.EventHandler(this.configBox_CheckedChanged);
-            // 
-            // pingButton
-            // 
-            this.pingButton.Location = new System.Drawing.Point(136, 123);
-            this.pingButton.Name = "pingButton";
-            this.pingButton.Size = new System.Drawing.Size(52, 23);
-            this.pingButton.TabIndex = 12;
-            this.pingButton.Text = "Ping";
-            this.pingButton.UseVisualStyleBackColor = true;
-            this.pingButton.Click += new System.EventHandler(this.pingButton_Click);
-            // 
-            // Form
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -266,7 +291,7 @@
             this.Controls.Add(this.channelTree);
             this.Controls.Add(this.settingsPanel);
             this.MaximizeBox = false;
-            this.Name = "Form";
+            this.Name = "MainForm";
             this.Text = "DiscHax Bot Menu";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form_FormClosed);
             this.chatPanel.ResumeLayout(false);
@@ -297,6 +322,8 @@
         private System.Windows.Forms.Button configButton;
         public System.Windows.Forms.CheckBox configBox;
         private System.Windows.Forms.Button pingButton;
+        private System.Windows.Forms.CheckBox beemovieBox;
+        private System.Windows.Forms.Button beemovieButton;
     }
 }
 

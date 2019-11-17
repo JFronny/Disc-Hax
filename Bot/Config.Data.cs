@@ -15,6 +15,7 @@ namespace Bot
             private string key;
             private bool nsfw;
             private bool config;
+            private bool bees;
 
             public bool Chan
             {
@@ -109,6 +110,17 @@ namespace Bot
                 }
             }
 
+            public bool Bees
+            {
+                get {
+                    return bees;
+                }
+                set {
+                    bees = value;
+                    Save();
+                }
+            }
+
             public override string ToString() => ToString(true);
 
             public string ToString(bool hideSensitiveInfo)
@@ -118,6 +130,7 @@ namespace Bot
                     "\r\nWaifu: " + Waifu.ToString() +
                     "\r\nBooru: " + Booru.ToString() +
                     "\r\nNSFW: " + Nsfw.ToString() +
+                    "\r\nBees: " + Bees.ToString() +
                     "\r\nConfig: " + Config.ToString();
                 if (!hideSensitiveInfo)
                     msg += "\r\nKey: " + new string('*', Key.Length - 4) + Key.Substring(Key.Length - 5, 4) +

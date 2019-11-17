@@ -20,9 +20,9 @@ using System.Windows.Forms;
 
 namespace Bot
 {
-    public partial class Form : System.Windows.Forms.Form
+    public partial class MainForm : System.Windows.Forms.Form
     {
-        public static Form Instance;
+        public static MainForm Instance;
         public Random rnd = new Random();
         Dictionary<BotChannel, List<string>> messageSave = new Dictionary<BotChannel, List<string>>();
         private Task BotThread { get; set; }
@@ -31,7 +31,7 @@ namespace Bot
         private BotGuild SelectedGuild { get; set; }
         private BotChannel SelectedChannel { get; set; }
         bool ChannelDefined = false;
-        public Form()
+        public MainForm()
         {
             InitializeComponent();
             Bot = new Bot(Program.cfg);
@@ -54,6 +54,7 @@ namespace Bot
             waifuBox.Checked = Config.data.Waifu;
             nsfwBox.Checked = Config.data.Nsfw;
             configBox.Checked = Config.data.Config;
+            beemovieBox.Checked = Config.data.Bees;
         }
 
         private async Task BotThreadCallback()
@@ -242,6 +243,8 @@ namespace Bot
 
         private void configBox_CheckedChanged(object sender, EventArgs e) => Config.data.Config = configBox.Checked;
 
+        private void beemovieBox_CheckedChanged(object sender, EventArgs e) => Config.data.Bees = beemovieBox.Checked;
+
         private void debugButton_Click(object sender, EventArgs e) => new System.Threading.Thread(() => MessageBox.Show(Config.data.ToString(false))).Start();
 
         void SendMessage(string message, BotChannel channel, Action<Task> continuationAction = null)
@@ -294,6 +297,12 @@ namespace Bot
         {
             if (ChannelDefined)
                 _ = Commands.Ping((c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
+        }
+
+        private void beemovieButton_Click(object sender, EventArgs e)
+        {
+            if (ChannelDefined)
+                _ = Commands.Bees((c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
         }
     }
 }

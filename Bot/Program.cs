@@ -36,7 +36,7 @@ namespace Bot
                 i++;
             }
             Config.data.Key = inp;
-            Application.Run(new Form());
+            Application.Run(new MainForm());
         }
     }
 }

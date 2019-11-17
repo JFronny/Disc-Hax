@@ -12,6 +12,7 @@ using DSharpPlus.Entities;
 using BooruSharp;
 using BooruSharp.Booru;
 using BooruSharp.Search.Post;
+using HtmlAgilityPack;
 
 namespace Bot
 {
@@ -39,7 +40,7 @@ namespace Bot
                     if (Channel.IsNSFW || Config.data.Nsfw)
                     {
                         Thread[] threads = b.GetThreads().ToArray();
-                        Thread t = threads[Form.Instance.rnd.Next(threads.Length)];
+                        Thread t = threads[MainForm.Instance.rnd.Next(threads.Length)];
                         await postMessage.Invoke("https://boards.4channel.org/" + t.Board.BoardId + "/thread/" + t.PostNumber, false, new DiscordEmbedBuilder { Title = t.Name + "#" + t.Id + ": " + (string.IsNullOrWhiteSpace(t.Subject) ? "Untitled" : t.Subject), ImageUrl = t.Image.Image.AbsoluteUri });
                     }
                     else
@@ -54,7 +55,7 @@ namespace Bot
         {
             if (Config.data.Waifu)
                 if (Channel.IsNSFW || Config.data.Nsfw || args.Contains("f"))
-                    await postMessage.Invoke(null, false, new DiscordEmbedBuilder { Title = "There.", ImageUrl = "https://www.thiswaifudoesnotexist.net/example-" + Form.Instance.rnd.Next(6000).ToString() + ".jpg" });
+                    await postMessage.Invoke(null, false, new DiscordEmbedBuilder { Title = "There.", ImageUrl = "https://www.thiswaifudoesnotexist.net/example-" + MainForm.Instance.rnd.Next(6000).ToString() + ".jpg" });
                 else
                     await postMessage.Invoke("The generated waifus might not be something you want to be looking at at work.", false, null);
         }
@@ -67,6 +68,26 @@ namespace Bot
             if (Config.data.Play)
                 await postMessage.Invoke("No.", false, null);
         }
+
+        [Command("beemovie"), Description("Sends the a quote from the bee movie script as TTS.")]
+        public async Task Bees(CommandContext ctx) => await Bees((c1, c2, c3) => ctx.RespondAsync(c1, c2, c3));
+
+        public static async Task Bees(Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
+        {
+            if (Config.data.Bees)
+            {
+                if (_beequotes == null)
+                {
+                    _beequotes = new HtmlWeb().Load("http://www.script-o-rama.com/movie_scripts/a1/bee-movie-script-transcript-seinfeld.html")
+                        .DocumentNode.SelectSingleNode("//body/pre").InnerText.Split(new string[] { "\n\n  \n" }, StringSplitOptions.None);
+                    _beequotes[0] = _beequotes[0].Replace("  \n  \n", "");
+                }
+                int q = MainForm.Instance.rnd.Next(_beequotes.Length - 2);
+                await postMessage.Invoke((_beequotes[q] + "\n\n" + _beequotes[q + 1] + "\n\n" + _beequotes[q + 2]).Replace("\n", "\r\n"), true, null);
+            }
+        }
+
+        static string[] _beequotes;
 
         [Command("ping"), Description("Responds with \"Pong\" if the bot is active")]
         public async Task Ping(CommandContext ctx) => await Ping((c1, c2, c3) => ctx.RespondAsync(c1, c2, c3));

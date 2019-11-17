@@ -5,11 +5,13 @@ VisualStudioVersion = 16.0.29509.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bot", "Bot\Bot.csproj", "{28566F75-5BA5-481F-95A6-B1773A78F3FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageBoardScraper", "Cleverbot\ImageBoardScraper.csproj", "{4458C81F-8E8F-47B8-BADF-8D583DCD02FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "4chanI", "Cleverbot\4chanI.csproj", "{4458C81F-8E8F-47B8-BADF-8D583DCD02FE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WaifuGen", "WaifuGen\WaifuGen.csproj", "{626FEC08-A926-4DF2-B769-69CE9467284D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Booru", "Booru\Booru.csproj", "{D7E591B3-C165-45CC-A535-CA2BC26883F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeMovie", "BeeMovie\BeeMovie.csproj", "{C4D0ACF1-AC73-4E63-97E9-FCC4309E937F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{D7E591B3-C165-45CC-A535-CA2BC26883F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D7E591B3-C165-45CC-A535-CA2BC26883F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D7E591B3-C165-45CC-A535-CA2BC26883F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4D0ACF1-AC73-4E63-97E9-FCC4309E937F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4D0ACF1-AC73-4E63-97E9-FCC4309E937F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4D0ACF1-AC73-4E63-97E9-FCC4309E937F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4D0ACF1-AC73-4E63-97E9-FCC4309E937F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
