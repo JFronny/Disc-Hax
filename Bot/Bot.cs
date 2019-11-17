@@ -22,19 +22,19 @@ namespace Bot
             {
                 StringPrefix = "!"
             });
-            Commands.CommandExecuted += Commands_CommandExecuted; ;
-            Commands.CommandErrored += Commands_CommandErrored; ;
+            Commands.CommandExecuted += Commands_CommandExecuted;
+            Commands.CommandErrored += Commands_CommandErrored;
             Commands.RegisterCommands<Commands>();
             Client.DebugLogger.LogMessageReceived += DebugLogger_LogMessageReceived;
         }
 
         private async Task Commands_CommandErrored(CommandErrorEventArgs e)
         {
-            e.Context.Client.DebugLogger.LogMessage(LogLevel.Error, "ExampleBot", $"{e.Context.User.Username} tried executing '{e.Command?.QualifiedName ?? "<unknown command>"}' but it errored: {e.Exception.GetType()}: {e.Exception.Message ?? "<no message>"}", DateTime.Now);
+            e.Context.Client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax", $"{e.Context.User.Username} tried executing '{e.Command?.QualifiedName ?? "<unknown command>"}' but it errored: {e.Exception.GetType()}: {e.Exception.Message ?? "<no message>"}", DateTime.Now);
             if (e.Exception is ChecksFailedException ex)
             {
-                var emoji = DiscordEmoji.FromName(e.Context.Client, ":no_entry:");
-                var embed = new DiscordEmbedBuilder
+                DiscordEmoji emoji = DiscordEmoji.FromName(e.Context.Client, ":no_entry:");
+                DiscordEmbedBuilder embed = new DiscordEmbedBuilder
                 {
                     Title = "Access denied",
                     Description = $"{emoji} You do not have the permissions required to execute this command.",
@@ -46,15 +46,12 @@ namespace Bot
 
         private Task Commands_CommandExecuted(CommandExecutionEventArgs e)
         {
-            e.Context.Client.DebugLogger.LogMessage(LogLevel.Info, "ExampleBot", $"{e.Context.User.Username} successfully executed '{e.Command.QualifiedName}'", DateTime.Now);
+            e.Context.Client.DebugLogger.LogMessage(LogLevel.Info, "DiscHax", $"{e.Context.User.Username} successfully executed '{e.Command.QualifiedName}'", DateTime.Now);
             return Task.CompletedTask;
         }
 
         public Task StartAsync() => Client.ConnectAsync();
-        public Task StopAsync()
-        {
-            return Client.DisconnectAsync();
-        }
+        public Task StopAsync() => Client.DisconnectAsync();
 
         private void DebugLogger_LogMessageReceived(object sender, DebugLogMessageEventArgs e) => Debug.WriteLine($"[{e.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")}] [{e.Application}] [{e.Level}] {e.Message}");
     }

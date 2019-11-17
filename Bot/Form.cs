@@ -263,37 +263,37 @@ namespace Bot
         private void chanButton_Click(object sender, EventArgs e)
         {
             if (ChannelDefined)
-                Commands.Chan(new string[] { Interaction.InputBox("Please select a channel") }, SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
+                _ = Commands.Chan(new string[] { Interaction.InputBox("Please select a channel") }, SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
         }
 
         private void playButton_Click(object sender, EventArgs e)
         {
             if (ChannelDefined)
-                Commands.Play((c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
+                _ = Commands.Play((c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
         }
 
         private void waifuButton_Click(object sender, EventArgs e)
         {
             if (ChannelDefined)
-                Commands.Waifu(new string[] { "f" }, SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
+                _ = Commands.Waifu(new string[] { "f" }, SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
         }
 
         private void booruButton_Click(object sender, EventArgs e)
         {
             if (ChannelDefined)
-                Commands.Booru(new string[] { Interaction.InputBox("Please select categories") }, SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
+                _ = Commands.Booru(new string[] { Interaction.InputBox("Please select categories") }, SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
         }
 
         private void configButton_Click(object sender, EventArgs e)
         {
             if (ChannelDefined)
-                Commands.ConfigCmd((c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
+                _ = Commands.ConfigCmd((c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
         }
 
         private void pingButton_Click(object sender, EventArgs e)
         {
             if (ChannelDefined)
-                Commands.Ping((c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
+                _ = Commands.Ping((c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
         }
     }
 }
