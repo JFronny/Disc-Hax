@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DSharpPlus.Entities;
+using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Windows.Forms;
@@ -128,5 +129,7 @@ namespace Bot
             // the result
             return (TResult)dlg.DynamicInvoke(args);
         }
+
+        public static bool getEvaluatedNSFW(this DiscordChannel Channel) => Channel.IsNSFW || Config.data.Nsfw;
     }
 }

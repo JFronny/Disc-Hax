@@ -28,7 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Guilds");
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Guilds");
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.channelTree = new System.Windows.Forms.TreeView();
             this.chatBox = new System.Windows.Forms.ListBox();
             this.chatPanel = new System.Windows.Forms.Panel();
@@ -60,10 +61,10 @@
             this.channelTree.Enabled = false;
             this.channelTree.Location = new System.Drawing.Point(0, 0);
             this.channelTree.Name = "channelTree";
-            treeNode4.Name = "Guilds";
-            treeNode4.Text = "Guilds";
+            treeNode1.Name = "Guilds";
+            treeNode1.Text = "Guilds";
             this.channelTree.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode4});
+            treeNode1});
             this.channelTree.Size = new System.Drawing.Size(166, 310);
             this.channelTree.TabIndex = 0;
             this.channelTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.channelTree_AfterCheck);
@@ -290,7 +291,8 @@
             this.Controls.Add(this.chatPanel);
             this.Controls.Add(this.channelTree);
             this.Controls.Add(this.settingsPanel);
-            this.MaximizeBox = false;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MinimumSize = new System.Drawing.Size(555, 243);
             this.Name = "MainForm";
             this.Text = "DiscHax Bot Menu";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form_FormClosed);

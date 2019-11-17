@@ -37,7 +37,7 @@ namespace Bot
                 else
                 {
                     Board b = new Board(args[0]);
-                    if (Channel.IsNSFW || Config.data.Nsfw)
+                    if (Channel.getEvaluatedNSFW())
                     {
                         Thread[] threads = b.GetThreads().ToArray();
                         Thread t = threads[MainForm.Instance.rnd.Next(threads.Length)];
@@ -54,10 +54,10 @@ namespace Bot
         public static async Task Waifu(string[] args, DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
             if (Config.data.Waifu)
-                if (Channel.IsNSFW || Config.data.Nsfw || args.Contains("f"))
+                if (Channel.getEvaluatedNSFW() || args.Contains("f"))
                     await postMessage.Invoke(null, false, new DiscordEmbedBuilder { Title = "There.", ImageUrl = "https://www.thiswaifudoesnotexist.net/example-" + MainForm.Instance.rnd.Next(6000).ToString() + ".jpg" });
                 else
-                    await postMessage.Invoke("The generated waifus might not be something you want to be looking at at work.", false, null);
+                    await postMessage.Invoke("The generated waifus might not be something you want to be looking at at work. You can override this with the \"f\"-Flag", false, null);
         }
 
         [Command("play"), Description("Sends \"No.\" to the chat. For users used to RhythmBot.")]
@@ -103,12 +103,12 @@ namespace Bot
 
             if (Config.data.Booru)
             {
-                SearchResult result = await (Channel.IsNSFW || Config.data.Nsfw ? (Booru)new Rule34() : new Gelbooru()).GetRandomImage(args);
-                while (result.rating != (Channel.IsNSFW || Config.data.Nsfw ? Rating.Safe : Rating.Explicit))
+                SearchResult result = await (Channel.getEvaluatedNSFW() ? (Booru)new Rule34() : new Gelbooru()).GetRandomImage(args);
+                while (result.rating != (Channel.getEvaluatedNSFW() ? Rating.Explicit : Rating.Safe))
                 {
                     result = await new Gelbooru().GetRandomImage(args);
                 }
-                await postMessage.Invoke(null, false, new DiscordEmbedBuilder { Title = "There.", Description = string.Join(", ", result.tags), ImageUrl = result.fileUrl.AbsoluteUri });
+                await postMessage.Invoke(null, false, new DiscordEmbedBuilder { Title = result.source, Description = string.Join(", ", result.tags), ImageUrl = result.fileUrl.AbsoluteUri });
             }
         }
 
