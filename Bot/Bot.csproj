@@ -79,8 +79,9 @@
   <ItemGroup>
     <Compile Include="Bot.cs" />
     <Compile Include="Commands.cs" />
-    <Compile Include="Config.cs" />
-    <Compile Include="Config.Data.cs" />
+    <Compile Include="Config\ChannelConfig.cs" />
+    <Compile Include="Config\ChCfgMgr.cs" />
+    <Compile Include="Config\TokenContainer.cs" />
     <Compile Include="DataClasses.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="MainForm.cs">

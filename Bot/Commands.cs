@@ -13,6 +13,7 @@ using BooruSharp;
 using BooruSharp.Booru;
 using BooruSharp.Search.Post;
 using HtmlAgilityPack;
+using Bot.Config;
 
 namespace Bot
 {
@@ -23,7 +24,7 @@ namespace Bot
 
         public static async Task Chan(string[] args, DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (Config.data.Chan)
+            if (ChCfgMgr.getCh(Channel.Id).Chan)
                 if (args.Length == 0)
                 {
                     List<string> lmsg = new List<string>();
@@ -53,7 +54,7 @@ namespace Bot
 
         public static async Task Waifu(string[] args, DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (Config.data.Waifu)
+            if (ChCfgMgr.getCh(Channel.Id).Waifu)
                 if (Channel.getEvaluatedNSFW() || args.Contains("f"))
                     await postMessage.Invoke(null, false, new DiscordEmbedBuilder { Title = "There.", ImageUrl = "https://www.thiswaifudoesnotexist.net/example-" + MainForm.Instance.rnd.Next(6000).ToString() + ".jpg" });
                 else
@@ -61,20 +62,20 @@ namespace Bot
         }
 
         [Command("play"), Description("Sends \"No.\" to the chat. For users used to RhythmBot.")]
-        public async Task Play(CommandContext ctx) => await Play((c1, c2, c3) => ctx.RespondAsync(c1, c2, c3));
+        public async Task Play(CommandContext ctx) => await Play(ctx.Channel, (c1, c2, c3) => ctx.RespondAsync(c1, c2, c3));
 
-        public static async Task Play(Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
+        public static async Task Play(DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (Config.data.Play)
+            if (ChCfgMgr.getCh(Channel.Id).Play)
                 await postMessage.Invoke("No.", false, null);
         }
 
         [Command("beemovie"), Description("Sends a quote from the bee movie script as TTS")]
-        public async Task Bees(CommandContext ctx) => await Bees((c1, c2, c3) => ctx.RespondAsync(c1, c2, c3));
+        public async Task Bees(CommandContext ctx) => await Bees(ctx.Channel, (c1, c2, c3) => ctx.RespondAsync(c1, c2, c3));
 
-        public static async Task Bees(Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
+        public static async Task Bees(DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (Config.data.Bees)
+            if (ChCfgMgr.getCh(Channel.Id).Bees)
             {
                 if (_beequotes == null)
                 {
@@ -101,7 +102,7 @@ namespace Bot
         public static async Task Booru(string[] args, DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
 
-            if (Config.data.Booru)
+            if (ChCfgMgr.getCh(Channel.Id).Booru)
             {
                 SearchResult result = await (Channel.getEvaluatedNSFW() ? (Booru)new Rule34() : new Gelbooru()).GetRandomImage(args);
                 while (result.rating != (Channel.getEvaluatedNSFW() ? Rating.Explicit : Rating.Safe))
@@ -113,12 +114,12 @@ namespace Bot
         }
 
         [Command("config"), Description("Prints the DiscHax-bot config"), RequireUserPermissions(Permissions.Administrator)]
-        public async Task ConfigCmd(CommandContext ctx) => await ctx.RespondAsync(Config.data.ToString(true));
+        public async Task ConfigCmd(CommandContext ctx) => await ConfigCmd(ctx.Channel, (c1, c2, c3) => ctx.RespondAsync(c1, c2, c3));
 
-        public static async Task ConfigCmd(Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
+        public static async Task ConfigCmd(DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (Config.data.Config)
-                await postMessage.Invoke(Config.data.ToString(true), false, null);
+            if (ChCfgMgr.getCh(Channel.Id).Config)
+                await postMessage.Invoke(ChCfgMgr.getCh(Channel.Id).ToString(true), false, null);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using DSharpPlus.Entities;
+﻿using Bot.Config;
+using DSharpPlus.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -7,137 +8,106 @@ using System.Windows.Forms;
 
 namespace Bot
 {
-    // these delegates are used for invoking respective methods between threads
     public delegate void SetPropertyDelegate<TCtl, TProp>(TCtl control, Expression<Func<TCtl, TProp>> propexpr, TProp value) where TCtl : Control;
     public delegate TProp GetPropertyDelegate<TCtl, TProp>(TCtl control, Expression<Func<TProp>> propexpr) where TCtl : Control;
     public delegate void InvokeActionDelegate<TCtl>(TCtl control, Delegate dlg, params object[] args) where TCtl : Control;
     public delegate TResult InvokeFuncDelegate<TCtl, TResult>(TCtl control, Delegate dlg, params object[] args) where TCtl : Control;
 
-    // these are various convenience extensions for thread-safe ui mutation
     public static class Extensions
     {
-        // this method modifies specified property, assigning it the given value
-        // usage is control.SetProperty(x => x.Property, value)
         public static void SetProperty<TCtl, TProp>(this TCtl control, Expression<Func<TCtl, TProp>> propexpr, TProp value) where TCtl : Control
         {
-            // check for nulls
             if (control == null)
                 throw new ArgumentNullException(nameof(control));
 
             if (propexpr == null)
                 throw new ArgumentNullException(nameof(propexpr));
-
-            // check if cross-thread invocation is required
             if (control.InvokeRequired)
             {
-                // if it is, perform it
-                // this will invoke this method from (hopefully) the control's thread
                 control.Invoke(new SetPropertyDelegate<TCtl, TProp>(SetProperty), control, propexpr, value);
                 return;
             }
-
-            // get the body of the expression, check if it's an expression that 
-            // results in a class member being passed
             var propexprm = propexpr.Body as MemberExpression;
             if (propexprm == null)
                 throw new ArgumentException("Invalid member expression.", nameof(propexpr));
-
-            // get the member from the expression body, and check if it's a property
             var prop = propexprm.Member as PropertyInfo;
             if (prop == null)
                 throw new ArgumentException("Invalid property supplied.", nameof(propexpr));
-
-            // finally, set the value of the property to the supplied one
             prop.SetValue(control, value);
         }
 
-        // this method reads the value of specified property, and returns it
-        // usage is control.GetProperty(x => x.Property)
         public static TProp GetProperty<TCtl, TProp>(this TCtl control, Expression<Func<TProp>> propexpr) where TCtl : Control
         {
-            // check for nulls
             if (control == null)
                 throw new ArgumentNullException(nameof(control));
-
             if (propexpr == null)
                 throw new ArgumentNullException(nameof(propexpr));
-
-            // check if cross-thread invocation is required
-            // if it is, perform it
-            // this will invoke this method from (hopefully) the control's thread
             if (control.InvokeRequired)
                 return (TProp)control.Invoke(new GetPropertyDelegate<TCtl, TProp>(GetProperty), control, propexpr);
-
-            // get the body of the expression, check if it's an expression that 
-            // results in a class member being passed
             var propexprm = propexpr.Body as MemberExpression;
             if (propexprm == null)
                 throw new ArgumentException("Invalid member expression.", nameof(propexpr));
-
-            // get the member from the expression body, and check if it's a property
             var prop = propexprm.Member as PropertyInfo;
             if (prop == null)
                 throw new ArgumentException("Invalid property supplied.", nameof(propexpr));
-
-            // finally, set the value of the property to the supplied one
             return (TProp)prop.GetValue(control);
         }
 
-        // this method invokes a return-less method for given control
-        // usage is control.InvokeAction(new Action<T1, T2, ...>(method), arg1, arg2, ...)
         public static void InvokeAction<TCtl>(this TCtl control, Delegate dlg, params object[] args) where TCtl : Control
         {
-            // check for nulls
             if (control == null)
                 throw new ArgumentNullException(nameof(control));
-
             if (dlg == null)
                 throw new ArgumentNullException(nameof(dlg));
-
-            // check if cross-thread invocation is required
             if (control.InvokeRequired)
             {
-                // if it is, perform it
-                // this will invoke this method from (hopefully) the control's thread
                 control.Invoke(new InvokeActionDelegate<TCtl>(InvokeAction), control, dlg, args);
                 return;
             }
-
-            // finally, call the passed delegate, with supplied arguments
             dlg.DynamicInvoke(args);
         }
         
-        // this method invokes a method which returns for given control, the returned value is returned to the caller
-        // usage is control.InvokeAction<TReturn>(new Func<T1, T2, ..., TReturn>(method), arg1, arg2, ...)
         public static TResult InvokeFunc<TCtl, TResult>(this TCtl control, Delegate dlg, params object[] args) where TCtl : Control
         {
-            // check for nulls
             if (control == null)
                 throw new ArgumentNullException(nameof(control));
-
             if (dlg == null)
                 throw new ArgumentNullException(nameof(dlg));
-
-            // check if cross-thread invocation is required
-            if (control.InvokeRequired)
-            {
-                // if it is, perform it
-                // this will invoke this method from (hopefully) the control's thread
-                return (TResult)control.Invoke(new InvokeFuncDelegate<TCtl, TResult>(InvokeFunc<TCtl, TResult>), control, dlg, args);
-            }
-
-            // finally, call the passed delegate, with supplied arguments and return 
-            // the result
-            return (TResult)dlg.DynamicInvoke(args);
+            return control.InvokeRequired
+                ? (TResult)control.Invoke(new InvokeFuncDelegate<TCtl, TResult>(InvokeFunc<TCtl, TResult>), control, dlg, args)
+                : (TResult)dlg.DynamicInvoke(args);
         }
 
-        public static bool getEvaluatedNSFW(this DiscordChannel Channel) => Channel.IsNSFW || Config.data.Nsfw;
+        public static bool getEvaluatedNSFW(this DiscordChannel Channel) => Channel.IsNSFW || Config.ChCfgMgr.getCh(Channel.Id).Nsfw;
 
-        public static T get<G,T>(this Dictionary<G,T> dict, G key, T def)
+        public static T get<G, T>(this Dictionary<G, T> dict, G key, T def)
         {
             if (!dict.ContainsKey(key))
                 dict[key] = def;
             return dict[key];
         }
+
+        public static T set<G, T>(this Dictionary<G, T> dict, G key, T val)
+        {
+            dict[key] = val;
+            return dict[key];
+        }
+
+        public static bool tryCast<T>(this object o, out T parsed)
+        {
+            try
+            {
+                parsed = (T)o;
+                return true;
+            }
+            catch
+            {
+                parsed = default(T);
+                return false;
+            }
+        }
+
+        public static G mod<T, G>(this T self, Func<T, G> func) => func.Invoke(self);
+        public static void modCh(this ulong ID, Func<ChannelConfig, ChannelConfig> func) => ChCfgMgr.setCh(ID, ChCfgMgr.getCh(ID).mod(func));
     }
 }

@@ -1,4 +1,5 @@
-﻿using Bot.Properties;
+﻿using Bot.Config;
+using Bot.Properties;
 using Chan.Net;
 using Chan.Net.JsonModel;
 using DSharpPlus;
@@ -30,11 +31,12 @@ namespace Bot
         private CancellationTokenSource TokenSource { get; set; }
         private BotGuild SelectedGuild { get; set; }
         private BotChannel SelectedChannel { get; set; }
+        private ulong ChID => ChannelDefined ? SelectedChannel.Id : 0;
         bool ChannelDefined = false;
         public MainForm()
         {
             InitializeComponent();
-            Bot = new Bot(Program.cfg);
+            Bot = new Bot(new DiscordConfiguration { Token = TokenContainer.Token, TokenType = TokenType.Bot, AutoReconnect = true, LogLevel = LogLevel.Debug, UseInternalLogHandler = false });
             Bot.Client.Ready += Bot_Ready;
             Bot.Client.GuildAvailable += Bot_GuildAvailable;
             Bot.Client.GuildCreated += Bot_GuildCreated;
@@ -48,13 +50,6 @@ namespace Bot
             chatBox.Enabled = true;
             chatSend.Enabled = true;
             Instance = this;
-            booruBox.Checked = Config.data.Booru;
-            chanBox.Checked = Config.data.Chan;
-            playBox.Checked = Config.data.Play;
-            waifuBox.Checked = Config.data.Waifu;
-            nsfwBox.Checked = Config.data.Nsfw;
-            configBox.Checked = Config.data.Config;
-            beemovieBox.Checked = Config.data.Bees;
         }
 
         private async Task BotThreadCallback()
@@ -76,7 +71,6 @@ namespace Bot
         }
 
         private Task BotSendMessageCallback(string text, BotChannel chn) => chn.Channel.SendMessageAsync(text);
-        private Task BotSendMessageCallback(Uri image, string imageTitle, BotChannel chn) => chn.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder { Title = imageTitle, ImageUrl = image.AbsoluteUri });
 
         private Task Bot_Ready(ReadyEventArgs e)
         {
@@ -126,12 +120,12 @@ namespace Bot
             {
                 Text = gld.Guild.Name,
                 Tag = gld,
-                Checked = Config.data.CheckedMatrix.get(gld.Id, false)
+                Checked = ChCfgMgr.getGl(gld.Id)
             };
             IEnumerable<BotChannel> chns = gld.Guild.Channels.Where(xc => xc.Type == ChannelType.Text).OrderBy(xc => xc.Position).Select(xc => new BotChannel(xc));
             chns.ToList().ForEach(s =>
             {
-                node.Nodes.Add(new TreeNode { Text = s.Channel.Name, Tag = s, Checked = Config.data.CheckedMatrix.get(s.Id, false) });
+                node.Nodes.Add(new TreeNode { Text = s.Channel.Name, Tag = s, Checked = ChCfgMgr.getCh(s.Id).Enabled });
             });
             channelTree.TopNode.Nodes.Add(node);
             channelTree.Sort();
@@ -184,11 +178,26 @@ namespace Bot
                     if (!messageSave.ContainsKey(SelectedChannel))
                         messageSave.Add(SelectedChannel, new List<string>());
                     messageSave[SelectedChannel].ForEach(s => chatBox.Items.Add(s));
+                    booruBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id).Booru);
+                    chanBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id).Chan);
+                    playBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id).Play);
+                    waifuBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id).Waifu);
+                    nsfwBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id).Nsfw);
+                    configBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id).Config);
+                    beemovieBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id).Bees);
+                    settingsPanel.Text = "Channel: " + SelectedChannel.Channel.Name;
+                    settingsPanel.Enabled = true;
                 }
                 catch (InvalidCastException e1)
                 {
                     Console.WriteLine(e1.ToString());
                 }
+            }
+            else
+            {
+                ChannelDefined = false;
+                settingsPanel.Enabled = false;
+                settingsPanel.Text = "Channel";
             }
         }
 
@@ -215,9 +224,16 @@ namespace Bot
             finally
             {
                 busy = false;
-                if (e.Node.Tag != null)
+                if (e.Node.Parent != null)
                 {
-                    Config.data.CheckedMatrix[((IBotStruct)e.Node.Tag).Id] = e.Node.Checked;
+                    if (e.Node.Tag.tryCast(out BotChannel c))
+                    {
+                        c.Id.modCh(s => { s.Enabled = e.Node.Checked; return s; });
+                    }
+                    else if (e.Node.Tag.tryCast(out BotGuild g))
+                    {
+                        ChCfgMgr.setGl(g.Id, e.Node.Checked);
+                    }
                 }
             }
         }
@@ -231,21 +247,25 @@ namespace Bot
             }
         }
 
-        private void chanBox_CheckedChanged(object sender, EventArgs e) => Config.data.Chan = chanBox.Checked;
+        private void chanBox_CheckedChanged(object sender, EventArgs e) => ChID.modCh(s => { s.Chan = chanBox.Checked; return s; });
 
-        private void playBox_CheckedChanged(object sender, EventArgs e) => Config.data.Play = playBox.Checked;
+        private void playBox_CheckedChanged(object sender, EventArgs e) => ChID.modCh(s => { s.Play = playBox.Checked; return s; });
 
-        private void waifuBox_CheckedChanged(object sender, EventArgs e) => Config.data.Waifu = waifuBox.Checked;
+        private void waifuBox_CheckedChanged(object sender, EventArgs e) => ChID.modCh(s => { s.Waifu = waifuBox.Checked; return s; });
 
-        private void booruBox_CheckedChanged(object sender, EventArgs e) => Config.data.Booru = booruBox.Checked;
+        private void booruBox_CheckedChanged(object sender, EventArgs e) => ChID.modCh(s => { s.Booru = booruBox.Checked; return s; });
 
-        private void nsfwBox_CheckedChanged(object sender, EventArgs e) => Config.data.Nsfw = nsfwBox.Checked;
+        private void nsfwBox_CheckedChanged(object sender, EventArgs e) => ChID.modCh(s => { s.Nsfw = nsfwBox.Checked; return s; });
 
-        private void configBox_CheckedChanged(object sender, EventArgs e) => Config.data.Config = configBox.Checked;
+        private void configBox_CheckedChanged(object sender, EventArgs e) => ChID.modCh(s => { s.Config = configBox.Checked; return s; });
 
-        private void beemovieBox_CheckedChanged(object sender, EventArgs e) => Config.data.Bees = beemovieBox.Checked;
+        private void beemovieBox_CheckedChanged(object sender, EventArgs e) => ChID.modCh(s => { s.Bees = beemovieBox.Checked; return s; });
 
-        private void debugButton_Click(object sender, EventArgs e) => new System.Threading.Thread(() => MessageBox.Show(Config.data.ToString(false))).Start();
+        private void debugButton_Click(object sender, EventArgs e)
+        {
+            if (ChannelDefined)
+                new System.Threading.Thread(() => MessageBox.Show(ChCfgMgr.getCh(SelectedChannel.Id).ToString(false))).Start();
+        }
 
         void SendMessage(string message, BotChannel channel, Action<Task> continuationAction = null)
         {
@@ -254,13 +274,6 @@ namespace Bot
             _ = continuationAction == null
                 ? Task.Run(() => BotSendMessageCallback(message, channel))
                 : Task.Run(() => BotSendMessageCallback(message, channel)).ContinueWith(continuationAction);
-        }
-
-        void SendMessage(Uri image, string imageTitle, BotChannel channel, Action<Task> continuationAction = null)
-        {
-            _ = continuationAction == null
-                ? Task.Run(() => BotSendMessageCallback(image, imageTitle, channel))
-                : Task.Run(() => BotSendMessageCallback(image, imageTitle, channel)).ContinueWith(continuationAction);
         }
 
         private void chanButton_Click(object sender, EventArgs e)
@@ -272,7 +285,7 @@ namespace Bot
         private void playButton_Click(object sender, EventArgs e)
         {
             if (ChannelDefined)
-                _ = Commands.Play((c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
+                _ = Commands.Play(SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
         }
 
         private void waifuButton_Click(object sender, EventArgs e)
@@ -290,7 +303,7 @@ namespace Bot
         private void configButton_Click(object sender, EventArgs e)
         {
             if (ChannelDefined)
-                _ = Commands.ConfigCmd((c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
+                _ = Commands.ConfigCmd(SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
         }
 
         private void pingButton_Click(object sender, EventArgs e)
@@ -302,14 +315,14 @@ namespace Bot
         private void beemovieButton_Click(object sender, EventArgs e)
         {
             if (ChannelDefined)
-                _ = Commands.Bees((c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
+                _ = Commands.Bees(SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
         }
 
         private void resetButton_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Are you sure you want to reset everything?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                File.Delete("config.dat");
+                File.Delete(Path.GetDirectoryName(Application.ExecutablePath) + @"\key.secure");
                 Close();
             }
         }
