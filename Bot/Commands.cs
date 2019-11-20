@@ -14,6 +14,7 @@ using BooruSharp.Booru;
 using BooruSharp.Search.Post;
 using Bot.Config;
 using System.Net;
+using DSharpPlus.Interactivity;
 
 namespace Bot
 {
@@ -142,7 +143,7 @@ namespace Bot
         static Dictionary<string, Booru> booruDict = new Dictionary<string, Booru>();
 
         [Command("config"), Description("Prints or changes the DiscHax-bot config"), RequireUserPermissions(Permissions.Administrator)]
-        public async Task ConfigCmd(CommandContext ctx, [Description("Used to set a param: config [key] [true/false]")] params string[] args) => await ConfigCmd(args, ctx.Channel, (c1, c2, c3) => ctx.RespondAsync(c1, c2, c3));
+        public async Task ConfigCmd(CommandContext ctx, [Description("Used to set a param: config [key] [true/false]")] string[] args) => await ConfigCmd(args, ctx.Channel, (c1, c2, c3) => ctx.RespondAsync(c1, c2, c3));
 
         public static async Task ConfigCmd(string[] args, DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
@@ -219,6 +220,26 @@ namespace Bot
                     await postMessage("Finished command", false, null);
                 }
             }
+        }
+
+        [Command("poll"), Description("Run a poll with reactions")]
+        public async Task Poll(CommandContext ctx, [Description("How long should the poll last.")] TimeSpan duration, [Description("What options should people have.")] params DiscordEmoji[] options) => await Poll(ctx.Channel, (c1, c2, c3) => ctx.RespondAsync(c1, c2, c3), duration, options);
+
+        public async Task Poll(DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage, TimeSpan duration, params DiscordEmoji[] options)
+        {
+            IEnumerable<string> poll_options = options.Select(xe => xe.ToString());
+            var embed = new DiscordEmbedBuilder
+            {
+                Title = "Poll time!",
+                Description = string.Join(" ", poll_options)
+            };
+            var msg = await postMessage(null, false, embed);
+            for (var i = 0; i < options.Length; i++)
+                await msg.CreateReactionAsync(options[i]);
+            var poll_result = await Bot.instance.Client.GetInteractivityModule().CollectReactionsAsync(msg, duration);
+            var results = poll_result.Reactions.Where(xkvp => options.Contains(xkvp.Key))
+                .Select(xkvp => $"{xkvp.Key}: {xkvp.Value}");
+            await postMessage(string.Join("\n", results), false, null);
         }
     }
 }

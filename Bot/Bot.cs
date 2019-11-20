@@ -7,12 +7,13 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using DSharpPlus.Interactivity;
 
 namespace Bot
 {
     public class Bot
     {
-        public Bot instance;
+        public static Bot instance;
         public DiscordClient Client { get; }
         public CommandsNextModule Commands { get; set; }
         public Bot(DiscordConfiguration cfg)
@@ -25,6 +26,12 @@ namespace Bot
             });
             Commands.CommandExecuted += Commands_CommandExecuted;
             Commands.CommandErrored += Commands_CommandErrored;
+            _ = Client.UseInteractivity(new InteractivityConfiguration
+            {
+                PaginationBehaviour = TimeoutBehaviour.Ignore,
+                PaginationTimeout = TimeSpan.FromMinutes(5),
+                Timeout = TimeSpan.FromMinutes(2)
+            });
             Commands.RegisterCommands<Commands>();
             Client.DebugLogger.LogMessageReceived += DebugLogger_LogMessageReceived;
         }

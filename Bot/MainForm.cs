@@ -75,6 +75,7 @@ namespace Bot
         private Task Bot_Ready(ReadyEventArgs e)
         {
             this.SetProperty(xf => xf.Text, "DiscHax Bot Menu (connected)");
+            Console.WriteLine("Your invite Link:\r\n    https://discordapp.com/oauth2/authorize?client_id=" + e.Client.CurrentApplication.Id.ToString() + "&scope=bot&permissions=8");
             return Task.CompletedTask;
         }
 
