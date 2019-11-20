@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Bot.Config;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Exceptions;
@@ -20,7 +21,7 @@ namespace Bot
             Client = new DiscordClient(cfg);
             Commands = Client.UseCommandsNext(new CommandsNextConfiguration
             {
-                StringPrefix = "!"
+                StringPrefix = Common.prefix
             });
             Commands.CommandExecuted += Commands_CommandExecuted;
             Commands.CommandErrored += Commands_CommandErrored;
