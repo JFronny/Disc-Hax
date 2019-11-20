@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Bot
 {
@@ -7,7 +8,7 @@ namespace Bot
         [Serializable]
         public class Data
         {
-            private IDMatrix checkedMatrix;
+            private Dictionary<ulong, bool> checkedMatrix;
             private bool chan;
             private bool play;
             private bool waifu;
@@ -74,11 +75,11 @@ namespace Bot
                 }
             }
 
-            public IDMatrix CheckedMatrix
+            public Dictionary<ulong, bool> CheckedMatrix
             {
                 get {
                     if (checkedMatrix == null)
-                        CheckedMatrix = new IDMatrix();
+                        CheckedMatrix = new Dictionary<ulong, bool>();
                     return checkedMatrix;
                 }
 

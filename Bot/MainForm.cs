@@ -126,12 +126,12 @@ namespace Bot
             {
                 Text = gld.Guild.Name,
                 Tag = gld,
-                Checked = Config.data.CheckedMatrix[gld.Id]
+                Checked = Config.data.CheckedMatrix.get(gld.Id, false)
             };
             IEnumerable<BotChannel> chns = gld.Guild.Channels.Where(xc => xc.Type == ChannelType.Text).OrderBy(xc => xc.Position).Select(xc => new BotChannel(xc));
             chns.ToList().ForEach(s =>
             {
-                node.Nodes.Add(new TreeNode { Text = s.Channel.Name, Tag = s, Checked = Config.data.CheckedMatrix[s.Id] });
+                node.Nodes.Add(new TreeNode { Text = s.Channel.Name, Tag = s, Checked = Config.data.CheckedMatrix.get(s.Id, false) });
             });
             channelTree.TopNode.Nodes.Add(node);
             channelTree.Sort();
@@ -303,6 +303,15 @@ namespace Bot
         {
             if (ChannelDefined)
                 _ = Commands.Bees((c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
+        }
+
+        private void resetButton_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to reset everything?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                File.Delete("config.dat");
+                Close();
+            }
         }
     }
 }

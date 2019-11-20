@@ -35,6 +35,8 @@
             this.chatPanel = new System.Windows.Forms.Panel();
             this.chatSend = new System.Windows.Forms.TextBox();
             this.settingsPanel = new System.Windows.Forms.Panel();
+            this.beemovieButton = new System.Windows.Forms.Button();
+            this.beemovieBox = new System.Windows.Forms.CheckBox();
             this.pingButton = new System.Windows.Forms.Button();
             this.debugButton = new System.Windows.Forms.Button();
             this.configButton = new System.Windows.Forms.Button();
@@ -48,8 +50,7 @@
             this.waifuBox = new System.Windows.Forms.CheckBox();
             this.playBox = new System.Windows.Forms.CheckBox();
             this.chanBox = new System.Windows.Forms.CheckBox();
-            this.beemovieBox = new System.Windows.Forms.CheckBox();
-            this.beemovieButton = new System.Windows.Forms.Button();
+            this.resetButton = new System.Windows.Forms.Button();
             this.chatPanel.SuspendLayout();
             this.settingsPanel.SuspendLayout();
             this.SuspendLayout();
@@ -102,6 +103,7 @@
             // 
             // settingsPanel
             // 
+            this.settingsPanel.Controls.Add(this.resetButton);
             this.settingsPanel.Controls.Add(this.beemovieButton);
             this.settingsPanel.Controls.Add(this.beemovieBox);
             this.settingsPanel.Controls.Add(this.pingButton);
@@ -122,6 +124,27 @@
             this.settingsPanel.Name = "settingsPanel";
             this.settingsPanel.Size = new System.Drawing.Size(200, 310);
             this.settingsPanel.TabIndex = 3;
+            // 
+            // beemovieButton
+            // 
+            this.beemovieButton.Location = new System.Drawing.Point(136, 100);
+            this.beemovieButton.Name = "beemovieButton";
+            this.beemovieButton.Size = new System.Drawing.Size(52, 23);
+            this.beemovieButton.TabIndex = 14;
+            this.beemovieButton.Text = "Run";
+            this.beemovieButton.UseVisualStyleBackColor = true;
+            this.beemovieButton.Click += new System.EventHandler(this.beemovieButton_Click);
+            // 
+            // beemovieBox
+            // 
+            this.beemovieBox.AutoSize = true;
+            this.beemovieBox.Location = new System.Drawing.Point(6, 104);
+            this.beemovieBox.Name = "beemovieBox";
+            this.beemovieBox.Size = new System.Drawing.Size(124, 17);
+            this.beemovieBox.TabIndex = 13;
+            this.beemovieBox.Text = "!beemovie command";
+            this.beemovieBox.UseVisualStyleBackColor = true;
+            this.beemovieBox.CheckedChanged += new System.EventHandler(this.beemovieBox_CheckedChanged);
             // 
             // pingButton
             // 
@@ -261,26 +284,15 @@
             this.chanBox.UseVisualStyleBackColor = true;
             this.chanBox.CheckedChanged += new System.EventHandler(this.chanBox_CheckedChanged);
             // 
-            // beemovieBox
+            // resetButton
             // 
-            this.beemovieBox.AutoSize = true;
-            this.beemovieBox.Location = new System.Drawing.Point(6, 104);
-            this.beemovieBox.Name = "beemovieBox";
-            this.beemovieBox.Size = new System.Drawing.Size(124, 17);
-            this.beemovieBox.TabIndex = 13;
-            this.beemovieBox.Text = "!beemovie command";
-            this.beemovieBox.UseVisualStyleBackColor = true;
-            this.beemovieBox.CheckedChanged += new System.EventHandler(this.beemovieBox_CheckedChanged);
-            // 
-            // beemovieButton
-            // 
-            this.beemovieButton.Location = new System.Drawing.Point(136, 100);
-            this.beemovieButton.Name = "beemovieButton";
-            this.beemovieButton.Size = new System.Drawing.Size(52, 23);
-            this.beemovieButton.TabIndex = 14;
-            this.beemovieButton.Text = "Run";
-            this.beemovieButton.UseVisualStyleBackColor = true;
-            this.beemovieButton.Click += new System.EventHandler(this.beemovieButton_Click);
+            this.resetButton.Location = new System.Drawing.Point(145, 259);
+            this.resetButton.Name = "resetButton";
+            this.resetButton.Size = new System.Drawing.Size(52, 23);
+            this.resetButton.TabIndex = 15;
+            this.resetButton.Text = "Reset";
+            this.resetButton.UseVisualStyleBackColor = true;
+            this.resetButton.Click += new System.EventHandler(this.resetButton_Click);
             // 
             // MainForm
             // 
@@ -326,6 +338,7 @@
         private System.Windows.Forms.Button pingButton;
         private System.Windows.Forms.CheckBox beemovieBox;
         private System.Windows.Forms.Button beemovieButton;
+        private System.Windows.Forms.Button resetButton;
     }
 }
 

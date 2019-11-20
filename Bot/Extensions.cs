@@ -1,5 +1,6 @@
 ﻿using DSharpPlus.Entities;
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Windows.Forms;
@@ -131,5 +132,12 @@ namespace Bot
         }
 
         public static bool getEvaluatedNSFW(this DiscordChannel Channel) => Channel.IsNSFW || Config.data.Nsfw;
+
+        public static T get<G,T>(this Dictionary<G,T> dict, G key, T def)
+        {
+            if (!dict.ContainsKey(key))
+                dict[key] = def;
+            return dict[key];
+        }
     }
 }
