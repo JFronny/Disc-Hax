@@ -185,7 +185,7 @@ namespace Bot
                     nsfwBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id).Nsfw);
                     configBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id).Config);
                     beemovieBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id).Bees);
-                    settingsPanel.Text = "Channel: " + SelectedChannel.Channel.Name;
+                    settingsPanel.Text = SelectedGuild.Guild.Name + " - " + SelectedChannel.Channel.Name;
                     settingsPanel.Enabled = true;
                 }
                 catch (InvalidCastException e1)
@@ -309,7 +309,7 @@ namespace Bot
         private void pingButton_Click(object sender, EventArgs e)
         {
             if (ChannelDefined)
-                _ = Commands.Ping((c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
+                _ = Commands.Ping(SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
         }
 
         private void beemovieButton_Click(object sender, EventArgs e)

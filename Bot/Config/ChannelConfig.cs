@@ -17,7 +17,6 @@ namespace Bot.Config
         private bool bees;
         private bool enabled;
         public Action Save;
-
         public ChannelConfig(Action save) : this() => Save = save ?? throw new ArgumentNullException(nameof(save));
 
         public bool Chan

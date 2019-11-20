@@ -42,6 +42,8 @@ namespace Bot
                 };
                 await e.Context.RespondAsync("", embed: embed);
             }
+            else if (!(e.Exception is CommandNotFoundException))
+                await e.Context.RespondAsync("The command failed: " + e.Exception.Message);
         }
 
         private Task Commands_CommandExecuted(CommandExecutionEventArgs e)
