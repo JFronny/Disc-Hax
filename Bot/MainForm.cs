@@ -303,7 +303,7 @@ namespace Bot
         private void configButton_Click(object sender, EventArgs e)
         {
             if (ChannelDefined)
-                _ = Commands.ConfigCmd(SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
+                _ = Commands.ConfigCmd(Interaction.InputBox("Please select parameters").Split(' '), SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
         }
 
         private void pingButton_Click(object sender, EventArgs e)

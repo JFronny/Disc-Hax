@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using HtmlAgilityPack;
 
 namespace BeeMovie
 {
@@ -12,8 +12,14 @@ namespace BeeMovie
         static Random rnd = new Random();
         static void Main(string[] args)
         {
-            string[] Quotes = new HtmlWeb().Load("http://www.script-o-rama.com/movie_scripts/a1/bee-movie-script-transcript-seinfeld.html")
-                .DocumentNode.SelectSingleNode("//body/pre").InnerText.Split(new string[] { "\n\n  \n" }, StringSplitOptions.None);
+            string[] Quotes;
+            using (WebClient client = new WebClient())
+            {
+                Quotes = client.DownloadString("http://www.script-o-rama.com/movie_scripts/a1/bee-movie-script-transcript-seinfeld.html")
+                    .Split(new string[] { "<pre>" }, StringSplitOptions.None)[1]
+                    .Split(new string[] { "</pre>" }, StringSplitOptions.None)[0]
+                    .Split(new string[] { "\n\n  \n" }, StringSplitOptions.None);
+            }
             Quotes[0] = Quotes[0].Replace("  \n  \n", "");
             while (true)
             {

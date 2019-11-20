@@ -12,8 +12,8 @@ using DSharpPlus.Entities;
 using BooruSharp;
 using BooruSharp.Booru;
 using BooruSharp.Search.Post;
-using HtmlAgilityPack;
 using Bot.Config;
+using System.Net;
 
 namespace Bot
 {
@@ -78,11 +78,14 @@ namespace Bot
             if (ChCfgMgr.getCh(Channel.Id).Enabled && ChCfgMgr.getCh(Channel.Id).Bees)
             {
                 if (_beequotes == null)
-                {
-                    _beequotes = new HtmlWeb().Load("http://www.script-o-rama.com/movie_scripts/a1/bee-movie-script-transcript-seinfeld.html")
-                        .DocumentNode.SelectSingleNode("//body/pre").InnerText.Split(new string[] { "\n\n  \n" }, StringSplitOptions.None);
-                    _beequotes[0] = _beequotes[0].Replace("  \n  \n", "");
-                }
+                    using (WebClient client = new WebClient())
+                    {
+                        _beequotes = client.DownloadString("http://www.script-o-rama.com/movie_scripts/a1/bee-movie-script-transcript-seinfeld.html")
+                            .Split(new string[] { "<pre>" }, StringSplitOptions.None)[1]
+                            .Split(new string[] { "</pre>" }, StringSplitOptions.None)[0]
+                            .Split(new string[] { "\n\n  \n" }, StringSplitOptions.None);
+                        _beequotes[0] = _beequotes[0].Replace("  \n  \n", "");
+                    }
                 int q = MainForm.Instance.rnd.Next(_beequotes.Length - 2);
                 await postMessage((_beequotes[q] + "\n\n" + _beequotes[q + 1] + "\n\n" + _beequotes[q + 2]).Replace("\n", "\r\n"), true, null);
             }
@@ -213,6 +216,7 @@ namespace Bot
                             await postMessage("That is no config", false, null);
                             break;
                     }
+                    await postMessage("Finished command", false, null);
                 }
             }
         }
