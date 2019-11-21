@@ -49,6 +49,8 @@ namespace Bot.Config
 
         static void getXE()
         {
+            if (!Directory.Exists(Path.GetDirectoryName(path)))
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
             if (!File.Exists(path))
                 new XElement("common", new XElement("prefix", "!")).Save(path);
             common = XElement.Load(path);
