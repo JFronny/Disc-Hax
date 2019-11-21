@@ -78,7 +78,7 @@ namespace Bot
                 : (TResult)dlg.DynamicInvoke(args);
         }
 
-        public static bool getEvaluatedNSFW(this DiscordChannel Channel) => Channel.IsNSFW || Config.ChCfgMgr.getCh(Channel.Id).Nsfw;
+        public static bool getEvaluatedNSFW(this DiscordChannel Channel) => Channel.IsNSFW || ChCfgMgr.getCh(Channel.Id, ConfigElement.Nsfw);
 
         public static T get<G, T>(this Dictionary<G, T> dict, G key, T def)
         {
@@ -108,6 +108,5 @@ namespace Bot
         }
 
         public static G mod<T, G>(this T self, Func<T, G> func) => func.Invoke(self);
-        public static void modCh(this ulong ID, Func<ChannelConfig, ChannelConfig> func) => ChCfgMgr.setCh(ID, ChCfgMgr.getCh(ID).mod(func));
     }
 }

@@ -69,6 +69,7 @@
             this.channelTree.Size = new System.Drawing.Size(166, 288);
             this.channelTree.TabIndex = 0;
             this.channelTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.channelTree_AfterCheck);
+            this.channelTree.AfterCollapse += new System.Windows.Forms.TreeViewEventHandler(this.channelTree_AfterCollapse);
             this.channelTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.channelTree_AfterSelect);
             // 
             // chatBox

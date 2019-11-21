@@ -11,30 +11,40 @@ namespace Bot.Config
 {
     static class ChCfgMgr
     {
-        public static ChannelConfig getCh(ulong Channel)
+
+        static XElement getXML(ulong ID, string ElName)
         {
-            string XMLPath = Path.GetDirectoryName(Application.ExecutablePath) + @"\Cfgs\";
-            if (!Directory.Exists(XMLPath))
-                Directory.CreateDirectory(XMLPath);
-            XMLPath += Channel.ToString() + ".xml";
-            if (!File.Exists(XMLPath))
-                setCh(Channel, new ChannelConfig(() => { }));
-            XElement el = XElement.Load(XMLPath);
-            ChannelConfig tmp = new ChannelConfig
+            string XML = Path.GetDirectoryName(Application.ExecutablePath) + @"\Cfgs\";
+            if (!Directory.Exists(XML))
+                Directory.CreateDirectory(XML);
+            XML += ID.ToString() + ".xml";
+            if (!File.Exists(XML))
+                new XElement(ElName).Save(XML);
+            return XElement.Load(XML);
+        }
+
+        public static bool getCh(ulong Channel, ConfigElement element)
+        {
+            XElement el = getXML(Channel, "channel").Element(element.ToString().ToLower());
+            if (el == null)
             {
-                Save = () => { },
-                Bees = bool.Parse(el.Element("bees").Value),
-                Booru = bool.Parse(el.Element("booru").Value),
-                Chan = bool.Parse(el.Element("chan").Value),
-                Config = bool.Parse(el.Element("config").Value),
-                Enabled = bool.Parse(el.Element("enabled").Value),
-                Nsfw = bool.Parse(el.Element("nsfw").Value),
-                Play = bool.Parse(el.Element("play").Value),
-                Waifu = bool.Parse(el.Element("waifu").Value)
-            };
-            tmp.Save = () => setCh(Channel, tmp);
-            GC.Collect();
-            return tmp;
+                setCh(Channel, element, false);
+                return getCh(Channel, element);
+            }
+            else
+                return bool.Parse(el.Value);
+        }
+
+        public static string getChStr(ulong Channel) => string.Join("\r\n", Enum.GetValues(typeof(ConfigElement)).OfType<ConfigElement>().Select(s => s.ToString() + ": " + getCh(Channel, s)));
+
+        public static void setCh(ulong Channel, ConfigElement element, bool val)
+        {
+            XElement XML = getXML(Channel, "channel");
+            string el = element.ToString().ToLower();
+            if (XML.Elements(el).Count() == 0)
+                XML.Add(new XElement(el, val.ToString()));
+            else
+                XML.Element(el).Value = val.ToString();
         }
 
         public static bool getGl(ulong Guild)
@@ -45,18 +55,5 @@ namespace Bot.Config
         }
 
         public static void setGl(ulong Guild, bool val) => new XElement("guild", new XElement("enabled", val.ToString())).Save(Path.GetDirectoryName(Application.ExecutablePath) + @"\Cfgs\" + Guild.ToString() + ".xml");
-
-        public static void setCh(ulong Channel, ChannelConfig cfg)
-        {
-            new XElement("channel",
-                new XElement("chan", cfg.Chan),
-                new XElement("play", cfg.Play),
-                new XElement("waifu", cfg.Waifu),
-                new XElement("booru", cfg.Booru),
-                new XElement("nsfw", cfg.Nsfw),
-                new XElement("bees", cfg.Bees),
-                new XElement("config", cfg.Config),
-                new XElement("enabled", cfg.Enabled)).Save(Path.GetDirectoryName(Application.ExecutablePath) + @"\Cfgs\" + Channel.ToString() + ".xml");
-        }
     }
 }

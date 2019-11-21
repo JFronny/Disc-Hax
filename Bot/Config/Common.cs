@@ -17,9 +17,36 @@ namespace Bot.Config
         {
             get {
                 getXE();
+                if (common.Element("prefix") == null)
+                {
+                    common.Add(new XElement("prefix"), "!");
+                    saveXE();
+                }
                 return common.Element("prefix").Value;
             }
         }
+
+        public static bool guildsBox
+        {
+            get {
+                getXE();
+                if (common.Element("guildsBox") == null || !bool.TryParse(common.Element("guildsBox").Value, out bool t))
+                {
+                    common.Add(new XElement("guildsBox", bool.FalseString));
+                    saveXE();
+                }
+                return bool.Parse(common.Element("guildsBox").Value);
+            }
+            set {
+                getXE();
+                if (common.Element("guildsBox") == null)
+                    common.Add(new XElement("guildsBox", value.ToString()));
+                else
+                    common.Element("guildsBox").Value = value.ToString();
+                saveXE();
+            }
+        }
+
         static void getXE()
         {
             if (!File.Exists(path))

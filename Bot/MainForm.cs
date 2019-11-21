@@ -36,6 +36,7 @@ namespace Bot
         public MainForm()
         {
             InitializeComponent();
+            channelTree.Nodes[0].Checked = Common.guildsBox;
             Bot = new Bot(new DiscordConfiguration { Token = TokenContainer.Token, TokenType = TokenType.Bot, AutoReconnect = true, LogLevel = LogLevel.Debug, UseInternalLogHandler = false });
             Bot.Client.Ready += Bot_Ready;
             Bot.Client.GuildAvailable += Bot_GuildAvailable;
@@ -126,11 +127,13 @@ namespace Bot
             IEnumerable<BotChannel> chns = gld.Guild.Channels.Where(xc => xc.Type == ChannelType.Text).OrderBy(xc => xc.Position).Select(xc => new BotChannel(xc));
             chns.ToList().ForEach(s =>
             {
-                node.Nodes.Add(new TreeNode { Text = s.Channel.Name, Tag = s, Checked = ChCfgMgr.getCh(s.Id).Enabled });
+                node.Nodes.Add(new TreeNode { Text = s.Channel.Name, Tag = s, Checked = ChCfgMgr.getCh(s.Id, ConfigElement.Enabled) });
             });
             channelTree.TopNode.Nodes.Add(node);
+            node.Expand();
+            node.ExpandAll();
+            channelTree.Nodes[0].Expand();
             channelTree.Sort();
-            channelTree.TopNode.ExpandAll();
         }
 
         private void RemoveGuild(ulong id)
@@ -179,13 +182,13 @@ namespace Bot
                     if (!messageSave.ContainsKey(SelectedChannel))
                         messageSave.Add(SelectedChannel, new List<string>());
                     messageSave[SelectedChannel].ForEach(s => chatBox.Items.Add(s));
-                    booruBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id).Booru);
-                    chanBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id).Chan);
-                    playBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id).Play);
-                    waifuBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id).Waifu);
-                    nsfwBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id).Nsfw);
-                    configBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id).Config);
-                    beemovieBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id).Bees);
+                    booruBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id, ConfigElement.Booru));
+                    chanBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id, ConfigElement.Chan));
+                    playBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id, ConfigElement.Play));
+                    waifuBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id, ConfigElement.Waifu));
+                    nsfwBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id, ConfigElement.Nsfw));
+                    configBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id, ConfigElement.Config));
+                    beemovieBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id, ConfigElement.Bees));
                     settingsPanel.Text = SelectedGuild.Guild.Name + " - " + SelectedChannel.Channel.Name;
                     settingsPanel.Enabled = true;
                 }
@@ -229,13 +232,15 @@ namespace Bot
                 {
                     if (e.Node.Tag.tryCast(out BotChannel c))
                     {
-                        c.Id.modCh(s => { s.Enabled = e.Node.Checked; return s; });
+                        ChCfgMgr.setCh(c.Id, ConfigElement.Enabled, e.Node.Checked);
                     }
                     else if (e.Node.Tag.tryCast(out BotGuild g))
                     {
                         ChCfgMgr.setGl(g.Id, e.Node.Checked);
                     }
                 }
+                else
+                    Common.guildsBox = e.Node.Checked;
             }
         }
 
@@ -248,24 +253,24 @@ namespace Bot
             }
         }
 
-        private void chanBox_CheckedChanged(object sender, EventArgs e) => ChID.modCh(s => { s.Chan = chanBox.Checked; return s; });
+        private void chanBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Chan, chanBox.Checked);
 
-        private void playBox_CheckedChanged(object sender, EventArgs e) => ChID.modCh(s => { s.Play = playBox.Checked; return s; });
+        private void playBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Play, playBox.Checked);
 
-        private void waifuBox_CheckedChanged(object sender, EventArgs e) => ChID.modCh(s => { s.Waifu = waifuBox.Checked; return s; });
+        private void waifuBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Waifu, waifuBox.Checked);
 
-        private void booruBox_CheckedChanged(object sender, EventArgs e) => ChID.modCh(s => { s.Booru = booruBox.Checked; return s; });
+        private void booruBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Booru, booruBox.Checked);
 
-        private void nsfwBox_CheckedChanged(object sender, EventArgs e) => ChID.modCh(s => { s.Nsfw = nsfwBox.Checked; return s; });
+        private void nsfwBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Nsfw, nsfwBox.Checked);
 
-        private void configBox_CheckedChanged(object sender, EventArgs e) => ChID.modCh(s => { s.Config = configBox.Checked; return s; });
+        private void configBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Config, configBox.Checked);
 
-        private void beemovieBox_CheckedChanged(object sender, EventArgs e) => ChID.modCh(s => { s.Bees = beemovieBox.Checked; return s; });
+        private void beemovieBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Bees, beemovieBox.Checked);
 
         private void debugButton_Click(object sender, EventArgs e)
         {
             if (ChannelDefined)
-                new System.Threading.Thread(() => MessageBox.Show(ChCfgMgr.getCh(SelectedChannel.Id).ToString(false))).Start();
+                new System.Threading.Thread(() => MessageBox.Show(ChCfgMgr.getChStr(SelectedChannel.Id))).Start();
         }
 
         void SendMessage(string message, BotChannel channel, Action<Task> continuationAction = null)
@@ -327,5 +332,7 @@ namespace Bot
                 Close();
             }
         }
+
+        private void channelTree_AfterCollapse(object sender, TreeViewEventArgs e) => channelTree.Nodes[0].Expand();
     }
 }

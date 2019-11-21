@@ -25,7 +25,7 @@ namespace Bot
 
         public static async Task Chan(string[] args, DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (ChCfgMgr.getCh(Channel.Id).Enabled && ChCfgMgr.getCh(Channel.Id).Chan)
+            if (ChCfgMgr.getCh(Channel.Id, ConfigElement.Enabled) && ChCfgMgr.getCh(Channel.Id, ConfigElement.Chan))
                 if (args.Length == 0)
                 {
                     List<string> lmsg = new List<string>();
@@ -55,7 +55,7 @@ namespace Bot
 
         public static async Task Waifu(string[] args, DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (ChCfgMgr.getCh(Channel.Id).Enabled && ChCfgMgr.getCh(Channel.Id).Waifu)
+            if (ChCfgMgr.getCh(Channel.Id, ConfigElement.Enabled) && ChCfgMgr.getCh(Channel.Id, ConfigElement.Waifu))
                 if (Channel.getEvaluatedNSFW() || args.Contains("f"))
                     await postMessage(null, false, new DiscordEmbedBuilder { Title = "There.", ImageUrl = "https://www.thiswaifudoesnotexist.net/example-" + MainForm.Instance.rnd.Next(6000).ToString() + ".jpg" });
                 else
@@ -67,7 +67,7 @@ namespace Bot
 
         public static async Task Play(DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (ChCfgMgr.getCh(Channel.Id).Enabled && ChCfgMgr.getCh(Channel.Id).Play)
+            if (ChCfgMgr.getCh(Channel.Id, ConfigElement.Enabled) && ChCfgMgr.getCh(Channel.Id, ConfigElement.Play))
                 await postMessage("No.", false, null);
         }
 
@@ -76,7 +76,7 @@ namespace Bot
 
         public static async Task Bees(DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (ChCfgMgr.getCh(Channel.Id).Enabled && ChCfgMgr.getCh(Channel.Id).Bees)
+            if (ChCfgMgr.getCh(Channel.Id, ConfigElement.Enabled) && ChCfgMgr.getCh(Channel.Id, ConfigElement.Bees))
             {
                 if (_beequotes == null)
                     using (WebClient client = new WebClient())
@@ -99,7 +99,7 @@ namespace Bot
 
         public static async Task Ping(DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (ChCfgMgr.getCh(Channel.Id).Enabled)
+            if (ChCfgMgr.getCh(Channel.Id, ConfigElement.Enabled))
                 await postMessage("Pong", false, null);
         }
 
@@ -119,13 +119,13 @@ namespace Bot
                     booruDict.Add(s.ToString().Split('.')[2].ToLower(), s);
                 });
             }
-            if (ChCfgMgr.getCh(Channel.Id).Enabled && ChCfgMgr.getCh(Channel.Id).Booru)
+            if (ChCfgMgr.getCh(Channel.Id, ConfigElement.Enabled) && ChCfgMgr.getCh(Channel.Id, ConfigElement.Booru))
             {
                 if (args.Length == 1 && args[0].ToLower() == "list")
                 {
                     await postMessage(string.Join("; ", booruDict.Keys), false, null);
                 }
-                else if (ChCfgMgr.getCh(Channel.Id).Booru)
+                else if (ChCfgMgr.getCh(Channel.Id, ConfigElement.Booru))
                 {
                     Booru booru = (args.Length > 0 && booruDict.ContainsKey(args[0].ToLower())) ? booruDict[args[0]]
                         : (Channel.getEvaluatedNSFW() ? (Booru)new Rule34() : new Gelbooru());
@@ -147,77 +147,26 @@ namespace Bot
 
         public static async Task ConfigCmd(string[] args, DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (ChCfgMgr.getCh(Channel.Id).Enabled && ChCfgMgr.getCh(Channel.Id).Config)
+            if (ChCfgMgr.getCh(Channel.Id, ConfigElement.Enabled) && ChCfgMgr.getCh(Channel.Id, ConfigElement.Config))
             {
                 if (args.Length == 0)
-                    await postMessage(ChCfgMgr.getCh(Channel.Id).ToString(true), false, null);
+                    await postMessage(ChCfgMgr.getChStr(Channel.Id), false, null);
                 else if (args.Length == 1)
                 {
-                    switch (args[0].ToLower())
-                    {
-                        case "chan":
-                            await postMessage(ChCfgMgr.getCh(Channel.Id).Chan.ToString(), false, null);
-                            break;
-                        case "play":
-                            await postMessage(ChCfgMgr.getCh(Channel.Id).Play.ToString(), false, null);
-                            break;
-                        case "waifu":
-                            await postMessage(ChCfgMgr.getCh(Channel.Id).Waifu.ToString(), false, null);
-                            break;
-                        case "booru":
-                            await postMessage(ChCfgMgr.getCh(Channel.Id).Booru.ToString(), false, null);
-                            break;
-                        case "nsfw":
-                            await postMessage(ChCfgMgr.getCh(Channel.Id).Nsfw.ToString(), false, null);
-                            break;
-                        case "config":
-                            await postMessage(ChCfgMgr.getCh(Channel.Id).Config.ToString(), false, null);
-                            break;
-                        case "bees":
-                            await postMessage(ChCfgMgr.getCh(Channel.Id).Bees.ToString(), false, null);
-                            break;
-                        case "enabled":
-                            await postMessage(ChCfgMgr.getCh(Channel.Id).Enabled.ToString(), false, null);
-                            break;
-                        default:
-                            await postMessage("That is no config", false, null);
-                            break;
-                    }
+                    if (Enum.TryParse(args[0].ToLower(), out ConfigElement el))
+                        await postMessage(ChCfgMgr.getCh(Channel.Id, el).ToString(), false, null);
+                    else
+                        await postMessage("Config key not found", false, null);
                 }
                 else
                 {
-                    bool val = bool.Parse(args[1]);
-                    switch (args[0].ToLower())
+                    if (Enum.TryParse(args[0].ToLower(), out ConfigElement el) && bool.TryParse(args[1], out bool val))
                     {
-                        case "chan":
-                            Channel.Id.modCh(s => { s.Chan = val; return s; });
-                            break;
-                        case "play":
-                            Channel.Id.modCh(s => { s.Play = val; return s; });
-                            break;
-                        case "waifu":
-                            Channel.Id.modCh(s => { s.Waifu = val; return s; });
-                            break;
-                        case "booru":
-                            Channel.Id.modCh(s => { s.Booru = val; return s; });
-                            break;
-                        case "nsfw":
-                            Channel.Id.modCh(s => { s.Nsfw = val; return s; });
-                            break;
-                        case "config":
-                            Channel.Id.modCh(s => { s.Config = val; return s; });
-                            break;
-                        case "bees":
-                            Channel.Id.modCh(s => { s.Bees = val; return s; });
-                            break;
-                        case "enabled":
-                            Channel.Id.modCh(s => { s.Enabled = val; return s; });
-                            break;
-                        default:
-                            await postMessage("That is no config", false, null);
-                            break;
+                        ChCfgMgr.setCh(Channel.Id, el, val);
+                        await postMessage("Set " + el.ToString() + " to " + val.ToString(), false, null);
                     }
-                    await postMessage("Finished command", false, null);
+                    else
+                        await postMessage("Not found or invalid value", false, null);
                 }
             }
         }
