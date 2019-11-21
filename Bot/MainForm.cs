@@ -18,21 +18,22 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Linq;
 
 namespace Bot
 {
-    public partial class MainForm : System.Windows.Forms.Form
+    public partial class MainForm : Form
     {
         public static MainForm Instance;
         public Random rnd = new Random();
-        Dictionary<BotChannel, List<string>> messageSave = new Dictionary<BotChannel, List<string>>();
-        private Task BotThread { get; set; }
-        private Bot Bot { get; set; }
-        private CancellationTokenSource TokenSource { get; set; }
-        private BotGuild SelectedGuild { get; set; }
-        private BotChannel SelectedChannel { get; set; }
-        private ulong ChID => ChannelDefined ? SelectedChannel.Id : 0;
-        bool ChannelDefined = false;
+        public Dictionary<BotChannel, List<string>> messageSave = new Dictionary<BotChannel, List<string>>();
+        public Task BotThread { get; set; }
+        public Bot Bot { get; set; }
+        public CancellationTokenSource TokenSource { get; set; }
+        public BotGuild SelectedGuild { get; set; }
+        public BotChannel SelectedChannel { get; set; }
+        public ulong ChID => ChannelDefined ? SelectedChannel.Id : 0;
+        public bool ChannelDefined = false;
         public MainForm()
         {
             InitializeComponent();
@@ -154,8 +155,10 @@ namespace Bot
                     logMsg = "<USER>[" + msg.Message.Author.Username + "]" + msg.Message.Content;
                 if (!messageSave.ContainsKey(channel))
                     messageSave.Add(channel, new List<string>());
+                if (messageSave[channel].Count > 100)
+                    messageSave[channel].RemoveRange(99, messageSave[channel].Count - 100);
                 messageSave[channel].Add(logMsg);
-                if ((!ChannelDefined) || channel.Id == SelectedChannel.Id)
+                if (ChannelDefined && channel.Id == SelectedChannel.Id)
                 {
                     chatBox.Items.Add(logMsg);
                     chatBox.SelectedItem = logMsg;
@@ -168,8 +171,8 @@ namespace Bot
         }
 
         private void Form_FormClosed(object sender, FormClosedEventArgs e) => TokenSource.Cancel();
-
-        private void channelTree_AfterSelect(object sender, TreeViewEventArgs e)
+        bool recCheck = true;
+        public void channelTree_AfterSelect(object sender, TreeViewEventArgs e)
         {
             if (e.Node != null && e.Node.Tag != null && e.Node.Parent != null && e.Node.Parent.Tag != null)
             {
@@ -182,13 +185,15 @@ namespace Bot
                     if (!messageSave.ContainsKey(SelectedChannel))
                         messageSave.Add(SelectedChannel, new List<string>());
                     messageSave[SelectedChannel].ForEach(s => chatBox.Items.Add(s));
-                    booruBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id, ConfigElement.Booru));
-                    chanBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id, ConfigElement.Chan));
-                    playBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id, ConfigElement.Play));
-                    waifuBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id, ConfigElement.Waifu));
-                    nsfwBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id, ConfigElement.Nsfw));
-                    configBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id, ConfigElement.Config));
-                    beemovieBox.Checked = SelectedChannel.mod(s => ChCfgMgr.getCh(s.Id, ConfigElement.Bees));
+                    booruBox.Checked = ChCfgMgr.getCh(SelectedChannel.Id, ConfigElement.Booru);
+                    chanBox.Checked = ChCfgMgr.getCh(SelectedChannel.Id, ConfigElement.Chan);
+                    playBox.Checked = ChCfgMgr.getCh(SelectedChannel.Id, ConfigElement.Play);
+                    waifuBox.Checked = ChCfgMgr.getCh(SelectedChannel.Id, ConfigElement.Waifu);
+                    nsfwBox.Checked = SelectedChannel.Channel.IsNSFW || ChCfgMgr.getCh(SelectedChannel.Id, ConfigElement.Nsfw);
+                    configBox.Checked = ChCfgMgr.getCh(SelectedChannel.Id, ConfigElement.Config);
+                    beemovieBox.Checked = ChCfgMgr.getCh(SelectedChannel.Id, ConfigElement.Bees);
+                    pollBox.Checked = ChCfgMgr.getCh(SelectedChannel.Id, ConfigElement.Poll);
+                    nsfwBox.Enabled = !SelectedChannel.Channel.IsNSFW;
                     settingsPanel.Text = SelectedGuild.Guild.Name + " - " + SelectedChannel.Channel.Name;
                     settingsPanel.Enabled = true;
                 }
@@ -205,6 +210,23 @@ namespace Bot
             }
         }
 
+        public void updateChecking()
+        {
+            try
+            {
+                recCheck = false;
+                IEnumerable<TreeNode> nodes = channelTree.Nodes.OfType<TreeNode>();
+                nodes.First().Checked = Common.guildsBox;
+                nodes = nodes.First().Nodes.OfType<TreeNode>();
+                nodes = nodes.Concat(nodes.SelectMany(s => s.Nodes.OfType<TreeNode>()));
+                nodes.ToList().ForEach(s => s.Checked = s.Tag.tryCast(out BotChannel c) ? ChCfgMgr.getCh(c.Id, ConfigElement.Enabled) : s.Tag.tryCast(out BotGuild g) ? ChCfgMgr.getGl(g.Id) : s.Checked);
+            }
+            finally
+            {
+                recCheck = true;
+            }
+        }
+
         private void chatSend_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -217,31 +239,32 @@ namespace Bot
         bool busy = false;
         private void channelTree_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            try
-            {
-                if (!busy)
+            if (recCheck)
+                try
                 {
-                    busy = true;
-                    checkNodes(e.Node, e.Node.Checked);
-                }
-            }
-            finally
-            {
-                busy = false;
-                if (e.Node.Parent != null)
-                {
-                    if (e.Node.Tag.tryCast(out BotChannel c))
+                    if (!busy)
                     {
-                        ChCfgMgr.setCh(c.Id, ConfigElement.Enabled, e.Node.Checked);
-                    }
-                    else if (e.Node.Tag.tryCast(out BotGuild g))
-                    {
-                        ChCfgMgr.setGl(g.Id, e.Node.Checked);
+                        busy = true;
+                        checkNodes(e.Node, e.Node.Checked);
                     }
                 }
-                else
-                    Common.guildsBox = e.Node.Checked;
-            }
+                finally
+                {
+                    busy = false;
+                    if (e.Node.Parent != null)
+                    {
+                        if (e.Node.Tag.tryCast(out BotChannel c))
+                        {
+                            ChCfgMgr.setCh(c.Id, ConfigElement.Enabled, e.Node.Checked);
+                        }
+                        else if (e.Node.Tag.tryCast(out BotGuild g))
+                        {
+                            ChCfgMgr.setGl(g.Id, e.Node.Checked);
+                        }
+                    }
+                    else
+                        Common.guildsBox = e.Node.Checked;
+                }
         }
 
         private void checkNodes(TreeNode node, bool check)
@@ -253,19 +276,21 @@ namespace Bot
             }
         }
 
-        private void chanBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Chan, chanBox.Checked);
+        private void chanBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Chan, chanBox.Checked, true);
 
-        private void playBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Play, playBox.Checked);
+        private void playBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Play, playBox.Checked, true);
 
-        private void waifuBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Waifu, waifuBox.Checked);
+        private void waifuBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Waifu, waifuBox.Checked, true);
 
-        private void booruBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Booru, booruBox.Checked);
+        private void booruBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Booru, booruBox.Checked, true);
 
-        private void nsfwBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Nsfw, nsfwBox.Checked);
+        private void nsfwBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Nsfw, nsfwBox.Checked, true);
 
-        private void configBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Config, configBox.Checked);
+        private void configBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Config, configBox.Checked, true);
 
-        private void beemovieBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Bees, beemovieBox.Checked);
+        private void beemovieBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Bees, beemovieBox.Checked, true);
+
+        private void pollBox_CheckedChanged(object sender, EventArgs e) => ChCfgMgr.setCh(ChID, ConfigElement.Poll, pollBox.Checked, true);
 
         private void debugButton_Click(object sender, EventArgs e)
         {
@@ -324,15 +349,71 @@ namespace Bot
                 _ = Commands.Bees(SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3));
         }
 
+        private void pollButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (ChannelDefined)
+                    _ = Commands.Poll(SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3), new TimeSpan(10000 * long.Parse(Interaction.InputBox("Milliseconds"))),
+                        Interaction.InputBox("Emoticons").Split(' ').Select(s => DiscordEmoji.FromName(Bot.Client, s)).ToArray());
+            }
+            catch (Exception e1)
+            {
+                MessageBox.Show("Failed: " + e1.Message);
+            }
+        }
+
         private void resetButton_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Are you sure you want to reset everything?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                File.Delete(Path.GetDirectoryName(Application.ExecutablePath) + @"\key.secure");
+                Directory.Delete(Path.GetDirectoryName(Application.ExecutablePath) + @"\Cfgs");
                 Close();
             }
         }
 
         private void channelTree_AfterCollapse(object sender, TreeViewEventArgs e) => channelTree.Nodes[0].Expand();
+
+        private void cleanButton_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to delete unused configs?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                string[] cfgs = Directory.GetFiles(Path.GetDirectoryName(Application.ExecutablePath) + @"\Cfgs");
+                string[] guilds = channelTree.Nodes[0].Nodes
+                    .OfType<TreeNode>().Select(s => ((IBotStruct)s.Tag).Id.ToString()).ToArray();
+                string[] channels = channelTree.Nodes[0].Nodes.OfType<TreeNode>().SelectMany(s => s.Nodes.OfType<TreeNode>())
+                    .OfType<TreeNode>().Select(s => ((IBotStruct)s.Tag).Id.ToString()).ToArray();
+                string[] allowedNames = new string[] { "common.xml", "key.secure" };
+                for (int i = 0; i < cfgs.Length; i++)
+                {
+                    XDocument el;
+                    try
+                    {
+                        el = XDocument.Load(cfgs[i]);
+                    }
+                    catch
+                    {
+                        el = new XDocument();
+                    }
+                    string file = Path.GetFileName(cfgs[i]);
+                    string id = Path.GetFileNameWithoutExtension(file);
+                    if (el.Element("guild") != null)
+                    {
+                        if (!guilds.Contains(id))
+                            File.Delete(cfgs[i]);
+                    }
+                    else if (el.Element("channel") != null)
+                    {
+                        if (!channels.Contains(id))
+                            File.Delete(cfgs[i]);
+                    }
+                    else
+                    {
+                        if (!allowedNames.Contains(file))
+                            File.Delete(cfgs[i]);
+                    }
+                }
+            }
+        }
     }
 }

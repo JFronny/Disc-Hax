@@ -9,6 +9,7 @@
         Nsfw,
         Play,
         Waifu,
+        Poll,
         Enabled
     }
 }

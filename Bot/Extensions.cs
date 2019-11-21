@@ -2,6 +2,7 @@
 using DSharpPlus.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Windows.Forms;
@@ -108,5 +109,6 @@ namespace Bot
         }
 
         public static G mod<T, G>(this T self, Func<T, G> func) => func.Invoke(self);
+        public static T ParseToEnum<T>(string value) => (T)Enum.Parse(typeof(T), Enum.GetNames(typeof(T)).First(s => s.ToLower() == value.ToLower()));
     }
 }

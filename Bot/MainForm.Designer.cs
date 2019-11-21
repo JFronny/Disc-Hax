@@ -51,6 +51,9 @@
             this.playBox = new System.Windows.Forms.CheckBox();
             this.chanBox = new System.Windows.Forms.CheckBox();
             this.settingsPanel = new System.Windows.Forms.GroupBox();
+            this.pollButton = new System.Windows.Forms.Button();
+            this.pollBox = new System.Windows.Forms.CheckBox();
+            this.cleanButton = new System.Windows.Forms.Button();
             this.chatPanel.SuspendLayout();
             this.settingsPanel.SuspendLayout();
             this.SuspendLayout();
@@ -66,7 +69,7 @@
             treeNode1.Text = "Guilds";
             this.channelTree.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode1});
-            this.channelTree.Size = new System.Drawing.Size(166, 288);
+            this.channelTree.Size = new System.Drawing.Size(166, 379);
             this.channelTree.TabIndex = 0;
             this.channelTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.channelTree_AfterCheck);
             this.channelTree.AfterCollapse += new System.Windows.Forms.TreeViewEventHandler(this.channelTree_AfterCollapse);
@@ -79,7 +82,7 @@
             this.chatBox.FormattingEnabled = true;
             this.chatBox.Location = new System.Drawing.Point(0, 0);
             this.chatBox.Name = "chatBox";
-            this.chatBox.Size = new System.Drawing.Size(532, 288);
+            this.chatBox.Size = new System.Drawing.Size(479, 379);
             this.chatBox.TabIndex = 1;
             // 
             // chatPanel
@@ -89,23 +92,23 @@
             this.chatPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.chatPanel.Location = new System.Drawing.Point(166, 0);
             this.chatPanel.Name = "chatPanel";
-            this.chatPanel.Size = new System.Drawing.Size(532, 288);
+            this.chatPanel.Size = new System.Drawing.Size(479, 379);
             this.chatPanel.TabIndex = 2;
             // 
             // chatSend
             // 
             this.chatSend.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.chatSend.Enabled = false;
-            this.chatSend.Location = new System.Drawing.Point(0, 268);
+            this.chatSend.Location = new System.Drawing.Point(0, 359);
             this.chatSend.Name = "chatSend";
-            this.chatSend.Size = new System.Drawing.Size(532, 20);
+            this.chatSend.Size = new System.Drawing.Size(479, 20);
             this.chatSend.TabIndex = 2;
             this.chatSend.KeyDown += new System.Windows.Forms.KeyEventHandler(this.chatSend_KeyDown);
             // 
             // resetButton
             // 
             this.resetButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.resetButton.Location = new System.Drawing.Point(142, 232);
+            this.resetButton.Location = new System.Drawing.Point(88, 350);
             this.resetButton.Name = "resetButton";
             this.resetButton.Size = new System.Drawing.Size(52, 23);
             this.resetButton.TabIndex = 15;
@@ -136,7 +139,7 @@
             // 
             // pingButton
             // 
-            this.pingButton.Location = new System.Drawing.Point(142, 157);
+            this.pingButton.Location = new System.Drawing.Point(142, 176);
             this.pingButton.Name = "pingButton";
             this.pingButton.Size = new System.Drawing.Size(52, 23);
             this.pingButton.TabIndex = 12;
@@ -147,7 +150,7 @@
             // debugButton
             // 
             this.debugButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.debugButton.Location = new System.Drawing.Point(142, 259);
+            this.debugButton.Location = new System.Drawing.Point(142, 350);
             this.debugButton.Name = "debugButton";
             this.debugButton.Size = new System.Drawing.Size(52, 23);
             this.debugButton.TabIndex = 4;
@@ -180,11 +183,11 @@
             // 
             this.nsfwBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.nsfwBox.AutoSize = true;
-            this.nsfwBox.Location = new System.Drawing.Point(6, 263);
+            this.nsfwBox.Location = new System.Drawing.Point(6, 354);
             this.nsfwBox.Name = "nsfwBox";
-            this.nsfwBox.Size = new System.Drawing.Size(144, 17);
+            this.nsfwBox.Size = new System.Drawing.Size(86, 17);
             this.nsfwBox.TabIndex = 9;
-            this.nsfwBox.Text = "Allow NSFW everywhere";
+            this.nsfwBox.Text = "Allow NSFW";
             this.nsfwBox.UseVisualStyleBackColor = true;
             this.nsfwBox.CheckedChanged += new System.EventHandler(this.nsfwBox_CheckedChanged);
             // 
@@ -274,6 +277,9 @@
             // 
             // settingsPanel
             // 
+            this.settingsPanel.Controls.Add(this.cleanButton);
+            this.settingsPanel.Controls.Add(this.pollButton);
+            this.settingsPanel.Controls.Add(this.pollBox);
             this.settingsPanel.Controls.Add(this.resetButton);
             this.settingsPanel.Controls.Add(this.chanBox);
             this.settingsPanel.Controls.Add(this.beemovieButton);
@@ -292,24 +298,56 @@
             this.settingsPanel.Controls.Add(this.booruButton);
             this.settingsPanel.Dock = System.Windows.Forms.DockStyle.Right;
             this.settingsPanel.Enabled = false;
-            this.settingsPanel.Location = new System.Drawing.Point(698, 0);
+            this.settingsPanel.Location = new System.Drawing.Point(645, 0);
             this.settingsPanel.Name = "settingsPanel";
-            this.settingsPanel.Size = new System.Drawing.Size(200, 288);
+            this.settingsPanel.Size = new System.Drawing.Size(200, 379);
             this.settingsPanel.TabIndex = 16;
             this.settingsPanel.TabStop = false;
             this.settingsPanel.Text = "Channel";
+            // 
+            // pollButton
+            // 
+            this.pollButton.Location = new System.Drawing.Point(142, 153);
+            this.pollButton.Name = "pollButton";
+            this.pollButton.Size = new System.Drawing.Size(52, 23);
+            this.pollButton.TabIndex = 17;
+            this.pollButton.Text = "Run";
+            this.pollButton.UseVisualStyleBackColor = true;
+            this.pollButton.Click += new System.EventHandler(this.pollButton_Click);
+            // 
+            // pollBox
+            // 
+            this.pollBox.AutoSize = true;
+            this.pollBox.Location = new System.Drawing.Point(12, 157);
+            this.pollBox.Name = "pollBox";
+            this.pollBox.Size = new System.Drawing.Size(94, 17);
+            this.pollBox.TabIndex = 16;
+            this.pollBox.Text = "!poll command";
+            this.pollBox.UseVisualStyleBackColor = true;
+            this.pollBox.CheckedChanged += new System.EventHandler(this.pollBox_CheckedChanged);
+            // 
+            // cleanButton
+            // 
+            this.cleanButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.cleanButton.Location = new System.Drawing.Point(142, 325);
+            this.cleanButton.Name = "cleanButton";
+            this.cleanButton.Size = new System.Drawing.Size(52, 23);
+            this.cleanButton.TabIndex = 19;
+            this.cleanButton.Text = "Clean";
+            this.cleanButton.UseVisualStyleBackColor = true;
+            this.cleanButton.Click += new System.EventHandler(this.cleanButton_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(898, 288);
+            this.ClientSize = new System.Drawing.Size(845, 379);
             this.Controls.Add(this.chatPanel);
             this.Controls.Add(this.channelTree);
             this.Controls.Add(this.settingsPanel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MinimumSize = new System.Drawing.Size(555, 279);
+            this.MinimumSize = new System.Drawing.Size(555, 321);
             this.Name = "MainForm";
             this.Text = "DiscHax Bot Menu";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form_FormClosed);
@@ -344,6 +382,9 @@
         public System.Windows.Forms.Button beemovieButton;
         public System.Windows.Forms.Button resetButton;
         public System.Windows.Forms.GroupBox settingsPanel;
+        public System.Windows.Forms.Button pollButton;
+        public System.Windows.Forms.CheckBox pollBox;
+        private System.Windows.Forms.Button cleanButton;
     }
 }
 
