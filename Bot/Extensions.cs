@@ -67,7 +67,7 @@ namespace Bot
             }
             dlg.DynamicInvoke(args);
         }
-        
+
         public static TResult InvokeFunc<TCtl, TResult>(this TCtl control, Delegate dlg, params object[] args) where TCtl : Control
         {
             if (control == null)
@@ -79,7 +79,7 @@ namespace Bot
                 : (TResult)dlg.DynamicInvoke(args);
         }
 
-        public static bool getEvaluatedNSFW(this DiscordChannel Channel) => Channel.IsNSFW || ChCfgMgr.getCh(Channel.Id, ConfigElement.Nsfw);
+        public static bool getEvaluatedNSFW(this DiscordChannel Channel) => Channel.IsNSFW || ConfigManager.get(Channel.Id, ConfigElement.Nsfw).TRUE();
 
         public static T get<G, T>(this Dictionary<G, T> dict, G key, T def)
         {
@@ -110,5 +110,12 @@ namespace Bot
 
         public static G mod<T, G>(this T self, Func<T, G> func) => func.Invoke(self);
         public static T ParseToEnum<T>(string value) => (T)Enum.Parse(typeof(T), Enum.GetNames(typeof(T)).First(s => s.ToLower() == value.ToLower()));
+        public static bool? ParseBool(string value) => string.IsNullOrWhiteSpace(value) ? (bool?)null : bool.Parse(value);
+        public static bool AND(this bool? left, bool? right) => left.TRUE() && right.TRUE();
+        public static bool OR(this bool? left, bool? right) => left.TRUE() || right.TRUE();
+        public static bool XOR(this bool? left, bool? right) => left.OR(right) && (!left.AND(right));
+        public static bool TRUE(this bool? self) => self == true;
+        public static bool FALSE(this bool? self) => self == false;
+        public static bool NULL(this bool? self) => self == null;
     }
 }

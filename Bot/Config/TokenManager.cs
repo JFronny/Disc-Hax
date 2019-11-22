@@ -11,7 +11,7 @@ using Misc;
 
 namespace Bot.Config
 {
-    public static class TokenContainer
+    public static class TokenManager
     {
         static string _token;
         static readonly string containerFile = Path.GetDirectoryName(Application.ExecutablePath) + @"\Cfgs\key.secure";

@@ -9,7 +9,7 @@ using System.Xml.Linq;
 
 namespace Bot.Config
 {
-    static class ChCfgMgr
+    static class ConfigManager
     {
         static XElement getXML(ulong ID, string ElName, out string XMLPath)
         {
@@ -23,23 +23,23 @@ namespace Bot.Config
         }
         static XElement getXML(ulong ID, string ElName) => getXML(ID, ElName, out string leltisnotused);
 
-        public static bool getCh(ulong Channel, ConfigElement element)
+        public static bool? get(ulong Channel, ConfigElement element)
         {
             XElement el = getXML(Channel, "channel").Element(element.ToString().ToLower());
             if (el == null)
             {
-                setCh(Channel, element, false);
-                return getCh(Channel, element);
+                set(Channel, element, false);
+                return get(Channel, element);
             }
             else
-                return bool.Parse(el.Value);
+                return Extensions.ParseBool(el.Value);
         }
 
-        public static string getChStr(ulong Channel) => string.Join("\r\n", Enum.GetValues(typeof(ConfigElement)).OfType<ConfigElement>().Select(s => s.ToString() + ": " + getCh(Channel, s)));
+        public static string getStr(ulong Channel) => string.Join("\r\n", Enum.GetValues(typeof(ConfigElement)).OfType<ConfigElement>().Select(s => s.ToString() + ": " + get(Channel, s)));
 
-        public static void setCh(ulong Channel, ConfigElement element, bool val, bool disableFormChecks = false)
+        public static void set(ulong ID, ConfigElement element, bool? val, bool disableFormChecks = false, string configType = "channel")
         {
-            XElement XML = getXML(Channel, "channel", out string XMLPath);
+            XElement XML = getXML(ID, configType, out string XMLPath);
             string el = element.ToString().ToLower();
             if (XML.Elements(el).Count() == 0)
                 XML.Add(new XElement(el, val.ToString()));
@@ -48,27 +48,18 @@ namespace Bot.Config
             if (!disableFormChecks)
             {
                 MainForm f = MainForm.Instance;
-                if (f.ChannelDefined && f.SelectedChannel.Id == Channel)
+                if (f.ChannelDefined && f.SelectedChannel.Id == ID)
                     f.Invoke((MethodInvoker)delegate ()
                     {
                         f.channelTree_AfterSelect(null, new TreeViewEventArgs(
                             f.channelTree.Nodes[0].Nodes.OfType<TreeNode>()
                             .SelectMany(s => s.Nodes.OfType<TreeNode>())
-                            .First(s => ((BotChannel)s.Tag).Id == Channel)));
+                            .First(s => ((BotChannel)s.Tag).Id == ID)));
                     });
                 if (element == ConfigElement.Enabled)
                     f.Invoke((MethodInvoker)delegate () { f.updateChecking(); });
             }
             XML.Save(XMLPath);
         }
-
-        public static bool getGl(ulong Guild)
-        {
-            if (!File.Exists(Path.GetDirectoryName(Application.ExecutablePath) + @"\Cfgs\" + Guild.ToString() + ".xml"))
-                setGl(Guild, false);
-            return bool.Parse(XElement.Load(Path.GetDirectoryName(Application.ExecutablePath) + @"\Cfgs\" + Guild.ToString() + ".xml").Element("enabled").Value);
-        }
-
-        public static void setGl(ulong Guild, bool val) => new XElement("guild", new XElement("enabled", val.ToString())).Save(Path.GetDirectoryName(Application.ExecutablePath) + @"\Cfgs\" + Guild.ToString() + ".xml");
     }
 }

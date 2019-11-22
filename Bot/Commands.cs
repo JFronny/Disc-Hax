@@ -25,7 +25,7 @@ namespace Bot
 
         public static async Task Chan(string[] args, DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (ChCfgMgr.getCh(Channel.Id, ConfigElement.Enabled) && ChCfgMgr.getCh(Channel.Id, ConfigElement.Chan))
+            if (ConfigManager.get(Channel.Id, ConfigElement.Enabled).AND(ConfigManager.get(Channel.Id, ConfigElement.Chan)))
                 if (args.Length == 0)
                 {
                     List<string> lmsg = new List<string>();
@@ -55,7 +55,7 @@ namespace Bot
 
         public static async Task Waifu(string[] args, DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (ChCfgMgr.getCh(Channel.Id, ConfigElement.Enabled) && ChCfgMgr.getCh(Channel.Id, ConfigElement.Waifu))
+            if (ConfigManager.get(Channel.Id, ConfigElement.Enabled).AND(ConfigManager.get(Channel.Id, ConfigElement.Waifu)))
                 if (Channel.getEvaluatedNSFW() || args.Contains("f"))
                     await postMessage(null, false, new DiscordEmbedBuilder { Title = "There.", ImageUrl = "https://www.thiswaifudoesnotexist.net/example-" + MainForm.Instance.rnd.Next(6000).ToString() + ".jpg" });
                 else
@@ -67,7 +67,7 @@ namespace Bot
 
         public static async Task Play(DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (ChCfgMgr.getCh(Channel.Id, ConfigElement.Enabled) && ChCfgMgr.getCh(Channel.Id, ConfigElement.Play))
+            if (ConfigManager.get(Channel.Id, ConfigElement.Enabled).AND(ConfigManager.get(Channel.Id, ConfigElement.Play)))
                 await postMessage("No.", false, null);
         }
 
@@ -76,7 +76,7 @@ namespace Bot
 
         public static async Task Bees(DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (ChCfgMgr.getCh(Channel.Id, ConfigElement.Enabled) && ChCfgMgr.getCh(Channel.Id, ConfigElement.Bees))
+            if (ConfigManager.get(Channel.Id, ConfigElement.Enabled).AND(ConfigManager.get(Channel.Id, ConfigElement.Bees)))
             {
                 if (_beequotes == null)
                     using (WebClient client = new WebClient())
@@ -99,7 +99,7 @@ namespace Bot
 
         public static async Task Ping(DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (ChCfgMgr.getCh(Channel.Id, ConfigElement.Enabled))
+            if (ConfigManager.get(Channel.Id, ConfigElement.Enabled).TRUE())
                 await postMessage("Pong", false, null);
         }
 
@@ -119,13 +119,13 @@ namespace Bot
                     booruDict.Add(s.ToString().Split('.')[2].ToLower(), s);
                 });
             }
-            if (ChCfgMgr.getCh(Channel.Id, ConfigElement.Enabled) && ChCfgMgr.getCh(Channel.Id, ConfigElement.Booru))
+            if (ConfigManager.get(Channel.Id, ConfigElement.Enabled).AND(ConfigManager.get(Channel.Id, ConfigElement.Booru)))
             {
                 if (args.Length == 1 && args[0].ToLower() == "list")
                 {
                     await postMessage(string.Join("; ", booruDict.Keys), false, null);
                 }
-                else if (ChCfgMgr.getCh(Channel.Id, ConfigElement.Booru))
+                else if (ConfigManager.get(Channel.Id, ConfigElement.Booru).TRUE())
                 {
                     Booru booru = (args.Length > 0 && booruDict.ContainsKey(args[0].ToLower())) ? booruDict[args[0]]
                         : (Channel.getEvaluatedNSFW() ? (Booru)new Rule34() : new Gelbooru());
@@ -147,21 +147,21 @@ namespace Bot
 
         public static async Task ConfigCmd(string[] args, DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (ChCfgMgr.getCh(Channel.Id, ConfigElement.Enabled) && ChCfgMgr.getCh(Channel.Id, ConfigElement.Config))
+            if (ConfigManager.get(Channel.Id, ConfigElement.Enabled).AND(ConfigManager.get(Channel.Id, ConfigElement.Config)))
             {
                 if (args.Length == 0)
-                    await postMessage(ChCfgMgr.getChStr(Channel.Id), false, null);
+                    await postMessage(ConfigManager.getStr(Channel.Id), false, null);
                 else
                 {
                     ConfigElement el = Extensions.ParseToEnum<ConfigElement>(args[0]);
                     if (args.Length == 1)
                     {
-                        await postMessage(el.ToString() + ": " + ChCfgMgr.getCh(Channel.Id, el).ToString(), false, null);
+                        await postMessage(el.ToString() + ": " + ConfigManager.get(Channel.Id, el).ToString(), false, null);
                     }
                     else
                     {
                         bool val = bool.Parse(args[1]);
-                        ChCfgMgr.setCh(Channel.Id, el, val);
+                        ConfigManager.set(Channel.Id, el, val);
                         await postMessage("Set " + el.ToString() + " to " + val.ToString(), false, null);
                     }
                 }
@@ -173,7 +173,7 @@ namespace Bot
 
         public static async Task Poll(DiscordChannel Channel, Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage, TimeSpan duration, params DiscordEmoji[] options)
         {
-            if (ChCfgMgr.getCh(Channel.Id, ConfigElement.Enabled) && ChCfgMgr.getCh(Channel.Id, ConfigElement.Poll))
+            if (ConfigManager.get(Channel.Id, ConfigElement.Enabled).AND(ConfigManager.get(Channel.Id, ConfigElement.Poll)))
             {
                 IEnumerable<string> poll_options = options.Select(xe => xe.ToString());
                 var embed = new DiscordEmbedBuilder
