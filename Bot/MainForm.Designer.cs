@@ -50,11 +50,13 @@
             this.waifuBox = new System.Windows.Forms.CheckBox();
             this.playBox = new System.Windows.Forms.CheckBox();
             this.chanBox = new System.Windows.Forms.CheckBox();
-            this.settingsPanel = new System.Windows.Forms.GroupBox();
+            this.clientSettingsPanel = new System.Windows.Forms.GroupBox();
+            this.cleanButton = new System.Windows.Forms.Button();
             this.pollButton = new System.Windows.Forms.Button();
             this.pollBox = new System.Windows.Forms.CheckBox();
-            this.cleanButton = new System.Windows.Forms.Button();
+            this.settingsPanel = new System.Windows.Forms.Panel();
             this.chatPanel.SuspendLayout();
+            this.clientSettingsPanel.SuspendLayout();
             this.settingsPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -108,7 +110,7 @@
             // resetButton
             // 
             this.resetButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.resetButton.Location = new System.Drawing.Point(88, 350);
+            this.resetButton.Location = new System.Drawing.Point(6, 344);
             this.resetButton.Name = "resetButton";
             this.resetButton.Size = new System.Drawing.Size(52, 23);
             this.resetButton.TabIndex = 15;
@@ -150,7 +152,7 @@
             // debugButton
             // 
             this.debugButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.debugButton.Location = new System.Drawing.Point(142, 350);
+            this.debugButton.Location = new System.Drawing.Point(136, 344);
             this.debugButton.Name = "debugButton";
             this.debugButton.Size = new System.Drawing.Size(52, 23);
             this.debugButton.TabIndex = 4;
@@ -183,7 +185,7 @@
             // 
             this.nsfwBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.nsfwBox.AutoSize = true;
-            this.nsfwBox.Location = new System.Drawing.Point(6, 354);
+            this.nsfwBox.Location = new System.Drawing.Point(6, 313);
             this.nsfwBox.Name = "nsfwBox";
             this.nsfwBox.Size = new System.Drawing.Size(86, 17);
             this.nsfwBox.TabIndex = 9;
@@ -275,35 +277,43 @@
             this.chanBox.UseVisualStyleBackColor = true;
             this.chanBox.CheckedChanged += new System.EventHandler(this.chanBox_CheckedChanged);
             // 
-            // settingsPanel
+            // clientSettingsPanel
             // 
-            this.settingsPanel.Controls.Add(this.cleanButton);
-            this.settingsPanel.Controls.Add(this.pollButton);
-            this.settingsPanel.Controls.Add(this.pollBox);
-            this.settingsPanel.Controls.Add(this.resetButton);
-            this.settingsPanel.Controls.Add(this.chanBox);
-            this.settingsPanel.Controls.Add(this.beemovieButton);
-            this.settingsPanel.Controls.Add(this.playBox);
-            this.settingsPanel.Controls.Add(this.beemovieBox);
-            this.settingsPanel.Controls.Add(this.waifuBox);
-            this.settingsPanel.Controls.Add(this.pingButton);
-            this.settingsPanel.Controls.Add(this.booruBox);
-            this.settingsPanel.Controls.Add(this.debugButton);
-            this.settingsPanel.Controls.Add(this.chanButton);
-            this.settingsPanel.Controls.Add(this.configButton);
-            this.settingsPanel.Controls.Add(this.playButton);
-            this.settingsPanel.Controls.Add(this.configBox);
-            this.settingsPanel.Controls.Add(this.waifuButton);
-            this.settingsPanel.Controls.Add(this.nsfwBox);
-            this.settingsPanel.Controls.Add(this.booruButton);
-            this.settingsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.settingsPanel.Enabled = false;
-            this.settingsPanel.Location = new System.Drawing.Point(645, 0);
-            this.settingsPanel.Name = "settingsPanel";
-            this.settingsPanel.Size = new System.Drawing.Size(200, 379);
-            this.settingsPanel.TabIndex = 16;
-            this.settingsPanel.TabStop = false;
-            this.settingsPanel.Text = "Channel";
+            this.clientSettingsPanel.Controls.Add(this.pollButton);
+            this.clientSettingsPanel.Controls.Add(this.pollBox);
+            this.clientSettingsPanel.Controls.Add(this.chanBox);
+            this.clientSettingsPanel.Controls.Add(this.beemovieButton);
+            this.clientSettingsPanel.Controls.Add(this.playBox);
+            this.clientSettingsPanel.Controls.Add(this.beemovieBox);
+            this.clientSettingsPanel.Controls.Add(this.waifuBox);
+            this.clientSettingsPanel.Controls.Add(this.pingButton);
+            this.clientSettingsPanel.Controls.Add(this.booruBox);
+            this.clientSettingsPanel.Controls.Add(this.chanButton);
+            this.clientSettingsPanel.Controls.Add(this.configButton);
+            this.clientSettingsPanel.Controls.Add(this.playButton);
+            this.clientSettingsPanel.Controls.Add(this.configBox);
+            this.clientSettingsPanel.Controls.Add(this.waifuButton);
+            this.clientSettingsPanel.Controls.Add(this.nsfwBox);
+            this.clientSettingsPanel.Controls.Add(this.booruButton);
+            this.clientSettingsPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.clientSettingsPanel.Enabled = false;
+            this.clientSettingsPanel.Location = new System.Drawing.Point(0, 0);
+            this.clientSettingsPanel.Name = "clientSettingsPanel";
+            this.clientSettingsPanel.Size = new System.Drawing.Size(200, 338);
+            this.clientSettingsPanel.TabIndex = 16;
+            this.clientSettingsPanel.TabStop = false;
+            this.clientSettingsPanel.Text = "Channel";
+            // 
+            // cleanButton
+            // 
+            this.cleanButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.cleanButton.Location = new System.Drawing.Point(71, 344);
+            this.cleanButton.Name = "cleanButton";
+            this.cleanButton.Size = new System.Drawing.Size(52, 23);
+            this.cleanButton.TabIndex = 19;
+            this.cleanButton.Text = "Clean";
+            this.cleanButton.UseVisualStyleBackColor = true;
+            this.cleanButton.Click += new System.EventHandler(this.cleanButton_Click);
             // 
             // pollButton
             // 
@@ -326,16 +336,17 @@
             this.pollBox.UseVisualStyleBackColor = true;
             this.pollBox.CheckedChanged += new System.EventHandler(this.pollBox_CheckedChanged);
             // 
-            // cleanButton
+            // settingsPanel
             // 
-            this.cleanButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.cleanButton.Location = new System.Drawing.Point(142, 325);
-            this.cleanButton.Name = "cleanButton";
-            this.cleanButton.Size = new System.Drawing.Size(52, 23);
-            this.cleanButton.TabIndex = 19;
-            this.cleanButton.Text = "Clean";
-            this.cleanButton.UseVisualStyleBackColor = true;
-            this.cleanButton.Click += new System.EventHandler(this.cleanButton_Click);
+            this.settingsPanel.Controls.Add(this.cleanButton);
+            this.settingsPanel.Controls.Add(this.clientSettingsPanel);
+            this.settingsPanel.Controls.Add(this.resetButton);
+            this.settingsPanel.Controls.Add(this.debugButton);
+            this.settingsPanel.Dock = System.Windows.Forms.DockStyle.Right;
+            this.settingsPanel.Location = new System.Drawing.Point(645, 0);
+            this.settingsPanel.Name = "settingsPanel";
+            this.settingsPanel.Size = new System.Drawing.Size(200, 379);
+            this.settingsPanel.TabIndex = 20;
             // 
             // MainForm
             // 
@@ -353,8 +364,9 @@
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form_FormClosed);
             this.chatPanel.ResumeLayout(false);
             this.chatPanel.PerformLayout();
+            this.clientSettingsPanel.ResumeLayout(false);
+            this.clientSettingsPanel.PerformLayout();
             this.settingsPanel.ResumeLayout(false);
-            this.settingsPanel.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -381,10 +393,11 @@
         public System.Windows.Forms.CheckBox beemovieBox;
         public System.Windows.Forms.Button beemovieButton;
         public System.Windows.Forms.Button resetButton;
-        public System.Windows.Forms.GroupBox settingsPanel;
+        public System.Windows.Forms.GroupBox clientSettingsPanel;
         public System.Windows.Forms.Button pollButton;
         public System.Windows.Forms.CheckBox pollBox;
         private System.Windows.Forms.Button cleanButton;
+        private System.Windows.Forms.Panel settingsPanel;
     }
 }
 

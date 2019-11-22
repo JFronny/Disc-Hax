@@ -74,9 +74,7 @@ namespace Bot
                 throw new ArgumentNullException(nameof(control));
             if (dlg == null)
                 throw new ArgumentNullException(nameof(dlg));
-            return control.InvokeRequired
-                ? (TResult)control.Invoke(new InvokeFuncDelegate<TCtl, TResult>(InvokeFunc<TCtl, TResult>), control, dlg, args)
-                : (TResult)dlg.DynamicInvoke(args);
+            return control.InvokeRequired ? (TResult)control.Invoke(new InvokeFuncDelegate<TCtl, TResult>(InvokeFunc<TCtl, TResult>), control, dlg, args) : (TResult)dlg.DynamicInvoke(args);
         }
 
         public static bool getEvaluatedNSFW(this DiscordChannel Channel) => Channel.IsNSFW || ConfigManager.get(Channel.Id, ConfigElement.Nsfw).TRUE();
@@ -109,8 +107,13 @@ namespace Bot
         }
 
         public static G mod<T, G>(this T self, Func<T, G> func) => func.Invoke(self);
+        public static void ExIf(bool condition, Action func)
+        {
+            if (condition)
+                func();
+        }
         public static T ParseToEnum<T>(string value) => (T)Enum.Parse(typeof(T), Enum.GetNames(typeof(T)).First(s => s.ToLower() == value.ToLower()));
-        public static bool? ParseBool(string value) => string.IsNullOrWhiteSpace(value) ? (bool?)null : bool.Parse(value);
+        public static bool? ParseBool(string value) => (string.IsNullOrWhiteSpace(value) || value.ToLower() == "Indeterminate") ? (bool?)null : bool.Parse(value);
         public static bool AND(this bool? left, bool? right) => left.TRUE() && right.TRUE();
         public static bool OR(this bool? left, bool? right) => left.TRUE() || right.TRUE();
         public static bool XOR(this bool? left, bool? right) => left.OR(right) && (!left.AND(right));

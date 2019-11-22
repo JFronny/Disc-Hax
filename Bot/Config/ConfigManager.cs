@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DSharpPlus.Entities;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,29 +23,56 @@ namespace Bot.Config
             return XElement.Load(XMLPath);
         }
         static XElement getXML(ulong ID, string ElName) => getXML(ID, ElName, out string leltisnotused);
-
-        public static bool? get(ulong Channel, ConfigElement element)
+        public static bool? get(ulong ID, ConfigElement element, string configType = "channel", bool? defaultVal = false)
         {
-            XElement el = getXML(Channel, "channel").Element(element.ToString().ToLower());
+            XElement el = getXML(ID, configType);
+            if (el.Element("upper") != null && el.Element("upper").Value != null
+                && el.Element("upperType") != null && el.Element("upperType").Value != null)
+            {
+                bool? tmp = get(ulong.Parse(el.Element("upper").Value), element, el.Element("upperType").Value, null);
+                if (tmp.HasValue)
+                    return tmp;
+            }
+            el = el.Element(element.ToString().ToLower());
             if (el == null)
             {
-                set(Channel, element, false);
-                return get(Channel, element);
+                set(ID, element, defaultVal);
+                return get(ID, element, configType, defaultVal);
             }
             else
                 return Extensions.ParseBool(el.Value);
         }
 
-        public static string getStr(ulong Channel) => string.Join("\r\n", Enum.GetValues(typeof(ConfigElement)).OfType<ConfigElement>().Select(s => s.ToString() + ": " + get(Channel, s)));
+        public static string getStr(ulong ID) => string.Join("\r\n", Enum.GetValues(typeof(ConfigElement)).OfType<ConfigElement>().Select(s => s.ToString() + ": " + get(ID, s)));
 
-        public static void set(ulong ID, ConfigElement element, bool? val, bool disableFormChecks = false, string configType = "channel")
+
+        public static void set(DiscordChannel channel, ConfigElement element, bool? val, bool disableFormChecks = false) => set(channel.Id, element, val, disableFormChecks, "channel", new ValueTuple<ulong, string>[] { new ValueTuple<ulong, string>(channel.GuildId, "guild") });
+
+        public static void set(ulong ID, ConfigElement element, bool? val, bool disableFormChecks = false, string configType = "channel", ValueTuple<ulong, string>[]? upper = null)
         {
+            
             XElement XML = getXML(ID, configType, out string XMLPath);
             string el = element.ToString().ToLower();
             if (XML.Elements(el).Count() == 0)
                 XML.Add(new XElement(el, val.ToString()));
             else
                 XML.Element(el).Value = val.ToString();
+            if (upper != null)
+            {
+                XElement tmpXML = XML;
+                for (int i = 0; i < upper.Length; i++)
+                {
+                    if (tmpXML.Elements("upper").Count() == 0)
+                        tmpXML.Add(new XElement("upper", upper[i].Item1.ToString()));
+                    else
+                        tmpXML.Element("upper").Value = upper[i].Item1.ToString();
+                    if (tmpXML.Elements("upperType").Count() == 0)
+                        tmpXML.Add(new XElement("upperType", upper[i].Item2));
+                    else
+                        tmpXML.Element("upperType").Value = upper[i].Item2;
+                    tmpXML = getXML(ulong.Parse(tmpXML.Element("upper").Value), tmpXML.Element("upperType").Value);
+                }
+            }
             if (!disableFormChecks)
             {
                 MainForm f = MainForm.Instance;
@@ -57,7 +85,7 @@ namespace Bot.Config
                             .First(s => ((BotChannel)s.Tag).Id == ID)));
                     });
                 if (element == ConfigElement.Enabled)
-                    f.Invoke((MethodInvoker)delegate () { f.updateChecking(); });
+                    f.InvokeAction((MethodInvoker)delegate () { f.updateChecking(); });
             }
             XML.Save(XMLPath);
         }
