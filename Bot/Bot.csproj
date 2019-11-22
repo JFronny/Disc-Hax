@@ -83,7 +83,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bot.cs" />
-    <Compile Include="Commands.cs" />
+    <Compile Include="Commands\ImageBoards.cs" />
+    <Compile Include="Commands\Administration.cs" />
+    <Compile Include="Commands\Misc.cs" />
     <Compile Include="Config\ConfigManager.cs" />
     <Compile Include="Config\Common.cs" />
     <Compile Include="Config\ConfigElement.cs" />

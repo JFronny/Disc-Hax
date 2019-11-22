@@ -10,6 +10,8 @@
         Play,
         Waifu,
         Poll,
+        Quicktype,
+        Emojify,
         Enabled
     }
 }

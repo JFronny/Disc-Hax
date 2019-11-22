@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace Bot
@@ -120,5 +121,42 @@ namespace Bot
         public static bool TRUE(this bool? self) => self == true;
         public static bool FALSE(this bool? self) => self == false;
         public static bool NULL(this bool? self) => self == null;
+        public static string emotify(this string self)
+        {
+            return string.Join("", self.ToLower().ToCharArray().Select(s => {
+                if (Regex.IsMatch(s.ToString(), "[a-z]"))
+                    return ":regional_indicator_" + s + ":";
+                else if (int.TryParse(s.ToString(), out int r))
+                {
+                    switch (s)
+                    {
+                        case '1':
+                            return ":one:";
+                        case '2':
+                            return ":two:";
+                        case '3':
+                            return ":three:";
+                        case '4':
+                            return ":four:";
+                        case '5':
+                            return ":five:";
+                        case '6':
+                            return ":six:";
+                        case '7':
+                            return ":seven:";
+                        case '8':
+                            return ":eight:";
+                        case '9':
+                            return ":nine:";
+                        case '0':
+                            return ":zero:";
+                        default:
+                            throw new Exception("This should not happen");
+                    }
+                }
+                else
+                    throw new ArgumentException("Not Alphabeth or numbers");
+            }).ToArray());
+        }
     }
 }

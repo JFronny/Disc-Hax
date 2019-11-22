@@ -1,4 +1,5 @@
-﻿using Bot.Config;
+﻿using Bot.Commands;
+using Bot.Config;
 using Bot.Properties;
 using Chan.Net;
 using Chan.Net.JsonModel;
@@ -34,9 +35,24 @@ namespace Bot
         public BotChannel SelectedChannel { get; set; }
         public ulong ChID => ChannelDefined ? SelectedChannel.Id : 0;
         public bool ChannelDefined = false;
+        List<CheckBox> settingsBoxes;
         public MainForm()
         {
             InitializeComponent();
+            settingsBoxes = new List<CheckBox>();
+            string[] array = Enum.GetNames(typeof(ConfigElement)).Where(s => new List<string> { ConfigElement.Enabled.ToString(), ConfigElement.Nsfw.ToString() }.IndexOf(s) == -1).ToArray();
+            for (int i = 0; i < array.Length; i++)
+            {
+                CheckBox box = new CheckBox();
+                box.Tag = Extensions.ParseToEnum<ConfigElement>(array[i]);
+                box.Text = array[i];
+                box.CheckStateChanged += (sender, e) =>
+                {
+                    Extensions.ExIf(ChannelDefined, () => ConfigManager.set(SelectedChannel.Channel, (ConfigElement)box.Tag, box.Checked, true));
+                };
+                clientCheckGrid.Controls.Add(box);
+                settingsBoxes.Add(box);
+            }
             channelTree.Nodes[0].Checked = Common.guildsBox;
             Bot = new Bot(new DiscordConfiguration { Token = TokenManager.Token, TokenType = TokenType.Bot, AutoReconnect = true, LogLevel = LogLevel.Debug, UseInternalLogHandler = false });
             Bot.Client.Ready += Bot_Ready;
@@ -77,7 +93,7 @@ namespace Bot
         private Task Bot_Ready(ReadyEventArgs e)
         {
             this.SetProperty(xf => xf.Text, "DiscHax Bot Menu (connected)");
-            Console.WriteLine("Your invite Link:\r\n    https://discordapp.com/oauth2/authorize?client_id=" + e.Client.CurrentApplication.Id.ToString() + "&scope=bot&permissions=8");
+            Bot.Client.DebugLogger.LogMessage(LogLevel.Info, "DiscHax", "Your invite Link: https://discordapp.com/oauth2/authorize?client_id=" + e.Client.CurrentApplication.Id.ToString() + "&scope=bot&permissions=8", DateTime.Now);
             return Task.CompletedTask;
         }
 
@@ -185,14 +201,8 @@ namespace Bot
                     if (!messageSave.ContainsKey(SelectedChannel))
                         messageSave.Add(SelectedChannel, new List<string>());
                     messageSave[SelectedChannel].ForEach(s => chatBox.Items.Add(s));
-                    booruBox.Checked = ConfigManager.get(SelectedChannel.Id, ConfigElement.Booru).TRUE();
-                    chanBox.Checked = ConfigManager.get(SelectedChannel.Id, ConfigElement.Chan).TRUE();
-                    playBox.Checked = ConfigManager.get(SelectedChannel.Id, ConfigElement.Play).TRUE();
-                    waifuBox.Checked = ConfigManager.get(SelectedChannel.Id, ConfigElement.Waifu).TRUE();
                     nsfwBox.Checked = SelectedChannel.Channel.IsNSFW || ConfigManager.get(SelectedChannel.Id, ConfigElement.Nsfw).TRUE();
-                    configBox.Checked = ConfigManager.get(SelectedChannel.Id, ConfigElement.Config).TRUE();
-                    beemovieBox.Checked = ConfigManager.get(SelectedChannel.Id, ConfigElement.Bees).TRUE();
-                    pollBox.Checked = ConfigManager.get(SelectedChannel.Id, ConfigElement.Poll).TRUE();
+                    settingsBoxes.ForEach(s => s.Checked = ConfigManager.get(SelectedChannel.Id, (ConfigElement)s.Tag).TRUE());
                     nsfwBox.Enabled = !SelectedChannel.Channel.IsNSFW;
                     clientSettingsPanel.Text = SelectedGuild.Guild.Name + " - " + SelectedChannel.Channel.Name;
                     clientSettingsPanel.Enabled = true;
@@ -281,21 +291,7 @@ namespace Bot
                 }
         }
 
-        private void chanBox_CheckedChanged(object sender, EventArgs e) => Extensions.ExIf(ChannelDefined, () => ConfigManager.set(SelectedChannel.Channel, ConfigElement.Chan, chanBox.Checked, true));
-
-        private void playBox_CheckedChanged(object sender, EventArgs e) => Extensions.ExIf(ChannelDefined, () => ConfigManager.set(SelectedChannel.Channel, ConfigElement.Play, playBox.Checked, true));
-
-        private void waifuBox_CheckedChanged(object sender, EventArgs e) => Extensions.ExIf(ChannelDefined, () => ConfigManager.set(SelectedChannel.Channel, ConfigElement.Waifu, waifuBox.Checked, true));
-
-        private void booruBox_CheckedChanged(object sender, EventArgs e) => Extensions.ExIf(ChannelDefined, () => ConfigManager.set(SelectedChannel.Channel, ConfigElement.Booru, booruBox.Checked, true));
-
         private void nsfwBox_CheckedChanged(object sender, EventArgs e) => Extensions.ExIf(ChannelDefined, () => ConfigManager.set(SelectedChannel.Channel, ConfigElement.Nsfw, nsfwBox.Checked, true));
-
-        private void configBox_CheckedChanged(object sender, EventArgs e) => Extensions.ExIf(ChannelDefined, () => ConfigManager.set(SelectedChannel.Channel, ConfigElement.Config, configBox.Checked, true));
-
-        private void beemovieBox_CheckedChanged(object sender, EventArgs e) => Extensions.ExIf(ChannelDefined, () => ConfigManager.set(SelectedChannel.Channel, ConfigElement.Bees, beemovieBox.Checked, true));
-
-        private void pollBox_CheckedChanged(object sender, EventArgs e) => Extensions.ExIf(ChannelDefined, () => ConfigManager.set(SelectedChannel.Channel, ConfigElement.Poll, pollBox.Checked, true));
 
         private void debugButton_Click(object sender, EventArgs e) => Extensions.ExIf(ChannelDefined, () => new System.Threading.Thread(() => MessageBox.Show(ConfigManager.getStr(SelectedChannel.Id))).Start());
 
@@ -308,33 +304,7 @@ namespace Bot
                 : Task.Run(() => BotSendMessageCallback(message, channel)).ContinueWith(continuationAction);
         }
 
-        private void chanButton_Click(object sender, EventArgs e) => Extensions.ExIf(ChannelDefined, () => _ = Commands.Chan(new string[] { Interaction.InputBox("Please select a channel") }, SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3)));
-
-        private void playButton_Click(object sender, EventArgs e) => Extensions.ExIf(ChannelDefined, () => _ = Commands.Play(SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3)));
-
-        private void waifuButton_Click(object sender, EventArgs e) => Extensions.ExIf(ChannelDefined, () => _ = Commands.Waifu(new string[] { "f" }, SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3)));
-
-        private void booruButton_Click(object sender, EventArgs e) => Extensions.ExIf(ChannelDefined, () => _ = Commands.Booru(new string[] { Interaction.InputBox("Please select categories") }, SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3)));
-
-        private void configButton_Click(object sender, EventArgs e) => Extensions.ExIf(ChannelDefined, () => _ = Commands.ConfigCmd(Interaction.InputBox("Please select parameters").Split(' '), SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3)));
-
-        private void pingButton_Click(object sender, EventArgs e) => Extensions.ExIf(ChannelDefined, () => _ = Commands.Ping(SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3)));
-
-        private void beemovieButton_Click(object sender, EventArgs e) => Extensions.ExIf(ChannelDefined, () => _ = Commands.Bees(SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3)));
-
-        private void pollButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if (ChannelDefined)
-                    _ = Commands.Poll(SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3), new TimeSpan(10000 * long.Parse(Interaction.InputBox("Milliseconds"))),
-                        Interaction.InputBox("Emoticons").Split(' ').Select(s => DiscordEmoji.FromName(Bot.Client, s)).ToArray());
-            }
-            catch (Exception e1)
-            {
-                MessageBox.Show("Failed: " + e1.Message);
-            }
-        }
+        private void pingButton_Click(object sender, EventArgs e) => Extensions.ExIf(ChannelDefined, () => _ = Administration.Ping(SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3)));
 
         private void resetButton_Click(object sender, EventArgs e)
         {

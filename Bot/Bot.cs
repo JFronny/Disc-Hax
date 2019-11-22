@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Bot.Config;
+using Bot.Commands;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Exceptions;
@@ -32,7 +33,9 @@ namespace Bot
                 PaginationTimeout = TimeSpan.FromMinutes(5),
                 Timeout = TimeSpan.FromMinutes(2)
             });
-            Commands.RegisterCommands<Commands>();
+            Commands.RegisterCommands<ImageBoards>();
+            Commands.RegisterCommands<Administration>();
+            Commands.RegisterCommands<Commands.Misc>();
             Client.DebugLogger.LogMessageReceived += DebugLogger_LogMessageReceived;
         }
 
@@ -63,6 +66,9 @@ namespace Bot
         public Task StartAsync() => Client.ConnectAsync();
         public Task StopAsync() => Client.DisconnectAsync();
 
-        private void DebugLogger_LogMessageReceived(object sender, DebugLogMessageEventArgs e) => Debug.WriteLine($"[{e.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")}] [{e.Application}] [{e.Level}] {e.Message}");
+        private void DebugLogger_LogMessageReceived(object sender, DebugLogMessageEventArgs e)
+        {
+            Console.WriteLine($"[{e.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")}] [{e.Application}] [{e.Level}] {e.Message}");
+        }
     }
 }

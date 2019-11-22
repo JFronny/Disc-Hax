@@ -36,7 +36,7 @@ namespace Bot.Config
             el = el.Element(element.ToString().ToLower());
             if (el == null)
             {
-                set(ID, element, defaultVal);
+                set(ID, element, defaultVal, true);
                 return get(ID, element, configType, defaultVal);
             }
             else
@@ -48,7 +48,7 @@ namespace Bot.Config
 
         public static void set(DiscordChannel channel, ConfigElement element, bool? val, bool disableFormChecks = false) => set(channel.Id, element, val, disableFormChecks, "channel", new ValueTuple<ulong, string>[] { new ValueTuple<ulong, string>(channel.GuildId, "guild") });
 
-        public static void set(ulong ID, ConfigElement element, bool? val, bool disableFormChecks = false, string configType = "channel", ValueTuple<ulong, string>[]? upper = null)
+        public static void set(ulong ID, ConfigElement element, bool? val, bool disableFormChecks = false, string configType = "channel", ValueTuple<ulong, string>[] upper = null)
         {
             
             XElement XML = getXML(ID, configType, out string XMLPath);
