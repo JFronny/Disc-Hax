@@ -44,13 +44,9 @@ namespace Bot.Config
         }
 
         public static string getStr(ulong ID) => string.Join("\r\n", Enum.GetValues(typeof(ConfigElement)).OfType<ConfigElement>().Select(s => s.ToString() + ": " + get(ID, s)));
-
-
         public static void set(DiscordChannel channel, ConfigElement element, bool? val, bool disableFormChecks = false) => set(channel.Id, element, val, disableFormChecks, "channel", new ValueTuple<ulong, string>[] { new ValueTuple<ulong, string>(channel.GuildId, "guild") });
-
         public static void set(ulong ID, ConfigElement element, bool? val, bool disableFormChecks = false, string configType = "channel", ValueTuple<ulong, string>[] upper = null)
         {
-            
             XElement XML = getXML(ID, configType, out string XMLPath);
             string el = element.ToString().ToLower();
             if (XML.Elements(el).Count() == 0)

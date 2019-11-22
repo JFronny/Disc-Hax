@@ -54,7 +54,18 @@ namespace Bot
                 settingsBoxes.Add(box);
             }
             channelTree.Nodes[0].Checked = Common.guildsBox;
-            Bot = new Bot(new DiscordConfiguration { Token = TokenManager.Token, TokenType = TokenType.Bot, AutoReconnect = true, LogLevel = LogLevel.Debug, UseInternalLogHandler = false });
+            Bot = new Bot(new DiscordConfiguration
+            {
+                Token = TokenManager.Token,
+                TokenType = TokenType.Bot,
+                AutoReconnect = true,
+#if DEBUG
+                LogLevel = LogLevel.Debug,
+#else
+                LogLevel = LogLevel.Info,
+#endif
+                UseInternalLogHandler = false
+            });
             Bot.Client.Ready += Bot_Ready;
             Bot.Client.GuildAvailable += Bot_GuildAvailable;
             Bot.Client.GuildCreated += Bot_GuildCreated;

@@ -9,6 +9,8 @@ using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
+using DSharpPlus.VoiceNext;
+using DSharpPlus.VoiceNext.Codec;
 
 namespace Bot
 {
@@ -33,8 +35,13 @@ namespace Bot
                 PaginationTimeout = TimeSpan.FromMinutes(5),
                 Timeout = TimeSpan.FromMinutes(2)
             });
+            _ = Client.UseVoiceNext(new VoiceNextConfiguration
+            {
+                VoiceApplication = VoiceApplication.Music
+            });
             Commands.RegisterCommands<ImageBoards>();
             Commands.RegisterCommands<Administration>();
+            Commands.RegisterCommands<Music>();
             Commands.RegisterCommands<Commands.Misc>();
             Client.DebugLogger.LogMessageReceived += DebugLogger_LogMessageReceived;
         }

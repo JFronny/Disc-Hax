@@ -26,7 +26,7 @@ namespace Bot.Commands
                 await postMessage("Pong", false, null);
         }
 
-        [Command("config"), Description("Prints or changes the DiscHax-bot config"), RequireUserPermissions(Permissions.Administrator)]
+        [Command("config"), Description("Prints or changes the DiscHax-instance config"), RequireUserPermissions(Permissions.Administrator)]
         public async Task ConfigCmd(CommandContext ctx, [Description("Used to set a param: config [key] [true/false]")] params string[] args)
         {
             if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled).AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Config)))

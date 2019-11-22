@@ -51,10 +51,7 @@ namespace Cleverbot
                                 f.Controls.Add(l);
                                 SetFormSize(f, l.Size);
                             }
-                            catch
-                            {
-
-                            }
+                            catch { }
                         }
                     }
                     f.ShowDialog();

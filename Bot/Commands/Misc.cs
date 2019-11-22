@@ -36,7 +36,7 @@ namespace Bot.Commands
             }
         }
 
-        [Command("quicktype"), Description("Waits for a response containing a generated code.")]
+        [Command("quicktype"), Description("Waits for a response containing a generated code")]
         public async Task QuickType(CommandContext ctx, [Description("Bytes to generate. One byte equals two characters")] int bytes, [Description("Time before exiting")] TimeSpan time)
         {
             if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled).AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Quicktype)))
@@ -75,11 +75,11 @@ namespace Bot.Commands
         //    await interactivity.SendPaginatedMessage(ctx.Channel, ctx.User, lipsum_pages, TimeSpan.FromMinutes(5), TimeoutBehaviour.Delete);
         //}
 
-        [Command("play"), Description("Sends \"No.\" to the chat. For users used to RhythmBot.")]
-        public async Task Play(CommandContext ctx)
-        {
-            if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled).AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Play)))
-                await ctx.RespondAsync("No.");
-        }
+        //[Command("play"), Description("Sends \"No.\" to the chat. For users used to RhythmBot.")]
+        //public async Task Play(CommandContext ctx)
+        //{
+        //    if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled).AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Play)))
+        //        await ctx.RespondAsync("No.");
+        //}
     }
 }
