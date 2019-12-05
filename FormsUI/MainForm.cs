@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
-namespace Bot
+namespace FormsUI
 {
     public partial class MainForm : Form
     {

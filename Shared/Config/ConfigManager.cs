@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
-namespace Bot.Config
+namespace Shared.Config
 {
-    static class ConfigManager
+    public static class ConfigManager
     {
         static XElement getXML(ulong ID, string ElName, out string XMLPath)
         {
@@ -40,7 +40,7 @@ namespace Bot.Config
                 return get(ID, element, configType, defaultVal);
             }
             else
-                return Extensions.ParseBool(el.Value);
+                return ClassExtensions.ParseBool(el.Value);
         }
 
         public static string getStr(ulong ID) => string.Join("\r\n", Enum.GetValues(typeof(ConfigElement)).OfType<ConfigElement>().Select(s => s.ToString() + ": " + get(ID, s)));
@@ -71,19 +71,23 @@ namespace Bot.Config
             }
             if (!disableFormChecks)
             {
-                MainForm f = MainForm.Instance;
+                /*MainForm f = MainForm.Instance;
                 if (f.ChannelDefined && f.SelectedChannel.Id == ID)
                     f.Invoke((MethodInvoker)delegate ()
                     {
                         f.channelTree_AfterSelect(null, new TreeViewEventArgs(
                             f.channelTree.Nodes[0].Nodes.OfType<TreeNode>()
-                            .SelectMany(s => s.Nodes.OfType<TreeNode>())
+                            .SelectMany(s => ((TreeNode)s).Nodes.OfType<TreeNode>())
                             .First(s => ((BotChannel)s.Tag).Id == ID)));
                     });
                 if (element == ConfigElement.Enabled)
-                    f.InvokeAction((MethodInvoker)delegate () { f.updateChecking(); });
+                    f.InvokeAction((MethodInvoker)delegate () { f.updateChecking(); });*/
+                configUpdate?.Invoke(null, ID, element);
             }
             XML.Save(XMLPath);
         }
+
+        public static ConfigUpdateEvent configUpdate;
+        public delegate void ConfigUpdateEvent(object sender, ulong ID, ConfigElement element);
     }
 }

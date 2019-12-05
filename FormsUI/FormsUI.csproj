@@ -4,14 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{28566F75-5BA5-481F-95A6-B1773A78F3FB}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>Bot</RootNamespace>
-    <AssemblyName>Bot</AssemblyName>
+    <ProjectGuid>{09D2028B-A168-4DDB-9118-52C3CB8D3409}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>FormsUI</RootNamespace>
+    <AssemblyName>FormsUI</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -22,56 +23,28 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-    <LangVersion>8.0</LangVersion>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>none</DebugType>
+    <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Bot.Program</StartupObject>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>TextTemplate.ico</ApplicationIcon>
+    <StartupObject>FormsUI.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BooruSharp, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\BooruSharp.1.4.6\lib\net45\BooruSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="CC_Functions.Misc, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CC-Functions.Misc.1.0.0\lib\CC_Functions.Misc.dll</HintPath>
-    </Reference>
-    <Reference Include="Chan.Net, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chan.Net.0.0.15\lib\net45\Chan.Net.dll</HintPath>
-    </Reference>
     <Reference Include="DSharpPlus, Version=3.2.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\DSharpPlus.3.2.3\lib\net47\DSharpPlus.dll</HintPath>
     </Reference>
-    <Reference Include="DSharpPlus.CommandsNext, Version=3.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DSharpPlus.CommandsNext.3.2.3\lib\net47\DSharpPlus.CommandsNext.dll</HintPath>
-    </Reference>
-    <Reference Include="DSharpPlus.Interactivity, Version=3.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DSharpPlus.Interactivity.3.2.3\lib\net47\DSharpPlus.Interactivity.dll</HintPath>
-    </Reference>
-    <Reference Include="DSharpPlus.VoiceNext, Version=3.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DSharpPlus.VoiceNext.3.2.3\lib\net47\DSharpPlus.VoiceNext.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Management" />
-    <Reference Include="System.Security" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -83,11 +56,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bot.cs" />
-    <Compile Include="Commands\ImageBoards.cs" />
-    <Compile Include="Commands\Administration.cs" />
-    <Compile Include="Commands\Misc.cs" />
-    <Compile Include="Commands\Music.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -124,11 +92,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="TextTemplate.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.csproj">
-      <Project>{7D33F6C5-863A-4A48-A6D5-63619E2A6724}</Project>
+      <Project>{7d33f6c5-863a-4a48-a6d5-63619e2a6724}</Project>
       <Name>Shared</Name>
     </ProjectReference>
   </ItemGroup>

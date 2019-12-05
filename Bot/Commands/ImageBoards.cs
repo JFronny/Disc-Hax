@@ -12,9 +12,10 @@ using DSharpPlus.Entities;
 using BooruSharp;
 using BooruSharp.Booru;
 using BooruSharp.Search.Post;
-using Bot.Config;
 using System.Net;
 using DSharpPlus.Interactivity;
+using Shared.Config;
+using Shared;
 
 namespace Bot.Commands
 {

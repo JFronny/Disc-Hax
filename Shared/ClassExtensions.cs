@@ -1,5 +1,5 @@
-﻿using Bot.Config;
-using DSharpPlus.Entities;
+﻿using DSharpPlus.Entities;
+using Shared.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,14 +8,14 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
-namespace Bot
+namespace Shared
 {
     public delegate void SetPropertyDelegate<TCtl, TProp>(TCtl control, Expression<Func<TCtl, TProp>> propexpr, TProp value) where TCtl : Control;
     public delegate TProp GetPropertyDelegate<TCtl, TProp>(TCtl control, Expression<Func<TProp>> propexpr) where TCtl : Control;
     public delegate void InvokeActionDelegate<TCtl>(TCtl control, Delegate dlg, params object[] args) where TCtl : Control;
     public delegate TResult InvokeFuncDelegate<TCtl, TResult>(TCtl control, Delegate dlg, params object[] args) where TCtl : Control;
 
-    public static class Extensions
+    public static class ClassExtensions
     {
         public static void SetProperty<TCtl, TProp>(this TCtl control, Expression<Func<TCtl, TProp>> propexpr, TProp value) where TCtl : Control
         {
@@ -155,7 +155,7 @@ namespace Bot
                     }
                 }
                 else
-                    throw new ArgumentException("Not Alphabeth or numbers");
+                    throw new ArgumentException("Not Alphabet or numbers");
             }).ToArray());
         }
     }

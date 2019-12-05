@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
-namespace Bot.Config
+namespace Shared.Config
 {
-    static class Common
+    public static class Common
     {
         static string path = Path.GetDirectoryName(Application.ExecutablePath) + @"\Cfgs\common.xml";
         static XElement common;

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Bot.Config;
 using Bot.Commands;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -11,6 +10,7 @@ using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
 using DSharpPlus.VoiceNext;
 using DSharpPlus.VoiceNext.Codec;
+using Shared.Config;
 
 namespace Bot
 {
@@ -25,7 +25,8 @@ namespace Bot
             Client = new DiscordClient(cfg);
             Commands = Client.UseCommandsNext(new CommandsNextConfiguration
             {
-                StringPrefix = Common.prefix
+                StringPrefix = Common.prefix,
+                EnableDms = false
             });
             Commands.CommandExecuted += Commands_CommandExecuted;
             Commands.CommandErrored += Commands_CommandErrored;

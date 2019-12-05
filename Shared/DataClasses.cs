@@ -1,6 +1,6 @@
 ﻿using DSharpPlus.Entities;
 
-namespace Bot
+namespace Shared
 {
     public interface IBotStruct
     {

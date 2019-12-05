@@ -1,8 +1,9 @@
-﻿using Bot.Config;
-using DSharpPlus;
+﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using Shared;
+using Shared.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +36,7 @@ namespace Bot.Commands
                     await ctx.RespondAsync(ConfigManager.getStr(ctx.Channel.Id), false, null);
                 else
                 {
-                    ConfigElement el = Extensions.ParseToEnum<ConfigElement>(args[0]);
+                    ConfigElement el = ClassExtensions.ParseToEnum<ConfigElement>(args[0]);
                     if (args.Length == 1)
                     {
                         await ctx.RespondAsync(el.ToString() + ": " + ConfigManager.get(ctx.Channel.Id, el).ToString(), false, null);

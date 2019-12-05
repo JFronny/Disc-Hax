@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using Microsoft.VisualBasic;
 using Misc;
 
-namespace Bot.Config
+namespace Shared.Config
 {
     public static class TokenManager
     {

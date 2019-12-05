@@ -1,4 +1,4 @@
-﻿namespace Bot.Config
+﻿namespace Shared.Config
 {
     public enum ConfigElement
     {

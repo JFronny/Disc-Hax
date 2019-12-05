@@ -1,9 +1,10 @@
-﻿using Bot.Config;
-using DSharpPlus;
+﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
+using Shared;
+using Shared.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
