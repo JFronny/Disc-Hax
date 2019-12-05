@@ -44,7 +44,7 @@ namespace Bot.Commands
             {
                 InteractivityModule interactivity = ctx.Client.GetInteractivityModule();
                 byte[] codebytes = new byte[bytes];
-                MainForm.Instance.rnd.NextBytes(codebytes);
+                Program.rnd.NextBytes(codebytes);
                 string code = BitConverter.ToString(codebytes).ToLower().Replace("-", "");
                 await ctx.RespondAsync($"The first one to type the following code gets a reward: " + code.emotify());
                 var msg = await interactivity.WaitForMessageAsync(xm => xm.Content.Contains(code), time);

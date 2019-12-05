@@ -41,7 +41,7 @@ namespace Bot.Commands
                     if (ctx.Channel.getEvaluatedNSFW())
                     {
                         Thread[] threads = b.GetThreads().ToArray();
-                        Thread t = threads[MainForm.Instance.rnd.Next(threads.Length)];
+                        Thread t = threads[Program.rnd.Next(threads.Length)];
                         await ctx.RespondAsync("https://boards.4channel.org/" + t.Board.BoardId + "/thread/" + t.PostNumber, embed: new DiscordEmbedBuilder { Title = t.Name + "#" + t.Id + ": " + (string.IsNullOrWhiteSpace(t.Subject) ? "Untitled" : t.Subject), ImageUrl = t.Image.Image.AbsoluteUri });
                     }
                     else
@@ -54,7 +54,7 @@ namespace Bot.Commands
         {
             if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled).AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Waifu)))
                 if (ctx.Channel.getEvaluatedNSFW() || args.Contains("f"))
-                    await ctx.RespondAsync(embed: new DiscordEmbedBuilder { Title = "There.", ImageUrl = "https://www.thiswaifudoesnotexist.net/example-" + MainForm.Instance.rnd.Next(6000).ToString() + ".jpg" });
+                    await ctx.RespondAsync(embed: new DiscordEmbedBuilder { Title = "There.", ImageUrl = "https://www.thiswaifudoesnotexist.net/example-" + Program.rnd.Next(6000).ToString() + ".jpg" });
                 else
                     await ctx.RespondAsync("The generated waifus might not be something you want to be looking at at work. You can override this with the \"f\"-Flag");
         }
@@ -73,7 +73,7 @@ namespace Bot.Commands
                             .Split(new string[] { "\n\n  \n" }, StringSplitOptions.None);
                         _beequotes[0] = _beequotes[0].Replace("  \n  \n", "");
                     }
-                int q = MainForm.Instance.rnd.Next(_beequotes.Length - 2);
+                int q = Program.rnd.Next(_beequotes.Length - 2);
                 await ctx.RespondAsync((_beequotes[q] + "\n\n" + _beequotes[q + 1] + "\n\n" + _beequotes[q + 2]).Replace("\n", "\r\n"), true, null);
             }
         }

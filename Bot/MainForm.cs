@@ -17,8 +17,6 @@ namespace Bot
 {
     public partial class MainForm : Form
     {
-        public static MainForm Instance;
-        public Random rnd = new Random();
         public Dictionary<BotChannel, List<string>> messageSave = new Dictionary<BotChannel, List<string>>();
         public Task BotThread { get; set; }
         public Bot Bot { get; set; }
@@ -60,97 +58,12 @@ namespace Bot
                 settingsBoxes.Add(box);
             }
             channelTree.Nodes[0].Checked = Common.guildsBox;
-            Bot = new Bot(new DiscordConfiguration
-            {
-                Token = TokenManager.Token,
-                TokenType = TokenType.Bot,
-                AutoReconnect = true,
-#if DEBUG
-                LogLevel = LogLevel.Debug,
-#else
-                LogLevel = LogLevel.Info,
-#endif
-                UseInternalLogHandler = false
-            });
-            Bot.Client.Ready += Bot_Ready;
-            Bot.Client.GuildAvailable += Bot_GuildAvailable;
-            Bot.Client.GuildCreated += Bot_GuildCreated;
-            Bot.Client.GuildUnavailable += Bot_GuildUnavailable;
-            Bot.Client.GuildDeleted += Bot_GuildDeleted;
-            Bot.Client.MessageCreated += Bot_MessageCreated;
-            Bot.Client.ClientErrored += Bot_ClientErrored;
-            TokenSource = new CancellationTokenSource();
-            BotThread = Task.Run(BotThreadCallback);
             channelTree.Enabled = true;
             chatBox.Enabled = true;
             chatSend.Enabled = true;
-            Instance = this;
         }
 
-        private async Task BotThreadCallback()
-        {
-            await Bot.StartAsync().ConfigureAwait(false);
-            try
-            {
-                await Task.Delay(-1, TokenSource.Token).ConfigureAwait(false);
-            }
-            catch { }
-            await Bot.StopAsync().ConfigureAwait(false);
-            this.SetProperty(x => x.Text, "DiscHax Bot Menu");
-            channelTree.InvokeAction(new Action(channelTree.Nodes.Clear));
-            SelectedGuild = default;
-            SelectedChannel = default;
-            Bot = null;
-            TokenSource = null;
-            BotThread = null;
-        }
-
-        private Task BotSendMessageCallback(string text, BotChannel chn) => chn.Channel.SendMessageAsync(text);
-
-        private Task Bot_Ready(ReadyEventArgs e)
-        {
-            this.SetProperty(xf => xf.Text, "DiscHax Bot Menu (connected)");
-            Bot.Client.DebugLogger.LogMessage(LogLevel.Info, "DiscHax", "Your invite Link: https://discordapp.com/oauth2/authorize?client_id=" + e.Client.CurrentApplication.Id.ToString() + "&scope=bot&permissions=8", DateTime.Now);
-            return Task.CompletedTask;
-        }
-
-        private Task Bot_GuildAvailable(GuildCreateEventArgs e)
-        {
-            channelTree.InvokeAction(new Action<BotGuild>(AddGuild), new BotGuild(e.Guild));
-            return Task.CompletedTask;
-        }
-
-        private Task Bot_GuildCreated(GuildCreateEventArgs e)
-        {
-            channelTree.InvokeAction(new Action<BotGuild>(AddGuild), new BotGuild(e.Guild));
-            return Task.CompletedTask;
-        }
-
-        private Task Bot_GuildUnavailable(GuildDeleteEventArgs e)
-        {
-            channelTree.InvokeAction(new Action<ulong>(RemoveGuild), e.Guild.Id);
-            return Task.CompletedTask;
-        }
-
-        private Task Bot_GuildDeleted(GuildDeleteEventArgs e)
-        {
-            channelTree.InvokeAction(new Action<ulong>(RemoveGuild), e.Guild.Id);
-            return Task.CompletedTask;
-        }
-
-        private Task Bot_MessageCreated(MessageCreateEventArgs e)
-        {
-            channelTree.InvokeAction(new Action<BotMessage, BotChannel>(AddMessage), new BotMessage(e.Message), new BotChannel(e.Channel));
-            return Task.CompletedTask;
-        }
-
-        private Task Bot_ClientErrored(ClientErrorEventArgs e)
-        {
-            this.InvokeAction(new Action(() => MessageBox.Show(this, $"Exception in {e.EventName}: {e.Exception.ToString()}", "Unhandled exception in the bot", MessageBoxButtons.OK, MessageBoxIcon.Warning)));
-            return Task.CompletedTask;
-        }
-
-        private void AddGuild(BotGuild gld)
+        public void AddGuild(BotGuild gld)
         {
             TreeNode node = new TreeNode
             {
@@ -170,12 +83,12 @@ namespace Bot
             channelTree.Sort();
         }
 
-        private void RemoveGuild(ulong id)
+        public void RemoveGuild(ulong id)
         {
             channelTree.TopNode.Nodes.OfType<TreeNode>().Where(s => ((BotGuild)s.Tag).Id == id).ToList().ForEach(s => channelTree.Nodes.Remove(s));
         }
 
-        private void AddMessage(BotMessage msg, BotChannel channel)
+        public void AddMessage(BotMessage msg, BotChannel channel)
         {
             try
             {
@@ -202,8 +115,6 @@ namespace Bot
                 SendMessage("Failed: " + e.Message, channel);
             }
         }
-
-        private void Form_FormClosed(object sender, FormClosedEventArgs e) => TokenSource.Cancel();
 
         private bool recCheck = true;
 
@@ -320,8 +231,8 @@ namespace Bot
             if (string.IsNullOrWhiteSpace(message))
                 return;
             _ = continuationAction == null
-                ? Task.Run(() => BotSendMessageCallback(message, channel))
-                : Task.Run(() => BotSendMessageCallback(message, channel)).ContinueWith(continuationAction);
+                ? Task.Run(() => channel.Channel.SendMessageAsync(message))
+                : Task.Run(() => channel.Channel.SendMessageAsync(message)).ContinueWith(continuationAction);
         }
 
         private void pingButton_Click(object sender, EventArgs e) => ClassExtensions.ExIf(ChannelDefined, () => _ = Administration.Ping(SelectedChannel.Channel, (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3)));
@@ -377,6 +288,12 @@ namespace Bot
                     }
                 }
             }
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            e.Cancel = true;
+            Hide();
         }
     }
 }

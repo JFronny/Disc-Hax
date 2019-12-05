@@ -39,9 +39,9 @@
             this.debugButton = new System.Windows.Forms.Button();
             this.nsfwBox = new System.Windows.Forms.CheckBox();
             this.clientSettingsPanel = new System.Windows.Forms.GroupBox();
+            this.clientCheckGrid = new System.Windows.Forms.FlowLayoutPanel();
             this.cleanButton = new System.Windows.Forms.Button();
             this.settingsPanel = new System.Windows.Forms.Panel();
-            this.clientCheckGrid = new System.Windows.Forms.FlowLayoutPanel();
             this.serverSettingsPanel = new System.Windows.Forms.Panel();
             this.chatPanel.SuspendLayout();
             this.clientSettingsPanel.SuspendLayout();
@@ -155,6 +155,19 @@
             this.clientSettingsPanel.TabStop = false;
             this.clientSettingsPanel.Text = "Channel";
             // 
+            // clientCheckGrid
+            // 
+            this.clientCheckGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.clientCheckGrid.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.clientCheckGrid.Location = new System.Drawing.Point(0, 19);
+            this.clientCheckGrid.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
+            this.clientCheckGrid.Name = "clientCheckGrid";
+            this.clientCheckGrid.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
+            this.clientCheckGrid.Size = new System.Drawing.Size(200, 280);
+            this.clientCheckGrid.TabIndex = 13;
+            // 
             // cleanButton
             // 
             this.cleanButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -175,19 +188,6 @@
             this.settingsPanel.Name = "settingsPanel";
             this.settingsPanel.Size = new System.Drawing.Size(200, 379);
             this.settingsPanel.TabIndex = 20;
-            // 
-            // clientCheckGrid
-            // 
-            this.clientCheckGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.clientCheckGrid.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.clientCheckGrid.Location = new System.Drawing.Point(0, 19);
-            this.clientCheckGrid.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
-            this.clientCheckGrid.Name = "clientCheckGrid";
-            this.clientCheckGrid.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
-            this.clientCheckGrid.Size = new System.Drawing.Size(200, 280);
-            this.clientCheckGrid.TabIndex = 13;
             // 
             // serverSettingsPanel
             // 
@@ -213,7 +213,7 @@
             this.MinimumSize = new System.Drawing.Size(555, 321);
             this.Name = "MainForm";
             this.Text = "DiscHax Bot Menu";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form_FormClosed);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.chatPanel.ResumeLayout(false);
             this.chatPanel.PerformLayout();
             this.clientSettingsPanel.ResumeLayout(false);
