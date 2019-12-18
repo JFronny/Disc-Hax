@@ -1,15 +1,14 @@
-﻿using DSharpPlus;
-using DSharpPlus.CommandsNext;
+﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
+using Octokit;
 using Shared;
 using Shared.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Bot.Commands
@@ -64,6 +63,60 @@ namespace Bot.Commands
         {
             if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled).AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Emojify)))
                 await ctx.RespondAsync(string.Join(" ", args.Select(s => s.emotify())));
+        }
+
+        [Command("fortune"), Description("Spits out a quote")]
+        public async Task Fortune(CommandContext ctx)
+        {
+            if (fortunequotes == null)
+            {
+                DiscordMessage msg = await ctx.RespondAsync("Loading fortunes...");
+                fortunequotes = await getFortuneQuotes("fortune-mod/datfiles");
+                fortunequotes_off = await getFortuneQuotes("fortune-mod/datfiles/off/unrotated");
+                await msg.DeleteAsync();
+            }
+            if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled).AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Fortune)))
+            {
+                string[] quotes = ctx.Channel.getEvaluatedNSFW() ? fortunequotes_off : fortunequotes;
+                await ctx.RespondAsync(quotes[Program.rnd.Next(quotes.Length)], true);
+            }
+        }
+
+        private async Task<string[]> getFortuneQuotes(string path)
+        {
+            IEnumerable<RepositoryContent> files = await Program.cli.Repository.Content.GetAllContents("shlomif", "fortune-mod", path);
+            IEnumerable<string> disallowednames = new string[] { "CMakeLists.txt", null };
+            IEnumerable<RepositoryContent> filteredFiles = files.Where(s => s.Type == ContentType.File && !disallowednames.Contains(s.Name));
+            IEnumerable<string> cookies = filteredFiles.Where(s => !disallowednames.Contains(s.Name)).Select(s => s.DownloadUrl);
+            IEnumerable<string> contents;
+            using (WebClient client = new WebClient())
+                contents = cookies.Select(s => client.DownloadString(s));
+            return contents.SelectMany(s => s.Split(new string[] { "\n%\n" }, StringSplitOptions.None)).ToArray();
+        }
+
+        private string[] fortunequotes;
+        private string[] fortunequotes_off;
+
+        [Command("preview"), Description("Paginates a website for preview")]
+        public async Task PreviewSite(CommandContext ctx, [Description("URL to paginate site from")] string URL)
+        {
+            if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled).AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.PreviewSite)))
+            {
+                string HTML;
+                try
+                {
+                    using (WebClient client = new WebClient())
+                        HTML = client.DownloadString(URL);
+                }
+                catch
+                {
+                    await ctx.RespondAsync("Failed to download site");
+                    return;
+                }
+                InteractivityModule interactivity = ctx.Client.GetInteractivityModule();
+                var pages = interactivity.GeneratePagesInEmbeds(HTMLProcessor.StripTags(HTML));
+                await interactivity.SendPaginatedMessage(ctx.Channel, ctx.User, pages, TimeSpan.FromMinutes(5), TimeoutBehaviour.Delete);
+            }
         }
 
         //Possibly create a news browser using this?

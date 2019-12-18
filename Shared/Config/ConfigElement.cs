@@ -12,6 +12,8 @@
         Poll,
         Quicktype,
         Emojify,
+        Fortune,
+        PreviewSite,
         Enabled
     }
 }

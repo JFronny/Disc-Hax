@@ -6,6 +6,7 @@ namespace Shared
     {
         ulong Id { get; }
     }
+
     public struct BotGuild : IBotStruct
     {
         public DiscordGuild Guild { get; }

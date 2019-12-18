@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
@@ -11,8 +6,9 @@ namespace Shared.Config
 {
     public static class Common
     {
-        static string path = Path.GetDirectoryName(Application.ExecutablePath) + @"\Cfgs\common.xml";
-        static XElement common;
+        private static string path = Path.GetDirectoryName(Application.ExecutablePath) + @"\Cfgs\common.xml";
+        private static XElement common;
+
         public static string prefix
         {
             get {
@@ -47,7 +43,7 @@ namespace Shared.Config
             }
         }
 
-        static void getXE()
+        private static void getXE()
         {
             if (!Directory.Exists(Path.GetDirectoryName(path)))
                 Directory.CreateDirectory(Path.GetDirectoryName(path));
@@ -56,6 +52,6 @@ namespace Shared.Config
             common = XElement.Load(path);
         }
 
-        static void saveXE() => common.Save(path);
+        private static void saveXE() => common.Save(path);
     }
 }

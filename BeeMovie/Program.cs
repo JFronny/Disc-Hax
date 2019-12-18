@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BeeMovie
 {
-    class Program
+    internal class Program
     {
-        static Random rnd = new Random();
-        static void Main(string[] args)
+        private static Random rnd = new Random();
+
+        private static void Main(string[] args)
         {
             string[] Quotes;
             using (WebClient client = new WebClient())

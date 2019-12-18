@@ -1,21 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BooruSharp.Booru;
+using BooruSharp.Search.Post;
 using Chan.Net;
 using Chan.Net.JsonModel;
-using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using BooruSharp;
-using BooruSharp.Booru;
-using BooruSharp.Search.Post;
-using System.Net;
-using DSharpPlus.Interactivity;
-using Shared.Config;
 using Shared;
+using Shared.Config;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace Bot.Commands
 {
@@ -78,7 +74,7 @@ namespace Bot.Commands
             }
         }
 
-        static string[] _beequotes;
+        private static string[] _beequotes;
 
         [Command("booru"), Description("Shows a random Image from your favourite *booru. See [booru list] for a full list")]
         public async Task Booru(CommandContext ctx, [Description("Tags for image selection, first element can be a source")] params string[] args)
@@ -89,7 +85,8 @@ namespace Bot.Commands
                     new Furrybooru(), new Konachan(), new Lolibooru(), new Realbooru(), new Rule34(),
                     new Safebooru(), new Sakugabooru(), new Xbooru(), new Yandere() };
                 boorus.Sort((x, y) => x.ToString().Split('.')[2].ToLower().CompareTo(y.ToString().Split('.')[2].ToLower()));
-                boorus.ToList().ForEach(s => {
+                boorus.ToList().ForEach(s =>
+                {
                     booruDict.Add(s.ToString().Split('.')[2].ToLower(), s);
                 });
             }
@@ -119,6 +116,6 @@ namespace Bot.Commands
             }
         }
 
-        static Dictionary<string, Booru> booruDict = new Dictionary<string, Booru>();
+        private static Dictionary<string, Booru> booruDict = new Dictionary<string, Booru>();
     }
 }

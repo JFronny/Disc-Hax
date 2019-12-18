@@ -1,7 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using Bot.Commands;
+﻿using Bot.Commands;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Exceptions;
@@ -11,6 +8,8 @@ using DSharpPlus.Interactivity;
 using DSharpPlus.VoiceNext;
 using DSharpPlus.VoiceNext.Codec;
 using Shared.Config;
+using System;
+using System.Threading.Tasks;
 
 namespace Bot
 {
@@ -19,6 +18,7 @@ namespace Bot
         public static Bot instance;
         public DiscordClient Client { get; }
         public CommandsNextModule Commands { get; set; }
+
         public Bot(DiscordConfiguration cfg)
         {
             instance = this;
@@ -72,6 +72,7 @@ namespace Bot
         }
 
         public Task StartAsync() => Client.ConnectAsync();
+
         public Task StopAsync() => Client.DisconnectAsync();
 
         private void DebugLogger_LogMessageReceived(object sender, DebugLogMessageEventArgs e)

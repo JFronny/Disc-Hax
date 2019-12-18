@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace WaifuGen
 {
-    class Program
+    internal class Program
     {
         [STAThread]
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Random rnd = new Random();
             while (true)
@@ -36,7 +32,7 @@ namespace WaifuGen
             }
         }
 
-        static void SetFormSize(Form f, Size s)
+        private static void SetFormSize(Form f, Size s)
         {
             double ratio = (double)s.Height / s.Width;
             Rectangle screen = Screen.PrimaryScreen.WorkingArea;

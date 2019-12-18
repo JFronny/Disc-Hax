@@ -1,10 +1,7 @@
 ﻿using DSharpPlus.Entities;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
@@ -12,7 +9,7 @@ namespace Shared.Config
 {
     public static class ConfigManager
     {
-        static XElement getXML(ulong ID, string ElName, out string XMLPath)
+        private static XElement getXML(ulong ID, string ElName, out string XMLPath)
         {
             XMLPath = Path.GetDirectoryName(Application.ExecutablePath) + @"\Cfgs\";
             if (!Directory.Exists(XMLPath))
@@ -22,7 +19,9 @@ namespace Shared.Config
                 new XElement(ElName).Save(XMLPath);
             return XElement.Load(XMLPath);
         }
-        static XElement getXML(ulong ID, string ElName) => getXML(ID, ElName, out string leltisnotused);
+
+        private static XElement getXML(ulong ID, string ElName) => getXML(ID, ElName, out string leltisnotused);
+
         public static bool? get(ulong ID, ConfigElement element, string configType = "channel", bool? defaultVal = false)
         {
             XElement el = getXML(ID, configType);
@@ -44,7 +43,9 @@ namespace Shared.Config
         }
 
         public static string getStr(ulong ID) => string.Join("\r\n", Enum.GetValues(typeof(ConfigElement)).OfType<ConfigElement>().Select(s => s.ToString() + ": " + get(ID, s)));
+
         public static void set(DiscordChannel channel, ConfigElement element, bool? val, bool disableFormChecks = false) => set(channel.Id, element, val, disableFormChecks, "channel", new ValueTuple<ulong, string>[] { new ValueTuple<ulong, string>(channel.GuildId, "guild") });
+
         public static void set(ulong ID, ConfigElement element, bool? val, bool disableFormChecks = false, string configType = "channel", ValueTuple<ulong, string>[] upper = null)
         {
             XElement XML = getXML(ID, configType, out string XMLPath);
@@ -88,6 +89,7 @@ namespace Shared.Config
         }
 
         public static ConfigUpdateEvent configUpdate;
+
         public delegate void ConfigUpdateEvent(object sender, ulong ID, ConfigElement element);
     }
 }

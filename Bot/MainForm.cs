@@ -1,6 +1,5 @@
 ﻿using Bot.Commands;
 using DSharpPlus;
-using DSharpPlus.EventArgs;
 using Shared;
 using Shared.Config;
 using System;
@@ -224,7 +223,7 @@ namespace Bot
 
         private void nsfwBox_CheckedChanged(object sender, EventArgs e) => ClassExtensions.ExIf(ChannelDefined, () => ConfigManager.set(SelectedChannel.Channel, ConfigElement.Nsfw, nsfwBox.Checked, true));
 
-        private void debugButton_Click(object sender, EventArgs e) => ClassExtensions.ExIf(ChannelDefined, () => new System.Threading.Thread(() => MessageBox.Show(ConfigManager.getStr(SelectedChannel.Id))).Start());
+        private void debugButton_Click(object sender, EventArgs e) => ClassExtensions.ExIf(ChannelDefined, () => new Thread(() => MessageBox.Show(ConfigManager.getStr(SelectedChannel.Id))).Start());
 
         private void SendMessage(string message, BotChannel channel, Action<Task> continuationAction = null)
         {

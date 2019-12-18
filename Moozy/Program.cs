@@ -5,9 +5,7 @@ using DSharpPlus.VoiceNext;
 using DSharpPlus.VoiceNext.Codec;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -39,7 +37,7 @@ namespace Moozy
             {
                 Token = cfgjson.Token,
                 TokenType = TokenType.Bot,
-                
+
                 AutoReconnect = true,
                 LogLevel = LogLevel.Debug,
                 UseInternalLogHandler = true

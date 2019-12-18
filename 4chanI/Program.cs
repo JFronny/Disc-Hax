@@ -1,20 +1,18 @@
-﻿using System;
+﻿using Chan.Net;
+using Chan.Net.JsonModel;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Chan.Net;
-using Chan.Net.JsonModel;
 
 namespace Cleverbot
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Console.WriteLine("Fetching data from 4chan...");
             List<BoardInfo> m = JsonDeserializer.Deserialize<BoardListModel>(Internet.DownloadString(@"https://a.4cdn.org/boards.json").ConfigureAwait(false).GetAwaiter().GetResult()).boards;
@@ -60,7 +58,7 @@ namespace Cleverbot
             }
         }
 
-        static string consoleChoose(string prompt, string[] choices, string[] choiceDesc = null)
+        private static string consoleChoose(string prompt, string[] choices, string[] choiceDesc = null)
         {
             if (choiceDesc != null && choiceDesc.Length != choices.Length)
                 throw new ArgumentOutOfRangeException("choiceDesc[] needs to be of the same Length as choices[] or null");
@@ -80,7 +78,7 @@ namespace Cleverbot
             return choice;
         }
 
-        static void SetFormSize(Form f, Size s)
+        private static void SetFormSize(Form f, Size s)
         {
             double ratio = (double)s.Height / s.Width;
             Rectangle screen = Screen.PrimaryScreen.WorkingArea;

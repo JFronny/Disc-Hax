@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Microsoft.VisualBasic;
+﻿using Microsoft.VisualBasic;
 using Misc;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Windows.Forms;
 
 namespace Shared.Config
 {
     public static class TokenManager
     {
-        static string _token;
-        static readonly string containerFile = Path.GetDirectoryName(Application.ExecutablePath) + @"\Cfgs\key.secure";
+        private static string _token;
+        private static readonly string containerFile = Path.GetDirectoryName(Application.ExecutablePath) + @"\Cfgs\key.secure";
+
         public static string Token
         {
             get {

@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BooruSharp.Booru;
+﻿using BooruSharp.Booru;
 using BooruSharp.Search.Post;
+using System;
 
 namespace BooruT
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Console.Write("Allow NSFW? (Y/N):");
             Booru booru = Console.ReadKey().Key == ConsoleKey.Y ? (Booru)new Rule34() : new Gelbooru();

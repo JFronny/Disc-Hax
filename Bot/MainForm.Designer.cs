@@ -73,13 +73,13 @@
             this.chatBox.FormattingEnabled = true;
             this.chatBox.Location = new System.Drawing.Point(0, 0);
             this.chatBox.Name = "chatBox";
-            this.chatBox.Size = new System.Drawing.Size(479, 379);
+            this.chatBox.Size = new System.Drawing.Size(479, 359);
             this.chatBox.TabIndex = 1;
             // 
             // chatPanel
             // 
-            this.chatPanel.Controls.Add(this.chatSend);
             this.chatPanel.Controls.Add(this.chatBox);
+            this.chatPanel.Controls.Add(this.chatSend);
             this.chatPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.chatPanel.Location = new System.Drawing.Point(166, 0);
             this.chatPanel.Name = "chatPanel";

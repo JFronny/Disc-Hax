@@ -11,8 +11,11 @@ using System.Windows.Forms;
 namespace Shared
 {
     public delegate void SetPropertyDelegate<TCtl, TProp>(TCtl control, Expression<Func<TCtl, TProp>> propexpr, TProp value) where TCtl : Control;
+
     public delegate TProp GetPropertyDelegate<TCtl, TProp>(TCtl control, Expression<Func<TProp>> propexpr) where TCtl : Control;
+
     public delegate void InvokeActionDelegate<TCtl>(TCtl control, Delegate dlg, params object[] args) where TCtl : Control;
+
     public delegate TResult InvokeFuncDelegate<TCtl, TResult>(TCtl control, Delegate dlg, params object[] args) where TCtl : Control;
 
     public static class ClassExtensions
@@ -108,22 +111,33 @@ namespace Shared
         }
 
         public static G mod<T, G>(this T self, Func<T, G> func) => func.Invoke(self);
+
         public static void ExIf(bool condition, Action func)
         {
             if (condition)
                 func();
         }
+
         public static T ParseToEnum<T>(string value) => (T)Enum.Parse(typeof(T), Enum.GetNames(typeof(T)).First(s => s.ToLower() == value.ToLower()));
+
         public static bool? ParseBool(string value) => (string.IsNullOrWhiteSpace(value) || value.ToLower() == "Indeterminate") ? (bool?)null : bool.Parse(value);
+
         public static bool AND(this bool? left, bool? right) => left.TRUE() && right.TRUE();
+
         public static bool OR(this bool? left, bool? right) => left.TRUE() || right.TRUE();
+
         public static bool XOR(this bool? left, bool? right) => left.OR(right) && (!left.AND(right));
+
         public static bool TRUE(this bool? self) => self == true;
+
         public static bool FALSE(this bool? self) => self == false;
+
         public static bool NULL(this bool? self) => self == null;
+
         public static string emotify(this string self)
         {
-            return string.Join("", self.ToLower().ToCharArray().Select(s => {
+            return string.Join("", self.ToLower().ToCharArray().Select(s =>
+            {
                 if (Regex.IsMatch(s.ToString(), "[a-z]"))
                     return ":regional_indicator_" + s + ":";
                 else if (int.TryParse(s.ToString(), out int r))
@@ -132,24 +146,34 @@ namespace Shared
                     {
                         case '1':
                             return ":one:";
+
                         case '2':
                             return ":two:";
+
                         case '3':
                             return ":three:";
+
                         case '4':
                             return ":four:";
+
                         case '5':
                             return ":five:";
+
                         case '6':
                             return ":six:";
+
                         case '7':
                             return ":seven:";
+
                         case '8':
                             return ":eight:";
+
                         case '9':
                             return ":nine:";
+
                         case '0':
                             return ":zero:";
+
                         default:
                             throw new Exception("This should not happen");
                     }

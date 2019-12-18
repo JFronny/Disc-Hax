@@ -1,6 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using Bot.Properties;
+using DSharpPlus;
+using DSharpPlus.EventArgs;
+using Octokit;
+using Shared;
+using Shared.Config;
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -9,16 +13,11 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Bot.Properties;
-using DSharpPlus;
-using DSharpPlus.EventArgs;
-using Microsoft.VisualBasic;
-using Shared;
-using Shared.Config;
+using Application = System.Windows.Forms.Application;
 
 namespace Bot
 {
-    static class Program
+    internal static class Program
     {
         public static Random rnd = new Random();
         public static Task BotThread;
@@ -27,8 +26,10 @@ namespace Bot
         public static MainForm form;
         private static NotifyIcon notifyIcon;
         private static ApplicationContext ctx;
+        public static GitHubClient cli;
+
         [STAThread]
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
@@ -76,6 +77,7 @@ namespace Bot
                     notifyIcon.Icon = Resources.TextTemplate;
                     notifyIcon.ContextMenu = contextMenu;
                     notifyIcon.Visible = true;
+                    cli = new GitHubClient(new ProductHeaderValue("DiscHax"));
                     Bot = new Bot(new DiscordConfiguration
                     {
                         Token = TokenManager.Token,
@@ -175,7 +177,7 @@ namespace Bot
 
         private static Task Bot_ClientErrored(ClientErrorEventArgs e)
         {
-            form?.InvokeAction(new Action(() => MessageBox.Show(form, $"Exception in {e.EventName}: {e.Exception.ToString()}", "Unhandled exception in the bot", MessageBoxButtons.OK, MessageBoxIcon.Warning)));
+            Bot.Client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax", $"Exception in {e.EventName}: {e.Exception.ToString()}", DateTime.Now);
             return Task.CompletedTask;
         }
     }
