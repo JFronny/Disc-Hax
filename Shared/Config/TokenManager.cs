@@ -41,5 +41,8 @@ namespace Shared.Config
                 }
             }
         }
+
+        //HID.DecryptLocal and HID.EncryptLocal are NOT PORTABLE!
+        //The HID is used to prevent accidental leaking of your token
     }
 }

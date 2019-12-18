@@ -12,6 +12,7 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -45,9 +46,6 @@
   <ItemGroup>
     <Reference Include="BooruSharp, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\BooruSharp.1.4.6\lib\net45\BooruSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="CC_Functions.Misc, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CC-Functions.Misc.1.0.0\lib\CC_Functions.Misc.dll</HintPath>
     </Reference>
     <Reference Include="Chan.Net, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Chan.Net.0.0.15\lib\net45\Chan.Net.dll</HintPath>
