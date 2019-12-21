@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace Moozy
 {
-    public class Commands
+    public class Commands : BaseCommandModule
     {
         [Command("join")]
         public async Task Join(CommandContext ctx)
         {
             DiscordMessage tmp = await ctx.RespondAsync("JN: GVNC");
-            var vnext = ctx.Client.GetVoiceNextClient();
+            var vnext = ctx.Client.GetVoiceNext();
             await tmp.DeleteAsync();
             tmp = await ctx.RespondAsync("JN: GGLD");
             var vnc = vnext.GetConnection(ctx.Guild);
@@ -37,7 +37,7 @@ namespace Moozy
         public async Task Leave(CommandContext ctx)
         {
             DiscordMessage tmp = await ctx.RespondAsync("DC");
-            var vnext = ctx.Client.GetVoiceNextClient();
+            var vnext = ctx.Client.GetVoiceNext();
             await tmp.DeleteAsync();
             tmp = await ctx.RespondAsync("DC: GVNC");
             var vnc = vnext.GetConnection(ctx.Guild);

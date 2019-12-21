@@ -10,6 +10,7 @@ using DSharpPlus.VoiceNext.Codec;
 using Shared.Config;
 using System;
 using System.Threading.Tasks;
+using DSharpPlus.Interactivity.Enums;
 
 namespace Bot
 {
@@ -17,7 +18,7 @@ namespace Bot
     {
         public static Bot instance;
         public DiscordClient Client { get; }
-        public CommandsNextModule Commands { get; set; }
+        public CommandsNextExtension Commands { get; set; }
 
         public Bot(DiscordConfiguration cfg)
         {
@@ -25,21 +26,17 @@ namespace Bot
             Client = new DiscordClient(cfg);
             Commands = Client.UseCommandsNext(new CommandsNextConfiguration
             {
-                StringPrefix = Common.prefix,
+                StringPrefixes = new [] { Common.prefix },
                 EnableDms = false
             });
             Commands.CommandExecuted += Commands_CommandExecuted;
             Commands.CommandErrored += Commands_CommandErrored;
             _ = Client.UseInteractivity(new InteractivityConfiguration
             {
-                PaginationBehaviour = TimeoutBehaviour.Ignore,
-                PaginationTimeout = TimeSpan.FromMinutes(5),
+                PaginationBehaviour = PaginationBehaviour.Ignore,
                 Timeout = TimeSpan.FromMinutes(2)
             });
-            _ = Client.UseVoiceNext(new VoiceNextConfiguration
-            {
-                VoiceApplication = VoiceApplication.Music
-            });
+            _ = Client.UseVoiceNext(new VoiceNextConfiguration());
             Commands.RegisterCommands<ImageBoards>();
             Commands.RegisterCommands<Administration>();
             Commands.RegisterCommands<Music>();

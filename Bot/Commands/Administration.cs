@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Bot.Commands
 {
-    public class Administration
+    public class Administration : BaseCommandModule
     {
         [Command("ping"), Description("Responds with \"Pong\" if the bot is active")]
         public async Task Ping(CommandContext ctx)

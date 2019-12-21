@@ -70,7 +70,7 @@ namespace Bot
                 Tag = gld,
                 Checked = ConfigManager.get(gld.Id, ConfigElement.Enabled).TRUE()
             };
-            IEnumerable<BotChannel> chns = gld.Guild.Channels.Where(xc => xc.Type == ChannelType.Text).OrderBy(xc => xc.Position).Select(xc => new BotChannel(xc));
+            IEnumerable<BotChannel> chns = gld.Guild.Channels.Where(xc => xc.Value.Type == ChannelType.Text).OrderBy(xc => xc.Value.Position).Select(xc => new BotChannel(xc.Value));
             chns.ToList().ForEach(s =>
             {
                 node.Nodes.Add(new TreeNode { Text = s.Channel.Name, Tag = s, Checked = ConfigManager.get(s.Id, ConfigElement.Enabled).TRUE() });

@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Bot.Commands
 {
-    public class ImageBoards
+    public class ImageBoards : BaseCommandModule
     {
         [Command("4chan"), Description("Sends a random image from the board. If no board is specified, a list of boards will be displayed.")]
         public async Task Chan(CommandContext ctx, [Description("Board to select image from")] params string[] args)

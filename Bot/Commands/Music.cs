@@ -1,6 +1,8 @@
-﻿namespace Bot.Commands
+﻿using DSharpPlus.CommandsNext;
+
+namespace Bot.Commands
 {
-    public class Music
+    public class Music : BaseCommandModule
     {
         /*[Command("join"), Description("Joins a voice channel.")]
         public async Task Join(CommandContext ctx, DiscordChannel chn = null)

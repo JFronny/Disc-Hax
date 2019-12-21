@@ -46,13 +46,10 @@ namespace Moozy
             Client.UseVoiceNext();
             Client.UseCommandsNext(new CommandsNextConfiguration
             {
-                StringPrefix = cfgjson.CommandPrefix,
+                StringPrefixes = new string[] { cfgjson.CommandPrefix },
                 EnableDms = false
             }).RegisterCommands<Commands>();
-            Client.UseVoiceNext(new VoiceNextConfiguration
-            {
-                VoiceApplication = VoiceApplication.Music
-            });
+            Client.UseVoiceNext(new VoiceNextConfiguration());
             Client.Ready += Client_Ready;
             Client.GuildAvailable += Client_GuildAvailable;
             Client.ClientErrored += Client_ClientError;
