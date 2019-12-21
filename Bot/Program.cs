@@ -6,6 +6,7 @@ using Shared;
 using Shared.Config;
 using System;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
@@ -13,6 +14,7 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using DSharpPlus.Net.WebSocket;
 using Application = System.Windows.Forms.Application;
 
 namespace Bot
@@ -36,10 +38,10 @@ namespace Bot
             string appGuid = ((GuidAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(GuidAttribute), false).GetValue(0)).Value.ToString();
             string mutexId = string.Format("Global\\{{{0}}}", appGuid);
             bool createdNew;
-            var allowEveryoneRule = new MutexAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), MutexRights.FullControl, AccessControlType.Allow);
-            var securitySettings = new MutexSecurity();
+            MutexAccessRule allowEveryoneRule = new MutexAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), MutexRights.FullControl, AccessControlType.Allow);
+            MutexSecurity securitySettings = new MutexSecurity();
             securitySettings.AddAccessRule(allowEveryoneRule);
-            using (var mutex = new Mutex(false, mutexId, out createdNew, securitySettings))
+            using (Mutex mutex = new Mutex(false, mutexId, out createdNew, securitySettings))
             {
                 var hasHandle = false;
                 try
@@ -78,7 +80,7 @@ namespace Bot
                     notifyIcon.ContextMenu = contextMenu;
                     notifyIcon.Visible = true;
                     cli = new GitHubClient(new ProductHeaderValue("DiscHax"));
-                    Bot = new Bot(new DiscordConfiguration
+                    DiscordConfiguration cfg = new DiscordConfiguration
                     {
                         Token = TokenManager.Token,
                         TokenType = TokenType.Bot,
@@ -89,7 +91,10 @@ namespace Bot
                         LogLevel = LogLevel.Info,
 #endif
                         UseInternalLogHandler = false
-                    });
+                    };
+                    if (Type.GetType("Mono.Runtime") != null)
+                        cfg.WebSocketClientFactory = WebSocketSharpClient.CreateNew;
+                    Bot = new Bot(cfg);
                     Bot.Client.Ready += Bot_Ready;
                     Bot.Client.GuildAvailable += Bot_GuildAvailable;
                     Bot.Client.GuildCreated += Bot_GuildCreated;

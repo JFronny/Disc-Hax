@@ -11,10 +11,10 @@ namespace Shared.Config
     {
         private static XElement getXML(ulong ID, string ElName, out string XMLPath)
         {
-            XMLPath = Path.GetDirectoryName(Application.ExecutablePath) + @"\Cfgs\";
+            XMLPath = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Cfgs");
             if (!Directory.Exists(XMLPath))
                 Directory.CreateDirectory(XMLPath);
-            XMLPath += ID.ToString() + ".xml";
+            XMLPath = Path.Combine(XMLPath, ID.ToString() + ".xml");
             if (!File.Exists(XMLPath))
                 new XElement(ElName).Save(XMLPath);
             return XElement.Load(XMLPath);

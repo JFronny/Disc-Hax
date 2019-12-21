@@ -6,7 +6,7 @@ namespace Shared.Config
 {
     public static class Common
     {
-        private static string path = Path.GetDirectoryName(Application.ExecutablePath) + @"\Cfgs\common.xml";
+        private static string path = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Cfgs", "common.xml");
         private static XElement common;
 
         public static string prefix

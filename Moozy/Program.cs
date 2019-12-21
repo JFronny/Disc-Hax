@@ -1,6 +1,7 @@
 ﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.EventArgs;
+using DSharpPlus.Net.WebSocket;
 using DSharpPlus.VoiceNext;
 using DSharpPlus.VoiceNext.Codec;
 using Newtonsoft.Json;
@@ -42,6 +43,8 @@ namespace Moozy
                 LogLevel = LogLevel.Debug,
                 UseInternalLogHandler = true
             };
+            if (Type.GetType("Mono.Runtime") != null)
+                cfg.WebSocketClientFactory = WebSocketSharpClient.CreateNew;
             Client = new DiscordClient(cfg);
             Client.UseVoiceNext();
             Client.UseCommandsNext(new CommandsNextConfiguration

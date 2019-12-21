@@ -9,7 +9,7 @@ namespace Shared.Config
     public static class TokenManager
     {
         private static string _token;
-        private static readonly string containerFile = Path.GetDirectoryName(Application.ExecutablePath) + @"\Cfgs\key.secure";
+        private static readonly string containerFile = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Cfgs", "key.secure");
 
         public static string Token
         {

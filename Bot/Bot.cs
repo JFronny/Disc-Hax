@@ -39,7 +39,7 @@ namespace Bot
             _ = Client.UseVoiceNext(new VoiceNextConfiguration());
             Commands.RegisterCommands<ImageBoards>();
             Commands.RegisterCommands<Administration>();
-            Commands.RegisterCommands<Music>();
+            //Commands.RegisterCommands<Music>();
             Commands.RegisterCommands<Commands.Misc>();
             Client.DebugLogger.LogMessageReceived += DebugLogger_LogMessageReceived;
         }
