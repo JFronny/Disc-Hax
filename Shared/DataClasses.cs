@@ -1,4 +1,5 @@
-﻿using DSharpPlus.Entities;
+﻿using System.Collections.Generic;
+using DSharpPlus.Entities;
 
 namespace Shared
 {
@@ -7,33 +8,47 @@ namespace Shared
         ulong Id { get; }
     }
 
-    public struct BotGuild : IBotStruct
+    public class BotGuild : IBotStruct
     {
-        public DiscordGuild Guild { get; }
-        public ulong Id => Guild.Id;
+        public Dictionary<ulong, BotChannel> Channels = new Dictionary<ulong, BotChannel>();
 
         public BotGuild(DiscordGuild gld) => Guild = gld;
+        public DiscordGuild Guild { get; }
+        public ulong Id => Guild.Id;
 
         public override string ToString() => Guild.Name;
     }
 
-    public struct BotChannel : IBotStruct
+    public class BotChannel : IBotStruct
     {
-        public DiscordChannel Channel { get; }
-        public ulong Id => Channel.Id;
+        private readonly Dictionary<ulong, BotMessage> _messages = new Dictionary<ulong, BotMessage>();
 
         public BotChannel(DiscordChannel chn) => Channel = chn;
+        public DiscordChannel Channel { get; }
+
+        public Dictionary<ulong, BotMessage> Messages
+        {
+            get
+            {
+                while (_messages.Count > 100) _messages.RemoveAt(99);
+                return _messages;
+            }
+        }
+
+        public ulong Id => Channel.Id;
 
         public override string ToString() => $"#{Channel.Name}";
     }
 
-    public struct BotMessage : IBotStruct
+    public class BotMessage : IBotStruct
     {
+        public BotMessage(DiscordMessage msg) => Message = msg;
         public DiscordMessage Message { get; }
         public ulong Id => Message.Id;
 
-        public BotMessage(DiscordMessage msg) => Message = msg;
-
-        public override string ToString() => Message.Content;
+        public override string ToString() =>
+            "<" + (Message.Author.IsCurrent ? "SELF>" :
+                Message.Author.IsBot ? "BOT>[" + Message.Author.Username + "]" :
+                "USER>[" + Message.Author.Username + "]") + Message.Content;
     }
 }

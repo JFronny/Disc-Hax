@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -129,5 +130,8 @@ namespace Shared
                 };
             }).ToArray());
         }
+
+        public static void RemoveAt<T, G>(this Dictionary<T, G> dict, int index) =>
+            dict.Remove(dict.Keys.OfType<T>().ToArray()[index]);
     }
 }

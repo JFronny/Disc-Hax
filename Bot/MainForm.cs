@@ -19,7 +19,6 @@ namespace Bot
         private readonly List<CheckBox> settingsBoxes;
         private bool busy;
         public bool ChannelDefined;
-        public Dictionary<BotChannel, List<string>> messageSave = new Dictionary<BotChannel, List<string>>();
 
         private bool recCheck = true;
 
@@ -69,7 +68,6 @@ namespace Bot
         public CancellationTokenSource TokenSource { get; set; }
         public BotGuild SelectedGuild { get; set; }
         public BotChannel SelectedChannel { get; set; }
-        public ulong ChID => ChannelDefined ? SelectedChannel.Id : 0;
 
         public void AddGuild(BotGuild gld)
         {
@@ -80,7 +78,7 @@ namespace Bot
                 Checked = ConfigManager.get(gld.Id, ConfigElement.Enabled).TRUE()
             };
             IEnumerable<BotChannel> chns = gld.Guild.Channels.Where(xc => xc.Value.Type == ChannelType.Text)
-                .OrderBy(xc => xc.Value.Position).Select(xc => new BotChannel(xc.Value));
+                .OrderBy(xc => xc.Value.Position).Select(xc => xc.Value.getInstance());
             chns.ToList().ForEach(s =>
             {
                 node.Nodes.Add(new TreeNode
@@ -105,18 +103,7 @@ namespace Bot
         {
             try
             {
-                string logMsg = "";
-                if (msg.Message.Author.IsCurrent)
-                    logMsg = "<SELF>" + msg.Message.Content;
-                else if (msg.Message.Author.IsBot)
-                    logMsg = "<BOT>[" + msg.Message.Author.Username + "]" + msg.Message.Content;
-                else
-                    logMsg = "<USER>[" + msg.Message.Author.Username + "]" + msg.Message.Content;
-                if (!messageSave.ContainsKey(channel))
-                    messageSave.Add(channel, new List<string>());
-                if (messageSave[channel].Count > 100)
-                    messageSave[channel].RemoveRange(99, messageSave[channel].Count - 100);
-                messageSave[channel].Add(logMsg);
+                string logMsg = msg.Message.getInstance().ToString();
                 if (ChannelDefined && channel.Id == SelectedChannel.Id)
                 {
                     chatBox.Items.Add(logMsg);
@@ -139,9 +126,7 @@ namespace Bot
                     SelectedChannel = (BotChannel) e.Node.Tag;
                     ChannelDefined = true;
                     chatBox.Items.Clear();
-                    if (!messageSave.ContainsKey(SelectedChannel))
-                        messageSave.Add(SelectedChannel, new List<string>());
-                    messageSave[SelectedChannel].ForEach(s => chatBox.Items.Add(s));
+                    SelectedChannel.Messages.Values.ToList().ForEach(s => chatBox.Items.Add(s));
                     nsfwBox.Checked = SelectedChannel.Channel.IsNSFW ||
                                       ConfigManager.get(SelectedChannel.Id, ConfigElement.Nsfw).TRUE();
                     settingsBoxes.ForEach(s =>
@@ -274,8 +259,8 @@ namespace Bot
                 string[] guilds = channelTree.Nodes[0].Nodes
                     .OfType<TreeNode>().Select(s => ((IBotStruct) s.Tag).Id.ToString()).ToArray();
                 string[] channels = channelTree.Nodes[0].Nodes.OfType<TreeNode>()
-                    .SelectMany(s => s.Nodes.OfType<TreeNode>())
-                    .OfType<TreeNode>().Select(s => ((IBotStruct) s.Tag).Id.ToString()).ToArray();
+                    .SelectMany(s => s.Nodes.OfType<TreeNode>()).Select(s => ((IBotStruct) s.Tag).Id.ToString())
+                    .ToArray();
                 string[] allowedNames = {"common.xml", "key.secure"};
                 for (int i = 0; i < cfgs.Length; i++)
                 {

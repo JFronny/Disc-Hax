@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Bot.Properties;
 using DSharpPlus;
+using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Net.WebSocket;
 using Octokit;
@@ -28,6 +30,14 @@ namespace Bot
         private static NotifyIcon notifyIcon;
         private static ApplicationContext ctx;
         public static GitHubClient cli;
+        public static Dictionary<ulong, BotGuild> Guilds = new Dictionary<ulong, BotGuild>();
+        public static BotGuild getInstance(this DiscordGuild guild) => Guilds[guild.Id];
+
+        public static BotChannel getInstance(this DiscordChannel channel) =>
+            channel.Guild.getInstance().Channels[channel.Id];
+
+        public static BotMessage getInstance(this DiscordMessage message) =>
+            message.Channel.getInstance().Messages[message.Id];
 
         [STAThread]
         private static void Main(string[] args)
@@ -61,24 +71,27 @@ namespace Bot
 #endif
                         hasHandle = true;
                     }
+                    bool useForm = args == null || args.Length == 0 || args.Contains("form");
                     Console.WriteLine("Initializing");
-                    notifyIcon = new NotifyIcon();
-                    MenuItem formItem = new MenuItem("Show");
-                    MenuItem exitItem = new MenuItem("Exit");
-                    ContextMenu contextMenu = new ContextMenu(new[] {formItem, exitItem});
-                    formItem.Index = 0;
-                    formItem.Click += (sender, e) =>
+                    notifyIcon = new NotifyIcon
                     {
-                        if (form == null)
-                            form = new MainForm();
-                        form.Show();
+                        Text = "DiscHax", Icon = Resources.TextTemplate, Visible = true, ContextMenu = new ContextMenu()
                     };
-                    exitItem.Index = 1;
+                    if (useForm)
+                    {
+                        MenuItem formItem = new MenuItem("Show");
+                        formItem.Index = 0;
+                        formItem.Click += (sender, e) =>
+                        {
+                            if (form == null)
+                                form = new MainForm();
+                            form.Show();
+                        };
+                        notifyIcon.ContextMenu.MenuItems.Add(formItem);
+                    }
+                    MenuItem exitItem = new MenuItem("Exit");
                     exitItem.Click += (sender, e) => { ctx.ExitThread(); };
-                    notifyIcon.Text = "DiscHax";
-                    notifyIcon.Icon = Resources.TextTemplate;
-                    notifyIcon.ContextMenu = contextMenu;
-                    notifyIcon.Visible = true;
+                    notifyIcon.ContextMenu.MenuItems.Add(exitItem);
                     cli = new GitHubClient(new ProductHeaderValue("DiscHax"));
                     DiscordConfiguration cfg = new DiscordConfiguration
                     {
@@ -96,20 +109,22 @@ namespace Bot
                         cfg.WebSocketClientFactory = WebSocketSharpClient.CreateNew;
                     Bot = new Bot(cfg);
                     Bot.Client.Ready += Bot_Ready;
-                    Bot.Client.GuildAvailable += Bot_GuildAvailable;
-                    Bot.Client.GuildCreated += Bot_GuildCreated;
-                    Bot.Client.GuildUnavailable += Bot_GuildUnavailable;
-                    Bot.Client.GuildDeleted += Bot_GuildDeleted;
-                    Bot.Client.MessageCreated += Bot_MessageCreated;
+                    Bot.Client.GuildAvailable += AddGuild;
+                    Bot.Client.GuildCreated += AddGuild;
+                    Bot.Client.GuildUnavailable += RemoveGuild;
+                    Bot.Client.GuildDeleted += RemoveGuild;
+                    Bot.Client.ChannelCreated += AddChannel;
+                    Bot.Client.ChannelDeleted += RemoveChannel;
+                    Bot.Client.MessageCreated += AddMessage;
+                    Bot.Client.MessageDeleted += RemoveMessage;
                     Bot.Client.ClientErrored += Bot_ClientErrored;
                     TokenSource = new CancellationTokenSource();
                     BotThread = Task.Run(BotThreadCallback);
-                    if (args == null || args.Length == 0 || args.Contains("form"))
+                    if (useForm)
                     {
                         form = new MainForm();
                         form.Show();
                     }
-
                     ctx = new ApplicationContext();
                     Application.Run(ctx);
                     TokenSource.Cancel();
@@ -157,34 +172,45 @@ namespace Bot
             return Task.CompletedTask;
         }
 
-        private static Task Bot_GuildAvailable(GuildCreateEventArgs e)
+        private static Task AddGuild(GuildCreateEventArgs e)
         {
-            form?.channelTree.InvokeAction(new Action<BotGuild>(form.AddGuild), new BotGuild(e.Guild));
+            Guilds.Add(e.Guild.Id, new BotGuild(e.Guild));
+            foreach (KeyValuePair<ulong, DiscordChannel> channel in e.Guild.Channels)
+                e.Guild.getInstance().Channels.Add(channel.Key, new BotChannel(channel.Value));
+            form?.channelTree.InvokeAction(new Action<BotGuild>(form.AddGuild), Guilds[e.Guild.Id]);
             return Task.CompletedTask;
         }
 
-        private static Task Bot_GuildCreated(GuildCreateEventArgs e)
+        private static Task RemoveGuild(GuildDeleteEventArgs e)
         {
-            form?.channelTree.InvokeAction(new Action<BotGuild>(form.AddGuild), new BotGuild(e.Guild));
-            return Task.CompletedTask;
-        }
-
-        private static Task Bot_GuildUnavailable(GuildDeleteEventArgs e)
-        {
+            Guilds.Remove(e.Guild.Id);
             form?.channelTree.InvokeAction(new Action<ulong>(form.RemoveGuild), e.Guild.Id);
             return Task.CompletedTask;
         }
 
-        private static Task Bot_GuildDeleted(GuildDeleteEventArgs e)
+        private static Task AddChannel(ChannelCreateEventArgs e)
         {
-            form?.channelTree.InvokeAction(new Action<ulong>(form.RemoveGuild), e.Guild.Id);
+            e.Guild.getInstance().Channels.Add(e.Channel.Id, new BotChannel(e.Channel));
             return Task.CompletedTask;
         }
 
-        private static Task Bot_MessageCreated(MessageCreateEventArgs e)
+        private static Task RemoveChannel(ChannelDeleteEventArgs e)
         {
+            e.Guild.getInstance().Channels.Remove(e.Channel.Id);
+            return Task.CompletedTask;
+        }
+
+        private static Task AddMessage(MessageCreateEventArgs e)
+        {
+            e.Message.Channel.getInstance().Messages.Add(e.Message.Id, new BotMessage(e.Message));
             form?.channelTree.InvokeAction(new Action<BotMessage, BotChannel>(form.AddMessage),
                 new BotMessage(e.Message), new BotChannel(e.Channel));
+            return Task.CompletedTask;
+        }
+
+        private static Task RemoveMessage(MessageDeleteEventArgs e)
+        {
+            e.Channel.getInstance().Messages.Remove(e.Message.Id);
             return Task.CompletedTask;
         }
 
