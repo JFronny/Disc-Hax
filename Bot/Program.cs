@@ -1,12 +1,5 @@
-﻿using Bot.Properties;
-using DSharpPlus;
-using DSharpPlus.EventArgs;
-using Octokit;
-using Shared;
-using Shared.Config;
-using System;
+﻿using System;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
@@ -14,7 +7,13 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Bot.Properties;
+using DSharpPlus;
+using DSharpPlus.EventArgs;
 using DSharpPlus.Net.WebSocket;
+using Octokit;
+using Shared;
+using Shared.Config;
 using Application = System.Windows.Forms.Application;
 
 namespace Bot
@@ -35,15 +34,18 @@ namespace Bot
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            string appGuid = ((GuidAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(GuidAttribute), false).GetValue(0)).Value.ToString();
+            string appGuid = ((GuidAttribute) Assembly.GetExecutingAssembly()
+                .GetCustomAttributes(typeof(GuidAttribute), false).GetValue(0)).Value;
             string mutexId = string.Format("Global\\{{{0}}}", appGuid);
             bool createdNew;
-            MutexAccessRule allowEveryoneRule = new MutexAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), MutexRights.FullControl, AccessControlType.Allow);
+            MutexAccessRule allowEveryoneRule = new MutexAccessRule(
+                new SecurityIdentifier(WellKnownSidType.WorldSid, null), MutexRights.FullControl,
+                AccessControlType.Allow);
             MutexSecurity securitySettings = new MutexSecurity();
             securitySettings.AddAccessRule(allowEveryoneRule);
             using (Mutex mutex = new Mutex(false, mutexId, out createdNew, securitySettings))
             {
-                var hasHandle = false;
+                bool hasHandle = false;
                 try
                 {
                     try
@@ -59,10 +61,11 @@ namespace Bot
 #endif
                         hasHandle = true;
                     }
+                    Console.WriteLine("Initializing");
                     notifyIcon = new NotifyIcon();
                     MenuItem formItem = new MenuItem("Show");
                     MenuItem exitItem = new MenuItem("Exit");
-                    ContextMenu contextMenu = new ContextMenu(new MenuItem[] { formItem, exitItem });
+                    ContextMenu contextMenu = new ContextMenu(new[] {formItem, exitItem});
                     formItem.Index = 0;
                     formItem.Click += (sender, e) =>
                     {
@@ -71,10 +74,7 @@ namespace Bot
                         form.Show();
                     };
                     exitItem.Index = 1;
-                    exitItem.Click += (sender, e) =>
-                    {
-                        ctx.ExitThread();
-                    };
+                    exitItem.Click += (sender, e) => { ctx.ExitThread(); };
                     notifyIcon.Text = "DiscHax";
                     notifyIcon.Icon = Resources.TextTemplate;
                     notifyIcon.ContextMenu = contextMenu;
@@ -109,6 +109,7 @@ namespace Bot
                         form = new MainForm();
                         form.Show();
                     }
+
                     ctx = new ApplicationContext();
                     Application.Run(ctx);
                     TokenSource.Cancel();
@@ -129,7 +130,10 @@ namespace Bot
             {
                 await Task.Delay(-1, TokenSource.Token).ConfigureAwait(false);
             }
-            catch { }
+            catch
+            {
+            }
+
             await Bot.StopAsync().ConfigureAwait(false);
             if (form != null)
             {
@@ -138,6 +142,7 @@ namespace Bot
                 form.SelectedGuild = default;
                 form.SelectedChannel = default;
             }
+
             Bot = null;
             TokenSource = null;
             BotThread = null;
@@ -146,7 +151,9 @@ namespace Bot
         private static Task Bot_Ready(ReadyEventArgs e)
         {
             form?.SetProperty(xf => xf.Text, "DiscHax Bot Menu (connected)");
-            Bot.Client.DebugLogger.LogMessage(LogLevel.Info, "DiscHax", "Your invite Link: https://discordapp.com/oauth2/authorize?client_id=" + e.Client.CurrentApplication.Id.ToString() + "&scope=bot&permissions=8", DateTime.Now);
+            Bot.Client.DebugLogger.LogMessage(LogLevel.Info, "DiscHax",
+                "Your invite Link: https://discordapp.com/oauth2/authorize?client_id=" +
+                e.Client.CurrentApplication.Id + "&scope=bot&permissions=8", DateTime.Now);
             return Task.CompletedTask;
         }
 
@@ -176,13 +183,15 @@ namespace Bot
 
         private static Task Bot_MessageCreated(MessageCreateEventArgs e)
         {
-            form?.channelTree.InvokeAction(new Action<BotMessage, BotChannel>(form.AddMessage), new BotMessage(e.Message), new BotChannel(e.Channel));
+            form?.channelTree.InvokeAction(new Action<BotMessage, BotChannel>(form.AddMessage),
+                new BotMessage(e.Message), new BotChannel(e.Channel));
             return Task.CompletedTask;
         }
 
         private static Task Bot_ClientErrored(ClientErrorEventArgs e)
         {
-            Bot.Client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax", $"Exception in {e.EventName}: {e.Exception.ToString()}", DateTime.Now);
+            Bot.Client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax", $"Exception in {e.EventName}: {e.Exception}",
+                DateTime.Now);
             return Task.CompletedTask;
         }
     }

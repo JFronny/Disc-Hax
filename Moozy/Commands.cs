@@ -1,9 +1,9 @@
-﻿using DSharpPlus.CommandsNext;
+﻿using System;
+using System.Threading.Tasks;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.VoiceNext;
-using System;
-using System.Threading.Tasks;
 
 namespace Moozy
 {
@@ -13,34 +13,34 @@ namespace Moozy
         public async Task Join(CommandContext ctx)
         {
             DiscordMessage tmp = await ctx.RespondAsync("JN: GVNC");
-            var vnext = ctx.Client.GetVoiceNext();
+            VoiceNextExtension vnext = ctx.Client.GetVoiceNext();
             await tmp.DeleteAsync();
             tmp = await ctx.RespondAsync("JN: GGLD");
-            var vnc = vnext.GetConnection(ctx.Guild);
+            VoiceNextConnection vnc = vnext.GetConnection(ctx.Guild);
             await tmp.DeleteAsync();
             tmp = await ctx.RespondAsync("JN: CVNC");
             if (vnc != null)
                 throw new InvalidOperationException("Already connected in this guild.");
             await tmp.DeleteAsync();
             tmp = await ctx.RespondAsync("JN: CCHN");
-            var chn = ctx.Member?.VoiceState?.Channel;
+            DiscordChannel chn = ctx.Member?.VoiceState?.Channel;
             if (chn == null)
                 throw new InvalidOperationException("You need to be in a voice channel.");
             await tmp.DeleteAsync();
             tmp = await ctx.RespondAsync("JN: CTXC");
             vnc = await vnext.ConnectAsync(chn);
             await tmp.DeleteAsync();
-            await ctx.RespondAsync("👌");
+            await ctx.RespondAsync("👌Connected");
         }
 
         [Command("leave")]
         public async Task Leave(CommandContext ctx)
         {
             DiscordMessage tmp = await ctx.RespondAsync("DC");
-            var vnext = ctx.Client.GetVoiceNext();
+            VoiceNextExtension vnext = ctx.Client.GetVoiceNext();
             await tmp.DeleteAsync();
             tmp = await ctx.RespondAsync("DC: GVNC");
-            var vnc = vnext.GetConnection(ctx.Guild);
+            VoiceNextConnection vnc = vnext.GetConnection(ctx.Guild);
             await tmp.DeleteAsync();
             tmp = await ctx.RespondAsync("DC: CVNC");
             if (vnc == null)

@@ -5,18 +5,21 @@ namespace BeeMovie
 {
     internal class Program
     {
-        private static Random rnd = new Random();
+        private static readonly Random rnd = new Random();
 
         private static void Main(string[] args)
         {
             string[] Quotes;
             using (WebClient client = new WebClient())
             {
-                Quotes = client.DownloadString("http://www.script-o-rama.com/movie_scripts/a1/bee-movie-script-transcript-seinfeld.html")
-                    .Split(new string[] { "<pre>" }, StringSplitOptions.None)[1]
-                    .Split(new string[] { "</pre>" }, StringSplitOptions.None)[0]
-                    .Split(new string[] { "\n\n  \n" }, StringSplitOptions.None);
+                Quotes = client
+                    .DownloadString(
+                        "http://www.script-o-rama.com/movie_scripts/a1/bee-movie-script-transcript-seinfeld.html")
+                    .Split(new[] {"<pre>"}, StringSplitOptions.None)[1]
+                    .Split(new[] {"</pre>"}, StringSplitOptions.None)[0]
+                    .Split(new[] {"\n\n  \n"}, StringSplitOptions.None);
             }
+
             Quotes[0] = Quotes[0].Replace("  \n  \n", "");
             while (true)
             {

@@ -1,24 +1,21 @@
-﻿using Bot.Commands;
+﻿using System;
+using System.Threading.Tasks;
+using Bot.Commands;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
-using DSharpPlus.VoiceNext;
-using DSharpPlus.VoiceNext.Codec;
-using Shared.Config;
-using System;
-using System.Threading.Tasks;
 using DSharpPlus.Interactivity.Enums;
+using DSharpPlus.VoiceNext;
+using Shared.Config;
 
 namespace Bot
 {
     public class Bot
     {
         public static Bot instance;
-        public DiscordClient Client { get; }
-        public CommandsNextExtension Commands { get; set; }
 
         public Bot(DiscordConfiguration cfg)
         {
@@ -26,7 +23,7 @@ namespace Bot
             Client = new DiscordClient(cfg);
             Commands = Client.UseCommandsNext(new CommandsNextConfiguration
             {
-                StringPrefixes = new [] { Common.prefix },
+                StringPrefixes = new[] {Common.prefix},
                 EnableDms = false
             });
             Commands.CommandExecuted += Commands_CommandExecuted;
@@ -40,13 +37,18 @@ namespace Bot
             Commands.RegisterCommands<ImageBoards>();
             Commands.RegisterCommands<Administration>();
             //Commands.RegisterCommands<Music>();
-            Commands.RegisterCommands<Commands.Misc>();
+            Commands.RegisterCommands<Misc>();
             Client.DebugLogger.LogMessageReceived += DebugLogger_LogMessageReceived;
         }
 
+        public DiscordClient Client { get; }
+        public CommandsNextExtension Commands { get; set; }
+
         private async Task Commands_CommandErrored(CommandErrorEventArgs e)
         {
-            e.Context.Client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax", $"{e.Context.User.Username} tried executing '{e.Command?.QualifiedName ?? "<unknown command>"}' but it errored: {e.Exception.GetType()}: {e.Exception.Message ?? "<no message>"}", DateTime.Now);
+            e.Context.Client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax",
+                $"{e.Context.User.Username} tried executing '{e.Command?.QualifiedName ?? "<unknown command>"}' but it errored: {e.Exception.GetType()}: {e.Exception.Message ?? "<no message>"}",
+                DateTime.Now);
             if (e.Exception is ChecksFailedException ex)
             {
                 DiscordEmoji emoji = DiscordEmoji.FromName(e.Context.Client, ":no_entry:");
@@ -59,12 +61,15 @@ namespace Bot
                 await e.Context.RespondAsync("", embed: embed);
             }
             else if (!(e.Exception is CommandNotFoundException))
+            {
                 await e.Context.RespondAsync("The command failed: " + e.Exception.Message);
+            }
         }
 
         private Task Commands_CommandExecuted(CommandExecutionEventArgs e)
         {
-            e.Context.Client.DebugLogger.LogMessage(LogLevel.Info, "DiscHax", $"{e.Context.User.Username} successfully executed '{e.Command.QualifiedName}'", DateTime.Now);
+            e.Context.Client.DebugLogger.LogMessage(LogLevel.Info, "DiscHax",
+                $"{e.Context.User.Username} successfully executed '{e.Command.QualifiedName}'", DateTime.Now);
             return Task.CompletedTask;
         }
 
@@ -74,7 +79,8 @@ namespace Bot
 
         private void DebugLogger_LogMessageReceived(object sender, DebugLogMessageEventArgs e)
         {
-            Console.WriteLine($"[{e.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")}] [{e.Application}] [{e.Level}] {e.Message}");
+            Console.WriteLine(
+                $"[{e.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")}] [{e.Application}] [{e.Level}] {e.Message}");
         }
     }
 }

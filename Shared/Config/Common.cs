@@ -6,34 +6,42 @@ namespace Shared.Config
 {
     public static class Common
     {
-        private static string path = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Cfgs", "common.xml");
+        private static readonly string path = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Cfgs",
+            "common.xml");
+
         private static XElement common;
 
         public static string prefix
         {
-            get {
+            get
+            {
                 getXE();
                 if (common.Element("prefix") == null)
                 {
                     common.Add(new XElement("prefix"), "!");
                     saveXE();
                 }
+
                 return common.Element("prefix").Value;
             }
         }
 
         public static bool guildsBox
         {
-            get {
+            get
+            {
                 getXE();
-                if (common.Element("guildsBox") == null || !bool.TryParse(common.Element("guildsBox").Value, out bool t))
+                if (common.Element("guildsBox") == null ||
+                    !bool.TryParse(common.Element("guildsBox").Value, out bool t))
                 {
                     common.Add(new XElement("guildsBox", bool.FalseString));
                     saveXE();
                 }
+
                 return bool.Parse(common.Element("guildsBox").Value);
             }
-            set {
+            set
+            {
                 getXE();
                 if (common.Element("guildsBox") == null)
                     common.Add(new XElement("guildsBox", value.ToString()));

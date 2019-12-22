@@ -33,7 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CC_Functions.Misc, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\CC-Functions.Misc.1.0.3\lib\CC_Functions.Misc.dll</HintPath>
+      <HintPath>..\packages\CC-Functions.Misc.1.0.4\lib\CC_Functions.Misc.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="DSharpPlus, Version=4.0.0.641, Culture=neutral, PublicKeyToken=null">
