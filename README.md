@@ -1,7 +1,7 @@
 # Disc-Hax
 The BEST discord bot!
-[![CodeFactor](https://www.codefactor.io/repository/github/creepycrafter24/disc-hax/badge)](https://www.codefactor.io/repository/github/creepycrafter24/disc-hax)
-![Discord](https://img.shields.io/discord/466965965658128384?label=Discord)
+[![CodeFactor](https://www.codefactor.io/repository/github/jfronny/disc-hax/badge)](https://www.codefactor.io/repository/github/jfronny/disc-hax)
+[![Discord](https://img.shields.io/discord/466965965658128384?label=Discord)](https://discord.gg/UjhHBqt)
 
 Current features:
 - !booru - Shows a random Image from danbooru or rule34.xxx
