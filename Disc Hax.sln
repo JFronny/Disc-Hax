@@ -30,6 +30,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fortune", "Fortune\Fortune.csproj", "{0AE71307-EC2A-45C2-9039-9607A0938790}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalC", "CalC\CalC.csproj", "{09AF8E8C-B9D3-40A9-AB01-D9560C0C2887}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -68,6 +70,10 @@ Global
 		{0AE71307-EC2A-45C2-9039-9607A0938790}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0AE71307-EC2A-45C2-9039-9607A0938790}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0AE71307-EC2A-45C2-9039-9607A0938790}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09AF8E8C-B9D3-40A9-AB01-D9560C0C2887}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09AF8E8C-B9D3-40A9-AB01-D9560C0C2887}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09AF8E8C-B9D3-40A9-AB01-D9560C0C2887}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09AF8E8C-B9D3-40A9-AB01-D9560C0C2887}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -81,6 +87,7 @@ Global
 		{8E78CE17-8927-42BE-ADE7-EB48C845546A} = {58AA2CDA-66A3-45F2-96EB-90E3EE355663}
 		{7D33F6C5-863A-4A48-A6D5-63619E2A6724} = {D1767683-48E7-4038-A5C6-077DF02186FC}
 		{0AE71307-EC2A-45C2-9039-9607A0938790} = {58AA2CDA-66A3-45F2-96EB-90E3EE355663}
+		{09AF8E8C-B9D3-40A9-AB01-D9560C0C2887} = {58AA2CDA-66A3-45F2-96EB-90E3EE355663}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CAE17A9D-510E-4412-9865-E484487781F7}

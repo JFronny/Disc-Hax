@@ -14,6 +14,7 @@
         Emojify,
         Fortune,
         PreviewSite,
+        Calc,
         Enabled
     }
 }

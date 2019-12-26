@@ -11,10 +11,9 @@ using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.EventHandling;
-using Octokit;
+using org.mariuszgromada.math.mxparser;
 using Shared;
 using Shared.Config;
-using Page = DSharpPlus.Interactivity.Page;
 
 namespace Bot.Commands
 {
@@ -86,12 +85,12 @@ namespace Bot.Commands
             if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled)
                 .AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.PreviewSite)))
             {
-                string HTML;
+                string html;
                 try
                 {
                     using (WebClient client = new WebClient())
                     {
-                        HTML = client.DownloadString(URL);
+                        html = client.DownloadString(URL);
                     }
                 }
                 catch
@@ -101,9 +100,22 @@ namespace Bot.Commands
                 }
 
                 InteractivityExtension interactivity = ctx.Client.GetInteractivity();
-                Page[] pages = interactivity.GeneratePagesInEmbed(HTMLProcessor.StripTags(HTML));
+                Page[] pages = interactivity.GeneratePagesInEmbed(HTMLProcessor.StripTags(html));
                 await interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages,
                     deletion: PaginationDeletion.DeleteMessage);
+            }
+        }
+
+        [Command("calc")]
+        [Description(
+            "Calculates a result using mathparser.org\r\nExamples: \"sin(15^2)\", \"15*(-12)\", \"solve( 2*x - 4, x, 0, 10 )\"\r\nRemember: sin() etc use radians! 2*pi radians equals 360°")]
+        public async Task Calc(CommandContext ctx, [Description("Equation")] string equation)
+        {
+            if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled)
+                .AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Calc)))
+            {
+                Expression ex = new Expression(equation);
+                Console.WriteLine(ex.getExpressionString() + " = " + ex.calculate());
             }
         }
     }

@@ -13,7 +13,6 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Net.WebSocket;
-using DSharpPlus.VoiceNext;
 using Octokit;
 using Shared;
 using Shared.Config;
@@ -219,7 +218,7 @@ namespace Bot
             e.Message.Channel.getInstance().Messages.Add(e.Message.Id, new BotMessage(e.Message));
             if (form != null && !form.IsDisposed)
                 form.channelTree.InvokeAction(new Action<BotMessage, BotChannel>(form.AddMessage),
-                new BotMessage(e.Message), new BotChannel(e.Channel));
+                    new BotMessage(e.Message), new BotChannel(e.Channel));
             return Task.CompletedTask;
         }
 

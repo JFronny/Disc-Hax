@@ -75,6 +75,10 @@
       <HintPath>..\packages\DSharpPlus.WebSocket.WebSocketSharp.4.0.0-nightly-00643\lib\net45\DSharpPlus.WebSocket.WebSocketSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MathParser.org-mXparser, Version=4.3.3.0, Culture=neutral, PublicKeyToken=0fbab7add73ed6e2">
+      <HintPath>..\packages\MathParser.org-mXparser.4.3.3\lib\net472\MathParser.org-mXparser.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Extensions.DependencyInjection, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
       <HintPath>..\packages\Emzi0767.Microsoft.DependencyInjection.2.0.0\lib\net47\Microsoft.Extensions.DependencyInjection.dll</HintPath>
       <Private>True</Private>
