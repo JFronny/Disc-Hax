@@ -13,6 +13,7 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Net.WebSocket;
+using DSharpPlus.VoiceNext;
 using Octokit;
 using Shared;
 using Shared.Config;
@@ -42,6 +43,11 @@ namespace Bot
         [STAThread]
         private static void Main(string[] args)
         {
+            args = args == null || args.Length == 0
+                ? new[] {"form"}
+                : args.Select(s => s.Trim('-', '\\')).Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
+            bool showForm = args.Contains("form") || args.Contains("form-show");
+            bool formKey = args.Contains("form") || args.Contains("form-key");
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             string appGuid = ((GuidAttribute) Assembly.GetExecutingAssembly()
@@ -71,26 +77,31 @@ namespace Bot
 #endif
                         hasHandle = true;
                     }
-                    bool useForm = args == null || args.Length == 0 || args.Contains("form");
                     Console.WriteLine("Initializing");
                     notifyIcon = new NotifyIcon
                     {
                         Text = "DiscHax", Icon = Resources.TextTemplate, Visible = true, ContextMenu = new ContextMenu()
                     };
-                    if (useForm)
+                    if (formKey)
                     {
                         MenuItem formItem = new MenuItem("Show");
                         formItem.Index = 0;
                         formItem.Click += (sender, e) =>
                         {
-                            if (form == null)
-                                form = new MainForm();
+                            if (form != null && !form.IsDisposed)
+                                form.Dispose();
+                            form = new MainForm();
                             form.Show();
                         };
                         notifyIcon.ContextMenu.MenuItems.Add(formItem);
                     }
                     MenuItem exitItem = new MenuItem("Exit");
-                    exitItem.Click += (sender, e) => { ctx.ExitThread(); };
+                    exitItem.Click += (sender, e) =>
+                    {
+                        Bot.Client.DisconnectAsync();
+                        Bot.Client.Dispose();
+                        ctx.ExitThread();
+                    };
                     notifyIcon.ContextMenu.MenuItems.Add(exitItem);
                     cli = new GitHubClient(new ProductHeaderValue("DiscHax"));
                     DiscordConfiguration cfg = new DiscordConfiguration
@@ -120,7 +131,7 @@ namespace Bot
                     Bot.Client.ClientErrored += Bot_ClientErrored;
                     TokenSource = new CancellationTokenSource();
                     BotThread = Task.Run(BotThreadCallback);
-                    if (useForm)
+                    if (showForm)
                     {
                         form = new MainForm();
                         form.Show();
@@ -165,7 +176,8 @@ namespace Bot
 
         private static Task Bot_Ready(ReadyEventArgs e)
         {
-            form?.SetProperty(xf => xf.Text, "DiscHax Bot Menu (connected)");
+            if (form != null && !form.IsDisposed)
+                form.SetProperty(xf => xf.Text, "DiscHax Bot Menu (connected)");
             Bot.Client.DebugLogger.LogMessage(LogLevel.Info, "DiscHax",
                 "Your invite Link: https://discordapp.com/oauth2/authorize?client_id=" +
                 e.Client.CurrentApplication.Id + "&scope=bot&permissions=8", DateTime.Now);
@@ -177,14 +189,16 @@ namespace Bot
             Guilds.Add(e.Guild.Id, new BotGuild(e.Guild));
             foreach (KeyValuePair<ulong, DiscordChannel> channel in e.Guild.Channels)
                 e.Guild.getInstance().Channels.Add(channel.Key, new BotChannel(channel.Value));
-            form?.channelTree.InvokeAction(new Action<BotGuild>(form.AddGuild), Guilds[e.Guild.Id]);
+            if (form != null && !form.IsDisposed)
+                form.channelTree.InvokeAction(new Action<BotGuild>(form.AddGuild), Guilds[e.Guild.Id]);
             return Task.CompletedTask;
         }
 
         private static Task RemoveGuild(GuildDeleteEventArgs e)
         {
             Guilds.Remove(e.Guild.Id);
-            form?.channelTree.InvokeAction(new Action<ulong>(form.RemoveGuild), e.Guild.Id);
+            if (form != null && !form.IsDisposed)
+                form.channelTree.InvokeAction(new Action<ulong>(form.RemoveGuild), e.Guild.Id);
             return Task.CompletedTask;
         }
 
@@ -203,7 +217,8 @@ namespace Bot
         private static Task AddMessage(MessageCreateEventArgs e)
         {
             e.Message.Channel.getInstance().Messages.Add(e.Message.Id, new BotMessage(e.Message));
-            form?.channelTree.InvokeAction(new Action<BotMessage, BotChannel>(form.AddMessage),
+            if (form != null && !form.IsDisposed)
+                form.channelTree.InvokeAction(new Action<BotMessage, BotChannel>(form.AddMessage),
                 new BotMessage(e.Message), new BotChannel(e.Channel));
             return Task.CompletedTask;
         }

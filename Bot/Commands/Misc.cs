@@ -20,44 +20,6 @@ namespace Bot.Commands
 {
     public class Misc : BaseCommandModule
     {
-        private readonly string[] fortunequotes;
-        private readonly string[] fortunequotes_off;
-
-        public Misc()
-        {
-            Console.Write("Downloading fortunes");
-            fortunequotes = getFortuneQuotes("fortune-mod/datfiles");
-            fortunequotes_off = getFortuneQuotes("fortune-mod/datfiles/off/unrotated");
-            Console.WriteLine(" Finished.");
-        }
-
-        private string[] getFortuneQuotes(string path)
-        {
-            Console.Write(".");
-            IEnumerable<RepositoryContent> files =
-                Program.cli.Repository.Content.GetAllContents("shlomif", "fortune-mod", path).GetAwaiter().GetResult();
-            Console.Write(".");
-            IEnumerable<string> disallowednames = new[] {"CMakeLists.txt", null};
-            Console.Write(".");
-            IEnumerable<RepositoryContent> filteredFiles =
-                files.Where(s => s.Type == ContentType.File && !disallowednames.Contains(s.Name));
-            Console.Write(".");
-            IEnumerable<string> cookies =
-                filteredFiles.Where(s => !disallowednames.Contains(s.Name)).Select(s => s.DownloadUrl);
-            Console.Write(".");
-            IEnumerable<string> contents;
-            using (WebClient client = new WebClient())
-            {
-                contents = cookies.Select(s =>
-                {
-                    Console.Write(".");
-                    return client.DownloadString(s);
-                });
-                Console.Write(".");
-            }
-            return contents.SelectMany(s => s.Split(new[] {"\n%\n"}, StringSplitOptions.None)).ToArray();
-        }
-
         [Command("poll")]
         [Description(
             "Run a poll with reactions. WARNING: Only normal emoticons (:laughing:, :grinning:) are allowed! Special emojis (:one:, :regional_indicator_d:) might cause problems")]
@@ -114,18 +76,6 @@ namespace Bot.Commands
             if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled)
                 .AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Emojify)))
                 await ctx.RespondAsync(string.Join(" ", args.Select(s => s.emotify())));
-        }
-
-        [Command("fortune")]
-        [Description("Spits out a quote")]
-        public async Task Fortune(CommandContext ctx)
-        {
-            if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Fortune)))
-            {
-                string[] quotes = ctx.Channel.getEvaluatedNSFW() ? fortunequotes_off : fortunequotes;
-                await ctx.RespondAsync(quotes[Program.rnd.Next(quotes.Length)], true);
-            }
         }
 
         [Command("preview")]

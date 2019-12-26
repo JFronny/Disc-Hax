@@ -38,6 +38,7 @@ namespace Bot
             Commands.RegisterCommands<Administration>();
             //Commands.RegisterCommands<Music>();
             Commands.RegisterCommands<Misc>();
+            Commands.RegisterCommands<Quotes>();
             Client.DebugLogger.LogMessageReceived += DebugLogger_LogMessageReceived;
         }
 

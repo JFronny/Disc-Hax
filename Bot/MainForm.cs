@@ -61,6 +61,11 @@ namespace Bot
             channelTree.Enabled = true;
             chatBox.Enabled = true;
             chatSend.Enabled = true;
+            BotGuild[] arr = Program.Guilds.Values.ToArray();
+            for (int i = 0; i < arr.Length; i++)
+            {
+                AddGuild(arr[i]);
+            }
         }
 
         public Task BotThread { get; set; }
@@ -299,6 +304,7 @@ namespace Bot
         {
             e.Cancel = true;
             Hide();
+            Dispose();
         }
     }
 }
