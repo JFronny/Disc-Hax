@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -115,7 +117,42 @@ namespace Bot.Commands
                 .AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Calc)))
             {
                 Expression ex = new Expression(equation);
-                Console.WriteLine(ex.getExpressionString() + " = " + ex.calculate());
+                await ctx.RespondAsync(ex.getExpressionString() + " = " + ex.calculate());
+            }
+        }
+        
+        [Command("graph")]
+        [Description(
+            "Generates a x-based graph (variable x will be set), see \"calc\" for syntax\r\nExample: graph x + 15")]
+        public async Task Graph(CommandContext ctx, [Description("Equation")] string equation)
+        {
+            if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled)
+                .AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Calc)))
+            {
+                Bitmap bmp = new Bitmap(200, 200);
+                Graphics g = Graphics.FromImage(bmp);
+                Pen grid = Pens.LightGray;
+                Pen gridZero = Pens.Gray;
+                Pen line = Pens.Red;
+                for (int i = -100; i < 100; i += 10)
+                {
+                    g.DrawLine(i == 0 ? gridZero : grid, i, 100, i, -100);
+                    g.DrawLine(i == 0 ? gridZero : grid, 100, i, -100, i);
+                }
+                List<PointF> points = new List<PointF>();
+                for (int x = -100; x < 100; x++)
+                {
+                    double result = new Expression(equation, new Argument("x", x)).calculate();
+                    if (!double.IsNaN(result) && result <= 200 && result >= -200)
+                        points.Add(new PointF(x, Convert.ToSingle(result)));
+                }
+                g.DrawLines(line, points.ToArray());
+                g.Flush();
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    bmp.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    await ctx.RespondWithFileAsync("EquationResult.jpg", memoryStream);
+                }
             }
         }
     }
