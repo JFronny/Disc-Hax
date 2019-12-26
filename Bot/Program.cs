@@ -30,14 +30,6 @@ namespace Bot
         private static NotifyIcon notifyIcon;
         private static ApplicationContext ctx;
         public static GitHubClient cli;
-        public static Dictionary<ulong, BotGuild> Guilds = new Dictionary<ulong, BotGuild>();
-        public static BotGuild getInstance(this DiscordGuild guild) => Guilds[guild.Id];
-
-        public static BotChannel getInstance(this DiscordChannel channel) =>
-            channel.Guild.getInstance().Channels[channel.Id];
-
-        public static BotMessage getInstance(this DiscordMessage message) =>
-            message.Channel.getInstance().Messages[message.Id];
 
         [STAThread]
         private static void Main(string[] args)
@@ -185,17 +177,17 @@ namespace Bot
 
         private static Task AddGuild(GuildCreateEventArgs e)
         {
-            Guilds.Add(e.Guild.Id, new BotGuild(e.Guild));
+            BotGuild tmp = GuildSingleton.Add(e.Guild);
             foreach (KeyValuePair<ulong, DiscordChannel> channel in e.Guild.Channels)
                 e.Guild.getInstance().Channels.Add(channel.Key, new BotChannel(channel.Value));
             if (form != null && !form.IsDisposed)
-                form.channelTree.InvokeAction(new Action<BotGuild>(form.AddGuild), Guilds[e.Guild.Id]);
+                form.channelTree.InvokeAction(new Action<BotGuild>(form.AddGuild), tmp);
             return Task.CompletedTask;
         }
 
         private static Task RemoveGuild(GuildDeleteEventArgs e)
         {
-            Guilds.Remove(e.Guild.Id);
+            GuildSingleton.Remove(e.Guild.Id);
             if (form != null && !form.IsDisposed)
                 form.channelTree.InvokeAction(new Action<ulong>(form.RemoveGuild), e.Guild.Id);
             return Task.CompletedTask;

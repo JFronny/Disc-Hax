@@ -37,7 +37,7 @@ namespace Bot.Commands
                     Title = "Poll time!",
                     Description = text
                 };
-                DiscordMessage msg = await ctx.RespondAsync(embed: embed);
+                DiscordMessage msg = await ctx.RespondAsync(embed: embed.Build());
                 ReadOnlyCollection<PollEmoji> pollResult = await Bot.instance.Client.GetInteractivity()
                     .DoPollAsync(msg, options, timeout: duration);
                 IEnumerable<string> results = pollResult.Where(xkvp => options.Contains(xkvp.Emoji))

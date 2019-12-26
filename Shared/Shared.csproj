@@ -41,6 +41,9 @@
       <HintPath>..\packages\DSharpPlus.4.0.0-nightly-00643\lib\net45\DSharpPlus.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="DSharpPlus.CommandsNext, Version=4.0.0.643, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\DSharpPlus.CommandsNext.4.0.0-nightly-00643\lib\net45\DSharpPlus.CommandsNext.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="mscorlib" />
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -84,6 +87,7 @@
     <Compile Include="Config\TokenManager.cs" />
     <Compile Include="DataClasses.cs" />
     <Compile Include="ClassExtensions.cs" />
+    <Compile Include="GuildSingleton.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StripHTML.cs" />
   </ItemGroup>

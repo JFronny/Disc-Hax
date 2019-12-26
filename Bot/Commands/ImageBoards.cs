@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BooruSharp.Booru;
@@ -58,14 +59,15 @@ namespace Bot.Commands
                     {
                         Thread[] threads = b.GetThreads().ToArray();
                         Thread t = threads[Program.rnd.Next(threads.Length)];
-                        await ctx.RespondAsync(
-                            "https://boards.4channel.org/" + t.Board.BoardId + "/thread/" + t.PostNumber,
+                        await ctx.RespondAsync("https://boards.4channel.org/" + t.Board.BoardId + "/thread/" + t.PostNumber,
                             embed: new DiscordEmbedBuilder
-                            {
-                                Title = t.Name + "#" + t.Id + ": " +
-                                        (string.IsNullOrWhiteSpace(t.Subject) ? "Untitled" : t.Subject),
-                                ImageUrl = t.Image.Image.ToString()
-                            });
+                        {
+                            Author = new DiscordEmbedBuilder.EmbedAuthor {Name = t.Name},
+                            Timestamp = t.TimeCreated,
+                            Title = (string.IsNullOrWhiteSpace(t.Subject) ? "Untitled" : t.Subject),
+                            ImageUrl = await ctx.Client.stashFile(t.Image.Image.ToString(), t.PostNumber + ".jpg"),
+                            ThumbnailUrl = await ctx.Client.stashFile(t.Image.Thumbnail.ToString(), t.PostNumber + "_thumbnail.jpg")
+                        }.Build());
                     }
                     else
                     {
@@ -84,11 +86,14 @@ namespace Bot.Commands
             if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled)
                 .AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Waifu)))
                 if (ctx.Channel.getEvaluatedNSFW() || args.Contains("f"))
+                {
+                    int img = Program.rnd.Next(6000);
                     await ctx.RespondAsync(embed: new DiscordEmbedBuilder
                     {
                         Title = "There.",
-                        ImageUrl = "https://www.thiswaifudoesnotexist.net/example-" + Program.rnd.Next(6000) + ".jpg"
-                    });
+                        ImageUrl = await ctx.Client.stashFile("https://www.thiswaifudoesnotexist.net/example-" + img + ".jpg", img + ".jpg")
+                    }.Build());
+                }
                 else
                     await ctx.RespondAsync(
                         "The generated waifus might not be something you want to be looking at at work. You can override this with the \"f\"-Flag");
@@ -128,12 +133,15 @@ namespace Bot.Commands
                     while (result == null || result.Value.rating !=
                            (ctx.Channel.getEvaluatedNSFW() ? Rating.Explicit : Rating.Safe))
                         result = await booru.GetRandomImage(args);
-                    await ctx.RespondAsync(null, false,
-                        new DiscordEmbedBuilder
+                    string val = Program.rnd.Next(10000, 99999).ToString();
+                    await ctx.RespondAsync(
+                        embed:new DiscordEmbedBuilder
                         {
-                            Title = result.Value.source, Description = string.Join(", ", result.Value.tags),
-                            ImageUrl = result.Value.fileUrl.AbsoluteUri
-                        });
+                            Title = result.Value.source,
+                            Description = string.Join(", ", result.Value.tags),
+                            ImageUrl = await ctx.Client.stashFile(result.Value.fileUrl.AbsoluteUri, val + "_img.jpg"),
+                            ThumbnailUrl = await ctx.Client.stashFile(result.Value.previewUrl.AbsoluteUri, val + "_img_pre.jpg")
+                        }.Build());
                 }
             }
         }

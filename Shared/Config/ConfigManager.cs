@@ -52,10 +52,11 @@ namespace Shared.Config
         public static string getStr(ulong ID) => string.Join("\r\n",
             Enum.GetValues(typeof(ConfigElement)).OfType<ConfigElement>().Select(s => s + ": " + get(ID, s)));
 
-        public static void
-            set(DiscordChannel channel, ConfigElement element, bool? val, bool disableFormChecks = false) => set(
-            channel.Id, element, val, disableFormChecks, "channel",
-            new[] {new ValueTuple<ulong, string>(channel.GuildId, "guild")});
+        public static void set(DiscordChannel channel, ConfigElement element, bool? val, bool disableFormChecks = false)
+        {
+            set(channel.Id, element, val, disableFormChecks, "channel",
+                new[] {new ValueTuple<ulong, string>(channel.GuildId, "guild")});
+        }
 
         public static void set(ulong ID, ConfigElement element, bool? val, bool disableFormChecks = false,
             string configType = "channel", ValueTuple<ulong, string>[] upper = null)
@@ -82,19 +83,7 @@ namespace Shared.Config
                     tmpXML = getXML(ulong.Parse(tmpXML.Element("upper").Value), tmpXML.Element("upperType").Value);
                 }
             }
-
             if (!disableFormChecks)
-                /*MainForm f = MainForm.Instance;
-                    if (f.ChannelDefined && f.SelectedChannel.Id == ID)
-                        f.Invoke((MethodInvoker)delegate ()
-                        {
-                            f.channelTree_AfterSelect(null, new TreeViewEventArgs(
-                                f.channelTree.Nodes[0].Nodes.OfType<TreeNode>()
-                                .SelectMany(s => ((TreeNode)s).Nodes.OfType<TreeNode>())
-                                .First(s => ((BotChannel)s.Tag).Id == ID)));
-                        });
-                    if (element == ConfigElement.Enabled)
-                        f.InvokeAction((MethodInvoker)delegate () { f.updateChecking(); });*/
                 configUpdate?.Invoke(null, ID, element);
             XML.Save(XMLPath);
         }

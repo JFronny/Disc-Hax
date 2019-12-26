@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using CC_Functions.Misc;
+using DSharpPlus;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Shared.Config;
 
@@ -133,5 +138,16 @@ namespace Shared
 
         public static void RemoveAt<T, G>(this Dictionary<T, G> dict, int index) =>
             dict.Remove(dict.Keys.OfType<T>().ToArray()[index]);
+        
+        public static async Task<string> stashFile(this DiscordClient client, string fileURL, string name)
+        {
+            WebClient wClient = new WebClient();
+            string ret = await client.stashFile(wClient.OpenRead(fileURL), name);
+            wClient.Dispose();
+            return ret;
+        }
+
+        public static async Task<string> stashFile(this DiscordClient client, Stream file, string name) => 
+            (await Common.stash.Channel.SendFileAsync(name, file)).Attachments[0].ProxyUrl;
     }
 }

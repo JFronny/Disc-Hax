@@ -61,7 +61,7 @@ namespace Bot
             channelTree.Enabled = true;
             chatBox.Enabled = true;
             chatSend.Enabled = true;
-            BotGuild[] arr = Program.Guilds.Values.ToArray();
+            BotGuild[] arr = GuildSingleton.getAll();
             for (int i = 0; i < arr.Length; i++) AddGuild(arr[i]);
         }
 
