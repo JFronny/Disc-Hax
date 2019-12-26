@@ -111,7 +111,7 @@ namespace Bot.Commands
         [Command("calc")]
         [Description(
             "Calculates a result using mathparser.org\r\nExamples: \"sin(15^2)\", \"15*(-12)\", \"solve( 2*x - 4, x, 0, 10 )\"\r\nRemember: sin() etc use radians! 2*pi radians equals 360°")]
-        public async Task Calc(CommandContext ctx, [Description("Equation")] string equation)
+        public async Task Calc(CommandContext ctx, [Description("Equation")] [RemainingText] string equation)
         {
             if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled)
                 .AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Calc)))
@@ -124,33 +124,36 @@ namespace Bot.Commands
         [Command("graph")]
         [Description(
             "Generates a x-based graph (variable x will be set), see \"calc\" for syntax\r\nExample: graph x + 15")]
-        public async Task Graph(CommandContext ctx, [Description("Equation")] string equation)
+        public async Task Graph(CommandContext ctx, [Description("Equation")] [RemainingText] string equation)
         {
             if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled)
                 .AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Calc)))
             {
                 Bitmap bmp = new Bitmap(200, 200);
                 Graphics g = Graphics.FromImage(bmp);
+                g.Clear(Color.White);
                 Pen grid = Pens.LightGray;
                 Pen gridZero = Pens.Gray;
                 Pen line = Pens.Red;
                 for (int i = -100; i < 100; i += 10)
                 {
-                    g.DrawLine(i == 0 ? gridZero : grid, i, 100, i, -100);
-                    g.DrawLine(i == 0 ? gridZero : grid, 100, i, -100, i);
+                    g.DrawLine(i == 0 ? gridZero : grid, i + 100, 200, i + 100, 0);
+                    g.DrawLine(i == 0 ? gridZero : grid, 200, 100 - i, 0, 100 - i);
                 }
                 List<PointF> points = new List<PointF>();
                 for (int x = -100; x < 100; x++)
                 {
-                    double result = new Expression(equation, new Argument("x", x)).calculate();
+                    double result = new Expression(equation, new Argument("x", x / 10d)).calculate();
+                    result *= 10;
                     if (!double.IsNaN(result) && result <= 200 && result >= -200)
-                        points.Add(new PointF(x, Convert.ToSingle(result)));
+                        points.Add(new PointF(x + 100, 100 - Convert.ToSingle(result)));
                 }
                 g.DrawLines(line, points.ToArray());
                 g.Flush();
                 using (MemoryStream memoryStream = new MemoryStream())
                 {
                     bmp.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    memoryStream.Position = 0;
                     await ctx.RespondWithFileAsync("EquationResult.jpg", memoryStream);
                 }
             }
