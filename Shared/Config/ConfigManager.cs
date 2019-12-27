@@ -4,17 +4,23 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using CC_Functions.Misc;
-using DSharpPlus.Entities;
 
 namespace Shared.Config
 {
     public static class ConfigManager
     {
-        public delegate void ConfigUpdateEvent(object sender, ulong ID, ConfigElement element);
+        public delegate void ConfigUpdateEvent(object sender, string ID, ConfigElement element);
+
+        private static readonly string CHANNEL = "channel";
+        private static readonly string GUILD = "guild";
 
         public static ConfigUpdateEvent configUpdate;
+        private static string getTypeStr(this IBotStruct self) => self.tryCast(out BotGuild guild) ? GUILD : CHANNEL;
 
-        private static XElement getXML(ulong ID, string ElName, out string XMLPath)
+        private static XElement getXML(ulong ID, string ElName, out string XMLPath) =>
+            getXML(ID.ToString(), ElName, out XMLPath);
+
+        private static XElement getXML(string ID, string ElName, out string XMLPath)
         {
             XMLPath = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Cfgs");
             if (!Directory.Exists(XMLPath))
@@ -25,41 +31,52 @@ namespace Shared.Config
             return XElement.Load(XMLPath);
         }
 
-        private static XElement getXML(ulong ID, string ElName) => getXML(ID, ElName, out string leltisnotused);
+        //private static XElement getXML(ulong ID, string ElName) => getXML(ID, ElName, out string leltisnotused);
 
-        public static bool? get(ulong ID, ConfigElement element, string configType = "channel",
+        public static bool? get(IBotStruct ID, ConfigElement element, bool? defaultVal = false) =>
+            get(ID.Id.ToString(), element, ID.getTypeStr(), defaultVal);
+
+        public static bool? get(string ID, ConfigElement element, string configType,
             bool? defaultVal = false)
         {
-            XElement el = getXML(ID, configType);
-            if (el.Element("upper") != null && el.Element("upper").Value != null
-                                            && el.Element("upperType") != null && el.Element("upperType").Value != null)
+            XElement el = getXML(ID, configType, out _);
+            XElement self = el.Element(element.ToString().ToLower());
+            if (self == null)
             {
-                bool? tmp = get(ulong.Parse(el.Element("upper").Value), element, el.Element("upperType").Value, null);
-                if (tmp.HasValue)
-                    return tmp;
-            }
-
-            el = el.Element(element.ToString().ToLower());
-            if (el == null)
-            {
-                set(ID, element, defaultVal, true);
+                set(ID, element, null, true, configType);
                 return get(ID, element, configType, defaultVal);
             }
-
-            return GenericExtensions.ParseBool(el.Value);
+            if (string.IsNullOrEmpty(self.Value))
+            {
+                if (el.Element("upper") != null && !string.IsNullOrEmpty(el.Element("upper").Value) &&
+                    el.Element("upperType") != null && !string.IsNullOrEmpty(el.Element("upperType").Value))
+                    return get(el.Element("upper").Value, element, el.Element("upperType").Value, null);
+                set(ID, element, defaultVal, true, "common");
+                return get(ID, element, configType, defaultVal);
+            }
+            return GenericExtensions.ParseBool(self.Value);
         }
 
-        public static string getStr(ulong ID) => string.Join("\r\n",
-            Enum.GetValues(typeof(ConfigElement)).OfType<ConfigElement>().Select(s => s + ": " + get(ID, s)));
+        public static string getStr(IBotStruct ID) => getStr(ID.Id.ToString(), ID.getTypeStr());
 
-        public static void set(DiscordChannel channel, ConfigElement element, bool? val, bool disableFormChecks = false)
+        public static string getStr(string ID, string configType) => string.Join("\r\n",
+            Enum.GetValues(typeof(ConfigElement)).OfType<ConfigElement>()
+                .Select(s => s + ": " + get(ID, s, configType)));
+
+        public static void set(BotChannel channel, ConfigElement element, bool? val, bool disableFormChecks = false)
         {
-            set(channel.Id, element, val, disableFormChecks, "channel",
-                new[] {new ValueTuple<ulong, string>(channel.GuildId, "guild")});
+            set(channel.Id.ToString(), element, val, disableFormChecks, CHANNEL,
+                new[] {new ValueTuple<string, string>(channel.Channel.GuildId.ToString(), GUILD)});
         }
 
-        public static void set(ulong ID, ConfigElement element, bool? val, bool disableFormChecks = false,
-            string configType = "channel", ValueTuple<ulong, string>[] upper = null)
+        public static void set(BotGuild guild, ConfigElement element, bool? val, bool disableFormChecks = false)
+        {
+            set(guild.Id.ToString(), element, val, disableFormChecks, GUILD,
+                new[] {new ValueTuple<string, string>("common", "common")});
+        }
+
+        public static void set(string ID, ConfigElement element, bool? val, bool disableFormChecks, string configType,
+            ValueTuple<string, string>[] upper = null)
         {
             XElement XML = getXML(ID, configType, out string XMLPath);
             string el = element.ToString().ToLower();
@@ -73,14 +90,14 @@ namespace Shared.Config
                 for (int i = 0; i < upper.Length; i++)
                 {
                     if (tmpXML.Elements("upper").Count() == 0)
-                        tmpXML.Add(new XElement("upper", upper[i].Item1.ToString()));
+                        tmpXML.Add(new XElement("upper", upper[i].Item1));
                     else
-                        tmpXML.Element("upper").Value = upper[i].Item1.ToString();
+                        tmpXML.Element("upper").Value = upper[i].Item1;
                     if (tmpXML.Elements("upperType").Count() == 0)
                         tmpXML.Add(new XElement("upperType", upper[i].Item2));
                     else
                         tmpXML.Element("upperType").Value = upper[i].Item2;
-                    tmpXML = getXML(ulong.Parse(tmpXML.Element("upper").Value), tmpXML.Element("upperType").Value);
+                    tmpXML = getXML(tmpXML.Element("upper").Value, tmpXML.Element("upperType").Value, out _);
                 }
             }
             if (!disableFormChecks)

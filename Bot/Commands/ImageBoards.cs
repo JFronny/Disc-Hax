@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BooruSharp.Booru;
@@ -41,8 +40,8 @@ namespace Bot.Commands
         public async Task Chan(CommandContext ctx, [Description("Board to select image from")]
             params string[] args)
         {
-            if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Chan)))
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
+                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Chan)))
                 if (args.Length == 0)
                 {
                     List<string> lmsg = new List<string>();
@@ -59,15 +58,17 @@ namespace Bot.Commands
                     {
                         Thread[] threads = b.GetThreads().ToArray();
                         Thread t = threads[Program.rnd.Next(threads.Length)];
-                        await ctx.RespondAsync("https://boards.4channel.org/" + t.Board.BoardId + "/thread/" + t.PostNumber,
+                        await ctx.RespondAsync(
+                            "https://boards.4channel.org/" + t.Board.BoardId + "/thread/" + t.PostNumber,
                             embed: new DiscordEmbedBuilder
-                        {
-                            Author = new DiscordEmbedBuilder.EmbedAuthor {Name = t.Name},
-                            Timestamp = t.TimeCreated,
-                            Title = (string.IsNullOrWhiteSpace(t.Subject) ? "Untitled" : t.Subject),
-                            ImageUrl = await ctx.Client.stashFile(t.Image.Image.ToString(), t.PostNumber + ".jpg"),
-                            ThumbnailUrl = await ctx.Client.stashFile(t.Image.Thumbnail.ToString(), t.PostNumber + "_thumbnail.jpg")
-                        }.Build());
+                            {
+                                Author = new DiscordEmbedBuilder.EmbedAuthor {Name = t.Name},
+                                Timestamp = t.TimeCreated,
+                                Title = string.IsNullOrWhiteSpace(t.Subject) ? "Untitled" : t.Subject,
+                                ImageUrl = await ctx.Client.stashFile(t.Image.Image.ToString(), t.PostNumber + ".jpg"),
+                                ThumbnailUrl = await ctx.Client.stashFile(t.Image.Thumbnail.ToString(),
+                                    t.PostNumber + "_thumbnail.jpg")
+                            }.Build());
                     }
                     else
                     {
@@ -83,20 +84,23 @@ namespace Bot.Commands
             [Description("Use \"f\" to force execution, even on non-NSFW channels")]
             params string[] args)
         {
-            if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Waifu)))
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
+                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Waifu)))
                 if (ctx.Channel.getEvaluatedNSFW() || args.Contains("f"))
                 {
                     int img = Program.rnd.Next(6000);
                     await ctx.RespondAsync(embed: new DiscordEmbedBuilder
                     {
                         Title = "There.",
-                        ImageUrl = await ctx.Client.stashFile("https://www.thiswaifudoesnotexist.net/example-" + img + ".jpg", img + ".jpg")
+                        ImageUrl = await ctx.Client.stashFile(
+                            "https://www.thiswaifudoesnotexist.net/example-" + img + ".jpg", img + ".jpg")
                     }.Build());
                 }
                 else
+                {
                     await ctx.RespondAsync(
                         "The generated waifus might not be something you want to be looking at at work. You can override this with the \"f\"-Flag");
+                }
         }
 
         [Command("booru")]
@@ -105,14 +109,14 @@ namespace Bot.Commands
             [Description("Tags for image selection, first element can be a source")]
             params string[] args)
         {
-            if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Booru)))
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
+                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Booru)))
             {
                 if (args.Length == 1 && args[0].ToLower() == "list")
                 {
                     await ctx.RespondAsync(string.Join("; ", booruDict.Keys));
                 }
-                else if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Booru).TRUE())
+                else if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Booru).TRUE())
                 {
                     Booru booru;
                     if (args.Length > 0 && booruDict.ContainsKey(args[0].ToLower()))
@@ -135,12 +139,13 @@ namespace Bot.Commands
                         result = await booru.GetRandomImage(args);
                     string val = Program.rnd.Next(10000, 99999).ToString();
                     await ctx.RespondAsync(
-                        embed:new DiscordEmbedBuilder
+                        embed: new DiscordEmbedBuilder
                         {
                             Title = result.Value.source,
                             Description = string.Join(", ", result.Value.tags),
                             ImageUrl = await ctx.Client.stashFile(result.Value.fileUrl.AbsoluteUri, val + "_img.jpg"),
-                            ThumbnailUrl = await ctx.Client.stashFile(result.Value.previewUrl.AbsoluteUri, val + "_img_pre.jpg")
+                            ThumbnailUrl = await ctx.Client.stashFile(result.Value.previewUrl.AbsoluteUri,
+                                val + "_img_pre.jpg")
                         }.Build());
                 }
             }

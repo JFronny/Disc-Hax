@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Linq;
-using Microsoft.VisualBasic;
 
 namespace Shared.Config
 {
@@ -34,10 +33,7 @@ namespace Shared.Config
             get
             {
                 getXE();
-                if (common.Element("stash") == null)
-                {
-                    throw new ArgumentNullException("Stash not defined");
-                }
+                if (common.Element("stash") == null) throw new ArgumentNullException("Stash not defined");
                 ulong[] tmp = common.Element("stash").Value.Split(';').Select(s => ulong.Parse(s)).ToArray();
                 return GuildSingleton.getInstance(tmp[0]).Channels[tmp[1]];
             }
@@ -83,7 +79,8 @@ namespace Shared.Config
             if (!Directory.Exists(Path.GetDirectoryName(path)))
                 Directory.CreateDirectory(Path.GetDirectoryName(path));
             if (!File.Exists(path))
-                new XElement("common", new XElement("prefix", "!"), new XElement("guildsBox", false.ToString()), new XElement("stash")).Save(path);
+                new XElement("common", new XElement("prefix", "!"), new XElement("guildsBox", false.ToString()),
+                    new XElement("stash")).Save(path);
             common = XElement.Load(path);
         }
 

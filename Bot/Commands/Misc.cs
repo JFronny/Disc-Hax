@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -13,7 +11,6 @@ using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.EventHandling;
-using org.mariuszgromada.math.mxparser;
 using Shared;
 using Shared.Config;
 
@@ -29,8 +26,8 @@ namespace Bot.Commands
             TimeSpan duration, [Description("What options should people have.")]
             params DiscordEmoji[] options)
         {
-            if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Poll)))
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
+                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Poll)))
             {
                 DiscordEmbedBuilder embed = new DiscordEmbedBuilder
                 {
@@ -52,8 +49,8 @@ namespace Bot.Commands
             [Description("Bytes to generate. One byte equals two characters")]
             int bytes, [Description("Time before exiting")] TimeSpan time)
         {
-            if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Quicktype)))
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
+                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Quicktype)))
             {
                 InteractivityExtension interactivity = ctx.Client.GetInteractivity();
                 byte[] codebytes = new byte[bytes];
@@ -74,8 +71,8 @@ namespace Bot.Commands
         public async Task Emotify(CommandContext ctx, [Description("What should be converted")]
             params string[] args)
         {
-            if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Emojify)))
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
+                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Emojify)))
                 await ctx.RespondAsync(string.Join(" ", args.Select(s => s.emotify())));
         }
 
@@ -84,8 +81,8 @@ namespace Bot.Commands
         public async Task PreviewSite(CommandContext ctx, [Description("URL to paginate site from")]
             string URL)
         {
-            if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.PreviewSite)))
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
+                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.PreviewSite)))
             {
                 string html;
                 try
@@ -105,57 +102,6 @@ namespace Bot.Commands
                 Page[] pages = interactivity.GeneratePagesInEmbed(HTMLProcessor.StripTags(html));
                 await interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages,
                     deletion: PaginationDeletion.DeleteMessage);
-            }
-        }
-
-        [Command("calc")]
-        [Description(
-            "Calculates a result using mathparser.org\r\nExamples: \"sin(15^2)\", \"15*(-12)\", \"solve( 2*x - 4, x, 0, 10 )\"\r\nRemember: sin() etc use radians! 2*pi radians equals 360°")]
-        public async Task Calc(CommandContext ctx, [Description("Equation")] [RemainingText] string equation)
-        {
-            if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Calc)))
-            {
-                Expression ex = new Expression(equation);
-                await ctx.RespondAsync(ex.getExpressionString() + " = " + ex.calculate());
-            }
-        }
-        
-        [Command("graph")]
-        [Description(
-            "Generates a x-based graph (variable x will be set), see \"calc\" for syntax\r\nExample: graph x + 15")]
-        public async Task Graph(CommandContext ctx, [Description("Equation")] [RemainingText] string equation)
-        {
-            if (ConfigManager.get(ctx.Channel.Id, ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.Id, ConfigElement.Calc)))
-            {
-                Bitmap bmp = new Bitmap(200, 200);
-                Graphics g = Graphics.FromImage(bmp);
-                g.Clear(Color.White);
-                Pen grid = Pens.LightGray;
-                Pen gridZero = Pens.Gray;
-                Pen line = Pens.Red;
-                for (int i = -100; i < 100; i += 10)
-                {
-                    g.DrawLine(i == 0 ? gridZero : grid, i + 100, 200, i + 100, 0);
-                    g.DrawLine(i == 0 ? gridZero : grid, 200, 100 - i, 0, 100 - i);
-                }
-                List<PointF> points = new List<PointF>();
-                for (int x = -100; x < 100; x++)
-                {
-                    double result = new Expression(equation, new Argument("x", x / 10d)).calculate();
-                    result *= 10;
-                    if (!double.IsNaN(result) && result <= 200 && result >= -200)
-                        points.Add(new PointF(x + 100, 100 - Convert.ToSingle(result)));
-                }
-                g.DrawLines(line, points.ToArray());
-                g.Flush();
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    bmp.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
-                    memoryStream.Position = 0;
-                    await ctx.RespondWithFileAsync("EquationResult.jpg", memoryStream);
-                }
             }
         }
     }

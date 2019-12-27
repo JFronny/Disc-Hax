@@ -10,6 +10,7 @@ using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.VoiceNext;
 using Shared.Config;
+using Math = Bot.Commands.Math;
 
 namespace Bot
 {
@@ -38,6 +39,7 @@ namespace Bot
             Commands.RegisterCommands<Administration>();
             //Commands.RegisterCommands<Music>();
             Commands.RegisterCommands<Misc>();
+            Commands.RegisterCommands<Math>();
             Commands.RegisterCommands<Quotes>();
             Client.DebugLogger.LogMessageReceived += DebugLogger_LogMessageReceived;
         }

@@ -15,6 +15,7 @@
         Fortune,
         PreviewSite,
         Calc,
+        Graph,
         Enabled
     }
 }

@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using CC_Functions.Misc;
 using DSharpPlus;
-using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Shared.Config;
 
@@ -101,7 +100,7 @@ namespace Shared
         }
 
         public static bool getEvaluatedNSFW(this DiscordChannel Channel) =>
-            Channel.IsNSFW || ConfigManager.get(Channel.Id, ConfigElement.Nsfw).TRUE();
+            Channel.IsNSFW || ConfigManager.get(Channel.getInstance(), ConfigElement.Nsfw).TRUE();
 
         public static string emotify(this string self)
         {
@@ -138,7 +137,7 @@ namespace Shared
 
         public static void RemoveAt<T, G>(this Dictionary<T, G> dict, int index) =>
             dict.Remove(dict.Keys.OfType<T>().ToArray()[index]);
-        
+
         public static async Task<string> stashFile(this DiscordClient client, string fileURL, string name)
         {
             WebClient wClient = new WebClient();
@@ -147,7 +146,7 @@ namespace Shared
             return ret;
         }
 
-        public static async Task<string> stashFile(this DiscordClient client, Stream file, string name) => 
+        public static async Task<string> stashFile(this DiscordClient client, Stream file, string name) =>
             (await Common.stash.Channel.SendFileAsync(name, file)).Attachments[0].ProxyUrl;
     }
 }
