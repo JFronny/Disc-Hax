@@ -11,7 +11,7 @@ namespace CalC
             for (int i = 0; i < equations.Length; i++)
             {
                 Expression ex = new Expression(equations[i]);
-                Console.WriteLine(ex.getExpressionString() + "\n" + ex.calculate());
+                Console.WriteLine($"{ex.getExpressionString()}\n{ex.calculate()}");
             }
         }
     }

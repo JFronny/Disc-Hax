@@ -19,7 +19,7 @@ namespace WaifuGen
                     using (WebClient c = new WebClient())
                     {
                         using (Stream s =
-                            c.OpenRead("https://www.thiswaifudoesnotexist.net/example-" + rnd.Next(6000) + ".jpg"))
+                            c.OpenRead($"https://www.thiswaifudoesnotexist.net/example-{rnd.Next(6000)}.jpg"))
                         {
                             Bitmap img = (Bitmap) Image.FromStream(s);
                             f.BackgroundImage = img;

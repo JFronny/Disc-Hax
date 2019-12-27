@@ -97,7 +97,7 @@ namespace Bot
                     cli = new GitHubClient(new ProductHeaderValue("DiscHax"));
                     DiscordConfiguration cfg = new DiscordConfiguration
                     {
-                        Token = TokenManager.Token,
+                        Token = TokenManager.DiscordToken,
                         TokenType = TokenType.Bot,
                         AutoReconnect = true,
 #if DEBUG
@@ -107,6 +107,7 @@ namespace Bot
 #endif
                         UseInternalLogHandler = false
                     };
+                    TokenManager.CurrencyconverterapiToken.ToString();
                     if (Type.GetType("Mono.Runtime") != null)
                         cfg.WebSocketClientFactory = WebSocketSharpClient.CreateNew;
                     Bot = new Bot(cfg);
@@ -170,8 +171,8 @@ namespace Bot
             if (form != null && !form.IsDisposed)
                 form.SetProperty(xf => xf.Text, "DiscHax Bot Menu (connected)");
             Bot.Client.DebugLogger.LogMessage(LogLevel.Info, "DiscHax",
-                "Your invite Link: https://discordapp.com/oauth2/authorize?client_id=" +
-                e.Client.CurrentApplication.Id + "&scope=bot&permissions=8", DateTime.Now);
+                $"Your invite Link: https://discordapp.com/oauth2/authorize?client_id={e.Client.CurrentApplication.Id}&scope=bot&permissions=8",
+                DateTime.Now);
             return Task.CompletedTask;
         }
 

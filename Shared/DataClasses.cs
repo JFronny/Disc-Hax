@@ -47,8 +47,6 @@ namespace Shared
         public ulong Id => Message.Id;
 
         public override string ToString() =>
-            "<" + (Message.Author.IsCurrent ? "SELF>" :
-                Message.Author.IsBot ? "BOT>[" + Message.Author.Username + "]" :
-                "USER>[" + Message.Author.Username + "]") + Message.Content;
+            $"<{(Message.Author.IsCurrent ? "SELF>" : Message.Author.IsBot ? $"BOT>[{Message.Author.Username}]" : $"USER>[{Message.Author.Username}]")}{Message.Content}";
     }
 }

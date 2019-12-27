@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using CC_Functions.Misc;
 using DSharpPlus.CommandsNext;
@@ -15,19 +16,26 @@ namespace Bot.Commands
 {
     public class Math : BaseCommandModule
     {
-        private Function log;
+        private readonly Function log;
+
+        public Math()
+        {
+            Console.Write("Creating extra math functions...");
+            log = new Function("log", new Logarithm());
+            Console.WriteLine(" Finished.");
+        }
 
         [Command("calc")]
         [Description(
-            "Calculates a result using mathparser.org\r\nExamples: \"sin(15^2)\", \"15*(-12)\", \"solve( 2*x - 4, x, 0, 10 )\"\r\nRemember: sin() etc use radians! 2*pi radians equals 360°\r\nAlso: A result of NaN means, that you did something wrong and no result was found")]
+            "Calculates a result using mathparser.org\r\nExamples: \"sin(15^2)\", \"15 * (-12)\", \"solve( 2 * x - 4, x, 0, 10 )\", \"log(4, 2)\"\r\nRemember: sin() etc use radians! 2*pi radians equals 360°\r\nAlso: A result of NaN means, that you did something wrong and no result was found")]
         public async Task Calc(CommandContext ctx, [Description("Equation")] [RemainingText]
             string equation)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
                 .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Calc)))
             {
-                Expression ex = new Expression(equation);
-                await ctx.RespondAsync(ex.getExpressionString() + " = " + ex.calculate());
+                Expression ex = new Expression(equation, log);
+                await ctx.RespondAsync($"{ex.getExpressionString()} = {ex.calculate()}");
             }
         }
 
@@ -44,10 +52,10 @@ namespace Bot.Commands
                 .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Calc)))
             {
                 string[] parts = equation.Split('=');
-                string newEq = "(" + parts[0].Trim() + ") - (" + parts[1].Trim() + ")";
-                newEq = "solve(" + newEq + ", " + target + ", " + min + ", " + max + ")";
-                Expression ex = new Expression(newEq);
-                await ctx.RespondAsync(ex.getExpressionString() + " = " + ex.calculate());
+                string newEq = $"({parts[0].Trim()}) - ({parts[1].Trim()})";
+                newEq = $"solve({newEq}, {target}, {min}, {max})";
+                Expression ex = new Expression(newEq, log);
+                await ctx.RespondAsync($"{ex.getExpressionString()} = {ex.calculate()}");
             }
         }
 
@@ -74,7 +82,7 @@ namespace Bot.Commands
                 List<PointF> points = new List<PointF>();
                 for (int x = -100; x < 100; x++)
                 {
-                    double result = new Expression(equation, new Argument("x", x / 10d)).calculate();
+                    double result = new Expression(equation, new Argument("x", x / 10d), log).calculate();
                     result *= 10;
                     if (!double.IsNaN(result) && result <= 200 && result >= -200)
                         points.Add(new PointF(x + 100, 100 - Convert.ToSingle(result)));
@@ -90,42 +98,65 @@ namespace Bot.Commands
             }
         }
 
-        /*public class Logarithmm : FunctionExtension
+        [Command("currency")]
+        [Description("Transforms currencies")]
+        public async Task Currency(CommandContext ctx, [Description("Input currency in ISO")] Currency inCurrency,
+            [Description("Output currency in ISO")]
+            Currency outCurrency, [Description("Amount to convert")] double amount)
         {
-            double b;
-            double x;
-            public Logarithmm()
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
+                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Currency)))
+                await ctx.RespondAsync(
+                    $"{amount} {inCurrency.currencyName} equals {CurrencyConverter.Convert(amount, inCurrency, outCurrency)} {outCurrency.currencyName}");
+        }
+
+        [Command("currency")]
+        public async Task Currency(CommandContext ctx)
+        {
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
+                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Currency)))
+                await ctx.RespondPaginated(string.Join(", ",
+                    CurrencyConverter.Currencies.Values.Select(s => $"{s.currencyName}/{s.currencySymbol} ({s.id})")
+                        .OrderBy(s => s)));
+        }
+    }
+
+    public class Logarithm : FunctionExtension
+    {
+        private double b;
+        private double x;
+
+        public Logarithm()
+        {
+            x = double.NaN;
+            b = double.NaN;
+        }
+
+        public Logarithm(double x, double b)
+        {
+            this.x = x;
+            this.b = b;
+        }
+
+        public int getParametersNumber() => 2;
+
+        public void setParameterValue(int argumentIndex, double argumentValue)
+        {
+            switch (argumentIndex)
             {
-                b = Double.NaN;
-                x = Double.NaN;
+                case 0:
+                    x = argumentValue;
+                    break;
+                case 1:
+                    b = argumentValue;
+                    break;
             }
-            
-            public Logarithmm(double b, double x)
-            {
-                this.b = b;
-                this.x = x;
-            }
-            
-            public int getParametersNumber() => 2;
+        }
 
-            public void setParameterValue(int argumentIndex, double argumentValue)
-            {
-                switch (argumentIndex)
-                {
-                    case 0:
-                        b = argumentValue;
-                        break;
-                    case 1:
-                        x = argumentValue;
-                        break;
-                }
-            }
+        public string getParameterName(int parameterIndex) => parameterIndex switch {0 => "x", 1 => "b"};
 
-            public string getParameterName(int parameterIndex) => parameterIndex switch {0 => "b", 1 => "x"};
+        public double calculate() => System.Math.Log(x, b);
 
-            public double calculate() => System.Math.Log(x, b);
-
-            public FunctionExtension clone() => new Logarithmm(b, x);
-        }*/
+        public FunctionExtension clone() => new Logarithm(x, b);
     }
 }

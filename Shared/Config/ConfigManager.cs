@@ -25,7 +25,7 @@ namespace Shared.Config
             XMLPath = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Cfgs");
             if (!Directory.Exists(XMLPath))
                 Directory.CreateDirectory(XMLPath);
-            XMLPath = Path.Combine(XMLPath, ID + ".xml");
+            XMLPath = Path.Combine(XMLPath, $"{ID}.xml");
             if (!File.Exists(XMLPath))
                 new XElement(ElName).Save(XMLPath);
             return XElement.Load(XMLPath);
@@ -50,7 +50,7 @@ namespace Shared.Config
             {
                 if (el.Element("upper") != null && !string.IsNullOrEmpty(el.Element("upper").Value) &&
                     el.Element("upperType") != null && !string.IsNullOrEmpty(el.Element("upperType").Value))
-                    return get(el.Element("upper").Value, element, el.Element("upperType").Value, null);
+                    return get(el.Element("upper").Value, element, el.Element("upperType").Value, defaultVal);
                 set(ID, element, defaultVal, true, "common");
                 return get(ID, element, configType, defaultVal);
             }
@@ -61,7 +61,7 @@ namespace Shared.Config
 
         public static string getStr(string ID, string configType) => string.Join("\r\n",
             Enum.GetValues(typeof(ConfigElement)).OfType<ConfigElement>()
-                .Select(s => s + ": " + get(ID, s, configType)));
+                .Select(s => $"{s}: {get(ID, s, configType)}"));
 
         public static void set(BotChannel channel, ConfigElement element, bool? val, bool disableFormChecks = false)
         {

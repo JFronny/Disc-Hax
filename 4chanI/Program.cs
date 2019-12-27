@@ -27,12 +27,11 @@ namespace Cleverbot
             List<Chan.Net.Thread> th = b.GetThreads().ToList();
             for (int i = 0; i < th.Count; i++)
             {
-                Console.WriteLine("https://boards.4channel.org/" + th[i].Board.BoardId + "/thread/" + th[i].PostNumber);
+                Console.WriteLine($"https://boards.4channel.org/{th[i].Board.BoardId}/thread/{th[i].PostNumber}");
                 using (Form f = new Form())
                 {
-                    f.Text = th[i].Name + ": " +
-                             (string.IsNullOrWhiteSpace(th[i].Subject) ? "Untitled" : th[i].Subject) + " - " + (i + 1) +
-                             "/" + th.Count;
+                    f.Text =
+                        $"{th[i].Name}: {(string.IsNullOrWhiteSpace(th[i].Subject) ? "Untitled" : th[i].Subject)} - {i + 1}/{th.Count}";
                     f.StartPosition = FormStartPosition.CenterScreen;
                     using (WebClient c = new WebClient())
                     {

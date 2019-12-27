@@ -45,13 +45,13 @@ namespace Bot.Commands
                     ConfigElement el = GenericExtensions.ParseToEnum<ConfigElement>(args[0]);
                     if (args.Length == 1)
                     {
-                        await ctx.RespondAsync(el + ": " + ConfigManager.get(ctx.Channel.getInstance(), el));
+                        await ctx.RespondAsync($"{el}: {ConfigManager.get(ctx.Channel.getInstance(), el)}");
                     }
                     else
                     {
                         bool val = bool.Parse(args[1]);
                         ConfigManager.set(ctx.Channel.getInstance(), el, val);
-                        await ctx.RespondAsync("Set " + el + " to " + val);
+                        await ctx.RespondAsync($"Set {el} to {val}");
                     }
                 }
             }

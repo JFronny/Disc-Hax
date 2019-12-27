@@ -114,7 +114,7 @@ namespace Bot
             }
             catch (Exception e)
             {
-                SendMessage("Failed: " + e.Message, channel);
+                SendMessage($"Failed: {e.Message}", channel);
             }
         }
 
@@ -134,7 +134,7 @@ namespace Bot
                     settingsBoxes.ForEach(s =>
                         s.Checked = ConfigManager.get(SelectedChannel, (ConfigElement) s.Tag).TRUE());
                     nsfwBox.Enabled = !SelectedChannel.Channel.IsNSFW;
-                    clientSettingsPanel.Text = SelectedGuild.Guild.Name + " - " + SelectedChannel.Channel.Name;
+                    clientSettingsPanel.Text = $"{SelectedGuild.Guild.Name} - {SelectedChannel.Channel.Name}";
                     clientSettingsPanel.Enabled = true;
                 }
                 catch (InvalidCastException e1)

@@ -9,7 +9,6 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
-using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.EventHandling;
 using Shared;
 using Shared.Config;
@@ -56,7 +55,7 @@ namespace Bot.Commands
                 byte[] codebytes = new byte[bytes];
                 Program.rnd.NextBytes(codebytes);
                 string code = BitConverter.ToString(codebytes).ToLower().Replace("-", "");
-                await ctx.RespondAsync("The first one to type the following code gets a reward: " + code.emotify());
+                await ctx.RespondAsync($"The first one to type the following code gets a reward: {code.emotify()}");
                 InteractivityResult<DiscordMessage> msg =
                     await interactivity.WaitForMessageAsync(xm => xm.Content.Contains(code), time);
                 if (msg.TimedOut)
@@ -97,11 +96,7 @@ namespace Bot.Commands
                     await ctx.RespondAsync("Failed to download site");
                     return;
                 }
-
-                InteractivityExtension interactivity = ctx.Client.GetInteractivity();
-                Page[] pages = interactivity.GeneratePagesInEmbed(HTMLProcessor.StripTags(html));
-                await interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages,
-                    deletion: PaginationDeletion.DeleteMessage);
+                await ctx.RespondPaginated(HTMLProcessor.StripTags(html));
             }
         }
     }

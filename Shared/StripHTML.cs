@@ -173,8 +173,8 @@ namespace Shared
                 {
                     result = result.Replace(breaks, "\r\r");
                     result = result.Replace(tabs, "\t\t\t\t");
-                    breaks = breaks + "\r";
-                    tabs = tabs + "\t";
+                    breaks = $"{breaks}\r";
+                    tabs = $"{tabs}\t";
                 }
 
                 //Remove empty lines

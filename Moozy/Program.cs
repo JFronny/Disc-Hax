@@ -21,7 +21,7 @@ namespace Moozy
             {
                 Console.Write("Token: ");
                 File.WriteAllText("config.json",
-                    "{\r\n  \"token\": \"" + Console.ReadLine() + "\",\r\n  \"prefix\": \";;\"\r\n}");
+                    $"{{\r\n  \"token\": \"{Console.ReadLine()}\",\r\n  \"prefix\": \";;\"\r\n}}");
             }
 
             Program prog = new Program();
@@ -68,8 +68,8 @@ namespace Moozy
             e.Client.DebugLogger.LogMessage(LogLevel.Info, "ExampleBot", "Client is ready to process events.",
                 DateTime.Now);
             e.Client.DebugLogger.LogMessage(LogLevel.Info, "DiscHax",
-                "Your invite Link: https://discordapp.com/oauth2/authorize?client_id=" +
-                e.Client.CurrentApplication.Id + "&scope=bot&permissions=8", DateTime.Now);
+                $"Your invite Link: https://discordapp.com/oauth2/authorize?client_id={e.Client.CurrentApplication.Id}&scope=bot&permissions=8",
+                DateTime.Now);
             return Task.CompletedTask;
         }
 

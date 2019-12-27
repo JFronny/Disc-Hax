@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
@@ -25,27 +23,6 @@ namespace Shared.Config
                 }
 
                 return common.Element("prefix").Value;
-            }
-        }
-
-        public static BotChannel stash
-        {
-            get
-            {
-                getXE();
-                if (common.Element("stash") == null) throw new ArgumentNullException("Stash not defined");
-                ulong[] tmp = common.Element("stash").Value.Split(';').Select(s => ulong.Parse(s)).ToArray();
-                return GuildSingleton.getInstance(tmp[0]).Channels[tmp[1]];
-            }
-            set
-            {
-                getXE();
-                string val = value.Channel.Guild.Id + ";" + value.Id;
-                if (common.Element("stash") == null)
-                    common.Add(new XElement("stash", val));
-                else
-                    common.Element("stash").Value = val;
-                saveXE();
             }
         }
 

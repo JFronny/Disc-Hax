@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Bot.Commands;
+using Bot.Converters;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Exceptions;
@@ -41,6 +42,8 @@ namespace Bot
             Commands.RegisterCommands<Misc>();
             Commands.RegisterCommands<Math>();
             Commands.RegisterCommands<Quotes>();
+            Commands.RegisterCommands<PublicStats>();
+            Commands.RegisterConverter(new CurrencyConv());
             Client.DebugLogger.LogMessageReceived += DebugLogger_LogMessageReceived;
         }
 
@@ -65,7 +68,7 @@ namespace Bot
             }
             else if (!(e.Exception is CommandNotFoundException))
             {
-                await e.Context.RespondAsync("The command failed: " + e.Exception.Message);
+                await e.Context.RespondAsync($"The command failed: {e.Exception.Message}");
             }
         }
 

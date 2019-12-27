@@ -13,11 +13,8 @@ namespace BooruT
             Console.Write(Environment.NewLine);
             SearchResult result = booru.GetRandomImage(args).GetAwaiter().GetResult();
 
-            Console.WriteLine("Image preview URL: " + result.previewUrl + Environment.NewLine +
-                              "Image URL: " + result.fileUrl + Environment.NewLine +
-                              "Image Source: " + result.score + Environment.NewLine +
-                              "Image rating: " + result.rating + Environment.NewLine +
-                              "Tags on the image: " + string.Join(", ", result.tags));
+            Console.WriteLine(
+                $"Image preview URL: {result.previewUrl}{Environment.NewLine}Image URL: {result.fileUrl}{Environment.NewLine}Image Source: {result.score}{Environment.NewLine}Image rating: {result.rating}{Environment.NewLine}Tags on the image: {string.Join(", ", result.tags)}");
             Console.ReadKey();
         }
     }

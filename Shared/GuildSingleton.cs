@@ -7,6 +7,8 @@ namespace Shared
     public static class GuildSingleton
     {
         private static readonly Dictionary<ulong, BotGuild> Guilds = new Dictionary<ulong, BotGuild>();
+
+        public static int Count => Guilds.Count;
         public static BotGuild getInstance(this DiscordGuild guild) => Guilds[guild.Id];
 
         public static BotChannel getInstance(this DiscordChannel channel) =>

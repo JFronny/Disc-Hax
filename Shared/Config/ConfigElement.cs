@@ -16,6 +16,7 @@
         PreviewSite,
         Calc,
         Graph,
+        Currency,
         Enabled
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using BooruSharp.Booru;
 using BooruSharp.Search.Post;
@@ -48,8 +49,8 @@ namespace Bot.Commands
                     List<BoardInfo> lboard = JsonDeserializer
                         .Deserialize<BoardListModel>(await Internet.DownloadString(@"https://a.4cdn.org/boards.json")
                             .ConfigureAwait(false)).boards;
-                    lboard.ForEach(s => { lmsg.Add(s.Title + " (" + s.ShortName + ")"); });
-                    await ctx.RespondAsync(string.Join(", ", lmsg) + "\r\nUsage: !4chan <ShortName>");
+                    lboard.ForEach(s => { lmsg.Add($"{s.Title} ({s.ShortName})"); });
+                    await ctx.RespondAsync($"{string.Join(", ", lmsg)}\r\nUsage: !4chan <ShortName>");
                 }
                 else
                 {
@@ -58,17 +59,19 @@ namespace Bot.Commands
                     {
                         Thread[] threads = b.GetThreads().ToArray();
                         Thread t = threads[Program.rnd.Next(threads.Length)];
-                        await ctx.RespondAsync(
-                            "https://boards.4channel.org/" + t.Board.BoardId + "/thread/" + t.PostNumber,
-                            embed: new DiscordEmbedBuilder
-                            {
-                                Author = new DiscordEmbedBuilder.EmbedAuthor {Name = t.Name},
-                                Timestamp = t.TimeCreated,
-                                Title = string.IsNullOrWhiteSpace(t.Subject) ? "Untitled" : t.Subject,
-                                ImageUrl = await ctx.Client.stashFile(t.Image.Image.ToString(), t.PostNumber + ".jpg"),
-                                ThumbnailUrl = await ctx.Client.stashFile(t.Image.Thumbnail.ToString(),
-                                    t.PostNumber + "_thumbnail.jpg")
-                            }.Build());
+                        using (WebClient wClient = new WebClient())
+                        {
+                            await ctx.RespondWithFileAsync($"{t.PostNumber}.jpg",
+                                wClient.OpenRead(t.Image.Image),
+                                $"https://boards.4channel.org/{t.Board.BoardId}/thread/{t.PostNumber}",
+                                embed: new DiscordEmbedBuilder
+                                {
+                                    Author = new DiscordEmbedBuilder.EmbedAuthor {Name = t.Name},
+                                    Timestamp = t.TimeCreated,
+                                    Title = string.IsNullOrWhiteSpace(t.Subject) ? "Untitled" : t.Subject,
+                                    Description = t.Message
+                                }.Build());
+                        }
                     }
                     else
                     {
@@ -89,12 +92,12 @@ namespace Bot.Commands
                 if (ctx.Channel.getEvaluatedNSFW() || args.Contains("f"))
                 {
                     int img = Program.rnd.Next(6000);
-                    await ctx.RespondAsync(embed: new DiscordEmbedBuilder
+                    using (WebClient wClient = new WebClient())
                     {
-                        Title = "There.",
-                        ImageUrl = await ctx.Client.stashFile(
-                            "https://www.thiswaifudoesnotexist.net/example-" + img + ".jpg", img + ".jpg")
-                    }.Build());
+                        await ctx.RespondWithFileAsync($"{img}.jpg",
+                            wClient.OpenRead($"https://www.thiswaifudoesnotexist.net/example-{img}.jpg"),
+                            "There.");
+                    }
                 }
                 else
                 {
@@ -138,15 +141,14 @@ namespace Bot.Commands
                            (ctx.Channel.getEvaluatedNSFW() ? Rating.Explicit : Rating.Safe))
                         result = await booru.GetRandomImage(args);
                     string val = Program.rnd.Next(10000, 99999).ToString();
-                    await ctx.RespondAsync(
-                        embed: new DiscordEmbedBuilder
-                        {
-                            Title = result.Value.source,
-                            Description = string.Join(", ", result.Value.tags),
-                            ImageUrl = await ctx.Client.stashFile(result.Value.fileUrl.AbsoluteUri, val + "_img.jpg"),
-                            ThumbnailUrl = await ctx.Client.stashFile(result.Value.previewUrl.AbsoluteUri,
-                                val + "_img_pre.jpg")
-                        }.Build());
+                    using (WebClient wClient = new WebClient())
+                    {
+                        await ctx.RespondWithFileAsync($"{val}_img.jpg",
+                            wClient.OpenRead(result.Value.fileUrl), result.Value.source, embed: new DiscordEmbedBuilder
+                            {
+                                Description = string.Join(", ", result.Value.tags)
+                            }.Build());
+                    }
                 }
             }
         }
