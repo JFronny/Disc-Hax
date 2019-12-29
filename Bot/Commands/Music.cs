@@ -1,4 +1,8 @@
-﻿using DSharpPlus.CommandsNext;
+﻿#region
+
+using DSharpPlus.CommandsNext;
+
+#endregion
 
 namespace Bot.Commands
 {
@@ -94,7 +98,7 @@ namespace Bot.Commands
             if (!File.Exists(filename))
             {
                 // file does not exist
-                await ctx.RespondAsync($"File `{filename}` does not exist.");
+                await ctx.RespondAsyncFix($"File `{filename}` does not exist.");
                 return;
             }
 
@@ -104,7 +108,7 @@ namespace Bot.Commands
 
             // play
             Exception exc = null;
-            await ctx.Message.RespondAsync($"Playing `{filename}`");
+            await ctx.Message.RespondAsyncFix($"Playing `{filename}`");
             await vnc.SendSpeakingAsync(true);
             try
             {
@@ -147,7 +151,7 @@ namespace Bot.Commands
             }
 
             if (exc != null)
-                await ctx.RespondAsync($"An exception occured during playback: `{exc.GetType()}: {exc.Message}`");
+                await ctx.RespondAsyncFix($"An exception occured during playback: `{exc.GetType()}: {exc.Message}`");
         }*/
 
         //Partially broken. Might test again on DSharpPlus 4

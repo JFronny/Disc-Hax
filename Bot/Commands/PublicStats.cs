@@ -1,9 +1,13 @@
+#region
+
 using System.Threading.Tasks;
 using CC_Functions.Misc;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using Shared;
 using Shared.Config;
+
+#endregion
 
 namespace Bot.Commands
 {
@@ -14,7 +18,7 @@ namespace Bot.Commands
         public async Task About(CommandContext ctx)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled).TRUE())
-                await ctx.RespondPaginated(HTMLProcessor.StripTags(
+                await ctx.RespondPaginated(HTMLProcessor.ToPlainText(
                     await (await Program.cli.Repository.Content.GetReadme("JFronny", "Disc-Hax")).GetHtmlContent()));
         }
 
@@ -31,7 +35,7 @@ namespace Bot.Commands
         public async Task Changelog(CommandContext ctx)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled).TRUE())
-                await ctx.RespondAsync((await Program.cli.Repository.Commit.GetAll("JFronny", "Disc-Hax"))[0].Commit
+                await ctx.RespondAsyncFix((await Program.cli.Repository.Commit.GetAll("JFronny", "Disc-Hax"))[0].Commit
                     .Message);
         }
 

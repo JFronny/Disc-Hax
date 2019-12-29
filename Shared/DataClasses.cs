@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿#region
+
+using System.Collections.Generic;
 using DSharpPlus.Entities;
+
+#endregion
 
 namespace Shared
 {

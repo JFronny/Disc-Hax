@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -17,6 +19,8 @@ using Octokit;
 using Shared;
 using Shared.Config;
 using Application = System.Windows.Forms.Application;
+
+#endregion
 
 namespace Bot
 {

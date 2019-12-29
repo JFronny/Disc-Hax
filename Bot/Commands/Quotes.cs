@@ -1,3 +1,5 @@
+#region
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +11,8 @@ using DSharpPlus.CommandsNext.Attributes;
 using Octokit;
 using Shared;
 using Shared.Config;
+
+#endregion
 
 namespace Bot.Commands
 {
@@ -73,7 +77,7 @@ namespace Bot.Commands
                 .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Fortune)))
             {
                 string[] quotes = ctx.Channel.getEvaluatedNSFW() ? fortunequotes_off : fortunequotes;
-                await ctx.RespondAsync(quotes[Program.rnd.Next(quotes.Length)], true);
+                await ctx.RespondAsyncFix(quotes[Program.rnd.Next(quotes.Length)], true);
             }
         }
 
@@ -85,7 +89,7 @@ namespace Bot.Commands
                 .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Bees)))
             {
                 int q = Program.rnd.Next(_beequotes.Length - 2);
-                await ctx.RespondAsync(
+                await ctx.RespondAsyncFix(
                     (_beequotes[q] + "\n\n" + _beequotes[q + 1] + "\n\n" + _beequotes[q + 2]).Replace("\n", "\r\n"),
                     true);
             }

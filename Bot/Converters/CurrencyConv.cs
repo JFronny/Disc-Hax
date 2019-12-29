@@ -1,8 +1,12 @@
+#region
+
 using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Converters;
 using DSharpPlus.Entities;
 using Shared;
+
+#endregion
 
 namespace Bot.Converters
 {

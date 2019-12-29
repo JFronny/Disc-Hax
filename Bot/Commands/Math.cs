@@ -1,3 +1,5 @@
+#region
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -11,6 +13,8 @@ using DSharpPlus.CommandsNext.Attributes;
 using org.mariuszgromada.math.mxparser;
 using Shared;
 using Shared.Config;
+
+#endregion
 
 namespace Bot.Commands
 {
@@ -35,7 +39,11 @@ namespace Bot.Commands
                 .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Calc)))
             {
                 Expression ex = new Expression(equation, log);
-                await ctx.RespondAsync($"{ex.getExpressionString()} = {ex.calculate()}");
+                #if DEBUG
+                ex.setVerboseMode();
+                #endif
+                double result = ex.calculate();
+                await ctx.RespondAsyncFix(double.IsNaN(result) ? ex.getErrorMessage() : $"{ex.getExpressionString()} = {result}");
             }
         }
 
@@ -55,7 +63,7 @@ namespace Bot.Commands
                 string newEq = $"({parts[0].Trim()}) - ({parts[1].Trim()})";
                 newEq = $"solve({newEq}, {target}, {min}, {max})";
                 Expression ex = new Expression(newEq, log);
-                await ctx.RespondAsync($"{ex.getExpressionString()} = {ex.calculate()}");
+                await ctx.RespondAsyncFix($"{ex.getExpressionString()} = {ex.calculate()}");
             }
         }
 

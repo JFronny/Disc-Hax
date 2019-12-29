@@ -1,6 +1,10 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Drawing;
 using System.Windows.Forms;
+
+#endregion
 
 namespace Magic8
 {
@@ -15,7 +19,7 @@ namespace Magic8
             "AS I\nSEE IT,\nYES",
             "MOST\nLIKELY",
             "YES",
-            "REPLY\nHAZY,\nTRY AGAIN",
+            "REPLY HAZY,\nTRY AGAIN",
             "ASK\nAGAIN\nLATER",
             "DON'T\nCOUNT\nON IT",
             "VERY\nDOUBTFUL",
@@ -57,8 +61,11 @@ namespace Magic8
                     new PointF(center.X + (0.866f * radius), center.Y - (0.5f * radius)),
                     new PointF(center.X, center.Y + radius)
                 });
+                //Get text scale
+                Font font = SystemFonts.DefaultFont;
+                font = new Font(font.FontFamily, font.Size * (180f / g.MeasureString("QWERTBTESTSTR", font).Width));
                 //Text
-                g.DrawString(answerList[rnd.Next(answerList.Length)], SystemFonts.DefaultFont, Brushes.White, size,
+                g.DrawString(answerList[rnd.Next(answerList.Length)], font, Brushes.White, size,
                     new StringFormat
                     {
                         LineAlignment = StringAlignment.Center,

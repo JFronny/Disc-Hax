@@ -48,6 +48,10 @@
         <Reference Include="DSharpPlus.Interactivity, Version=4.0.0.643, Culture=neutral, PublicKeyToken=null">
           <HintPath>..\packages\DSharpPlus.Interactivity.4.0.0-nightly-00643\lib\net45\DSharpPlus.Interactivity.dll</HintPath>
         </Reference>
+        <Reference Include="HtmlAgilityPack, Version=1.11.17.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a">
+          <HintPath>..\packages\HtmlAgilityPack.1.11.17\lib\Net45\HtmlAgilityPack.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
         <Reference Include="Microsoft.VisualBasic" />
         <Reference Include="mscorlib" />
         <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">

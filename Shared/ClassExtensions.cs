@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -12,6 +14,8 @@ using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using Shared.Config;
+
+#endregion
 
 namespace Shared
 {
@@ -145,5 +149,7 @@ namespace Shared
             return interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages,
                 deletion: PaginationDeletion.DeleteMessage);
         }
+
+        public static Task<DiscordMessage> RespondAsyncFix(this CommandContext ctx, string content = null, bool isTTS = false, DiscordEmbed embed = null) => ctx.RespondAsync(content.Replace("*", "\\*").Replace("_", "\\_"), isTTS, embed);
     }
 }

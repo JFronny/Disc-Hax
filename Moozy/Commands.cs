@@ -1,9 +1,13 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.VoiceNext;
+
+#endregion
 
 namespace Moozy
 {

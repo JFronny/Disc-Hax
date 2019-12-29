@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Threading.Tasks;
 using Bot.Commands;
 using Bot.Converters;
@@ -10,8 +12,11 @@ using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.VoiceNext;
+using Shared;
 using Shared.Config;
 using Math = Bot.Commands.Math;
+
+#endregion
 
 namespace Bot
 {
@@ -57,18 +62,16 @@ namespace Bot
                 DateTime.Now);
             if (e.Exception is ChecksFailedException ex)
             {
-                DiscordEmoji emoji = DiscordEmoji.FromName(e.Context.Client, ":no_entry:");
-                DiscordEmbedBuilder embed = new DiscordEmbedBuilder
+                await e.Context.RespondAsync(embed: new DiscordEmbedBuilder
                 {
                     Title = "Access denied",
-                    Description = $"{emoji} You do not have the permissions required to execute this command.",
+                    Description = $"{DiscordEmoji.FromName(e.Context.Client, ":no_entry:")} You do not have the permissions required to execute this command.",
                     Color = new DiscordColor(0xFF0000)
-                };
-                await e.Context.RespondAsync("", embed: embed);
+                }.Build());
             }
             else if (!(e.Exception is CommandNotFoundException))
             {
-                await e.Context.RespondAsync($"The command failed: {e.Exception.Message}");
+                await e.Context.RespondAsyncFix($"The command failed: {e.Exception.Message}");
             }
         }
 

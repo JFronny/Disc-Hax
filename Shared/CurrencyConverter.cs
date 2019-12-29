@@ -1,8 +1,12 @@
+#region
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Newtonsoft.Json.Linq;
 using Shared.Config;
+
+#endregion
 
 namespace Shared
 {
