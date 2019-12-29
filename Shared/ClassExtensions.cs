@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -149,5 +150,12 @@ namespace Shared
         public static Task<DiscordMessage> RespondAsyncFix(this CommandContext ctx, string content = null,
             bool isTTS = false, DiscordEmbed embed = null) =>
             ctx.RespondAsync(content.Replace("*", "\\*").Replace("_", "\\_"), isTTS, embed);
+
+        public static bool IsLocal(this Uri self)
+        {
+            IPAddress[] local = Dns.GetHostAddresses(Dns.GetHostName());
+            return Dns.GetHostAddresses(self.Host).Count(host => IPAddress.IsLoopback(host) || local.Contains(host)) >
+                   0;
+        }
     }
 }

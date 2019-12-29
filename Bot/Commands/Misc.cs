@@ -18,6 +18,7 @@ using Shared.Config;
 
 namespace Bot.Commands
 {
+    [Group("misc")]
     public class Misc : BaseCommandModule
     {
         private static readonly string[] answerList =
@@ -55,12 +56,12 @@ namespace Bot.Commands
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
                 .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Poll)))
             {
-                DiscordEmbedBuilder embed = new DiscordEmbedBuilder
+                await ctx.TriggerTypingAsync();
+                DiscordMessage msg = await ctx.RespondAsync(embed: new DiscordEmbedBuilder
                 {
                     Title = "Poll time!",
                     Description = text
-                };
-                DiscordMessage msg = await ctx.RespondAsync(embed: embed.Build());
+                }.Build());
                 ReadOnlyCollection<PollEmoji> pollResult = await Bot.instance.Client.GetInteractivity()
                     .DoPollAsync(msg, options, timeout: duration);
                 IEnumerable<string> results = pollResult.Where(xkvp => options.Contains(xkvp.Emoji))
@@ -78,6 +79,7 @@ namespace Bot.Commands
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
                 .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Quicktype)))
             {
+                await ctx.TriggerTypingAsync();
                 InteractivityExtension interactivity = ctx.Client.GetInteractivity();
                 byte[] codebytes = new byte[bytes];
                 Program.rnd.NextBytes(codebytes);
@@ -99,17 +101,23 @@ namespace Bot.Commands
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
                 .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Emojify)))
+            {
+                await ctx.TriggerTypingAsync();
                 await ctx.RespondAsyncFix(text.emotify());
+            }
         }
 
         [Command("preview")]
         [Description("Paginates a website for preview")]
         public async Task PreviewSite(CommandContext ctx, [Description("URL to paginate site from")] [RemainingText]
-            string URL)
+            Uri URL)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
                 .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.PreviewSite)))
             {
+                await ctx.TriggerTypingAsync();
+                if (URL.IsLocal())
+                    throw new WebException("Error: NameResolutionFailure");
                 string html;
                 try
                 {
@@ -132,46 +140,51 @@ namespace Bot.Commands
         public async Task Magic8(CommandContext ctx, [Description("Question to answer")] [RemainingText]
             string question)
         {
-            Rectangle size = new Rectangle(0, 0, 400, 400);
-            Bitmap bmp = new Bitmap(size.Width, size.Height);
-            Graphics g = Graphics.FromImage(bmp);
-            //Background
-            g.Clear(Color.White);
-            //Main Circle
-            g.FillEllipse(Brushes.Black, size);
-            //Center circle
-            size.Width /= 2;
-            size.Height /= 2;
-            size.X = size.Width / 2;
-            size.Y = size.Height / 2;
-            g.DrawEllipse(new Pen(Color.FromArgb(100, 80, 80, 80), 6), size);
-            //Triangle
-            PointF center = new PointF(size.X + (size.Width / 2), size.Y + (size.Height / 2));
-            float radius = size.Width / 2;
-            g.FillPolygon(Brushes.Blue, new[]
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
+                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Magic8)))
             {
-                new PointF(center.X - (0.866f * radius), center.Y - (0.5f * radius)),
-                new PointF(center.X + (0.866f * radius), center.Y - (0.5f * radius)),
-                new PointF(center.X, center.Y + radius)
-            });
-            //Get text scale
-            Font font = SystemFonts.DefaultFont;
-            font = new Font(font.FontFamily, font.Size * (180f / g.MeasureString("QWERTBTESTSTR", font).Width));
-            //Text
-            g.DrawString(answerList[Program.rnd.Next(answerList.Length)], font, Brushes.White, size,
-                new StringFormat
+                await ctx.TriggerTypingAsync();
+                Rectangle size = new Rectangle(0, 0, 400, 400);
+                Bitmap bmp = new Bitmap(size.Width, size.Height);
+                Graphics g = Graphics.FromImage(bmp);
+                //Background
+                g.Clear(Color.White);
+                //Main Circle
+                g.FillEllipse(Brushes.Black, size);
+                //Center circle
+                size.Width /= 2;
+                size.Height /= 2;
+                size.X = size.Width / 2;
+                size.Y = size.Height / 2;
+                g.DrawEllipse(new Pen(Color.FromArgb(100, 80, 80, 80), 6), size);
+                //Triangle
+                PointF center = new PointF(size.X + (size.Width / 2), size.Y + (size.Height / 2));
+                float radius = size.Width / 2;
+                g.FillPolygon(Brushes.Blue, new[]
                 {
-                    LineAlignment = StringAlignment.Center,
-                    Alignment = StringAlignment.Center
+                    new PointF(center.X - (0.866f * radius), center.Y - (0.5f * radius)),
+                    new PointF(center.X + (0.866f * radius), center.Y - (0.5f * radius)),
+                    new PointF(center.X, center.Y + radius)
                 });
-            //Save
-            g.Flush();
-            g.Dispose();
-            using (MemoryStream str = new MemoryStream())
-            {
-                bmp.Save(str, ImageFormat.Jpeg);
-                str.Position = 0;
-                await ctx.RespondWithFileAsync("Magic8.jpg", str);
+                //Get text scale
+                Font font = SystemFonts.DefaultFont;
+                font = new Font(font.FontFamily, font.Size * (180f / g.MeasureString("QWERTBTESTSTR", font).Width));
+                //Text
+                g.DrawString(answerList[Program.rnd.Next(answerList.Length)], font, Brushes.White, size,
+                    new StringFormat
+                    {
+                        LineAlignment = StringAlignment.Center,
+                        Alignment = StringAlignment.Center
+                    });
+                //Save
+                g.Flush();
+                g.Dispose();
+                using (MemoryStream str = new MemoryStream())
+                {
+                    bmp.Save(str, ImageFormat.Jpeg);
+                    str.Position = 0;
+                    await ctx.RespondWithFileAsync("Magic8.jpg", str);
+                }
             }
         }
     }

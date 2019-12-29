@@ -7,15 +7,19 @@ using Shared.Config;
 
 namespace Bot.Commands
 {
+    [Group("stat")]
     public class PublicStats : BaseCommandModule
     {
         [Command("about")]
-        [Description("Prints out the Readme.md file from the repository")]
+        [Description("Prints out the README file from the repository")]
         public async Task About(CommandContext ctx)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled).TRUE())
+            {
+                await ctx.TriggerTypingAsync();
                 await ctx.RespondPaginated(HTMLProcessor.ToPlainText(
                     await (await Program.cli.Repository.Content.GetReadme("JFronny", "Disc-Hax")).GetHtmlContent()));
+            }
         }
 
         [Command("guildcount")]
@@ -23,7 +27,10 @@ namespace Bot.Commands
         public async Task GuildCount(CommandContext ctx)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled).TRUE())
+            {
+                await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync($"Currently connected to {GuildSingleton.Count} Guilds");
+            }
         }
 
         [Command("changelog")]
@@ -31,8 +38,11 @@ namespace Bot.Commands
         public async Task Changelog(CommandContext ctx)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled).TRUE())
+            {
+                await ctx.TriggerTypingAsync();
                 await ctx.RespondAsyncFix((await Program.cli.Repository.Commit.GetAll("JFronny", "Disc-Hax"))[0].Commit
                     .Message);
+            }
         }
 
         [Command("invite")]
@@ -40,8 +50,11 @@ namespace Bot.Commands
         public async Task Invite(CommandContext ctx)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled).TRUE())
+            {
+                await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(
                     $"Invite Link: https://discordapp.com/oauth2/authorize?client_id={ctx.Client.CurrentApplication.Id}&scope=bot&permissions=8");
+            }
         }
     }
 }

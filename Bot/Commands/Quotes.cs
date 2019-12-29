@@ -12,6 +12,7 @@ using Shared.Config;
 
 namespace Bot.Commands
 {
+    [Group("quote")]
     public class Quotes : BaseCommandModule
     {
         private static string[] _beequotes;
@@ -72,6 +73,7 @@ namespace Bot.Commands
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
                 .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Fortune)))
             {
+                await ctx.TriggerTypingAsync();
                 string[] quotes = ctx.Channel.getEvaluatedNSFW() ? fortunequotes_off : fortunequotes;
                 await ctx.RespondAsyncFix(quotes[Program.rnd.Next(quotes.Length)], true);
             }
@@ -84,6 +86,7 @@ namespace Bot.Commands
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
                 .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Bees)))
             {
+                await ctx.TriggerTypingAsync();
                 int q = Program.rnd.Next(_beequotes.Length - 2);
                 await ctx.RespondAsyncFix(
                     (_beequotes[q] + "\n\n" + _beequotes[q + 1] + "\n\n" + _beequotes[q + 2]).Replace("\n", "\r\n"),

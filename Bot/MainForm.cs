@@ -263,7 +263,7 @@ namespace Bot
                 string[] channels = channelTree.Nodes[0].Nodes.OfType<TreeNode>()
                     .SelectMany(s => s.Nodes.OfType<TreeNode>()).Select(s => ((IBotStruct) s.Tag).Id.ToString())
                     .ToArray();
-                string[] allowedNames = {"common.xml", "key.secure"};
+                string[] allowedNames = {"common.xml", "keys.secure"};
                 for (int i = 0; i < cfgs.Length; i++)
                 {
                     XDocument el;

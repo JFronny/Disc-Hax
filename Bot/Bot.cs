@@ -39,11 +39,13 @@ namespace Bot
             _ = Client.UseVoiceNext(new VoiceNextConfiguration());
             Commands.RegisterCommands<ImageBoards>();
             Commands.RegisterCommands<Administration>();
-            //Commands.RegisterCommands<Music>();
             Commands.RegisterCommands<Misc>();
             Commands.RegisterCommands<Math>();
             Commands.RegisterCommands<Quotes>();
             Commands.RegisterCommands<PublicStats>();
+            Commands.RegisterConverter(new BoardConv());
+            Commands.RegisterConverter(new BooruConv());
+            Commands.RegisterConverter(new ConfigElementConv());
             Commands.RegisterConverter(new CurrencyConv());
             Client.DebugLogger.LogMessageReceived += DebugLogger_LogMessageReceived;
         }

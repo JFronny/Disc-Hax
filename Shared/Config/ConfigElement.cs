@@ -17,6 +17,7 @@
         Calc,
         Graph,
         Currency,
+        Magic8,
         Enabled
     }
 }

@@ -14,6 +14,7 @@ using Shared.Config;
 
 namespace Bot.Commands
 {
+    [Group("Math")]
     public class Math : BaseCommandModule
     {
         [Command("calc")]
@@ -25,6 +26,7 @@ namespace Bot.Commands
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
                 .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Calc)))
             {
+                await ctx.TriggerTypingAsync();
                 Expression ex = new Expression(equation);
 #if DEBUG
                 ex.setVerboseMode();
@@ -48,6 +50,7 @@ namespace Bot.Commands
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
                 .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Calc)))
             {
+                await ctx.TriggerTypingAsync();
                 string[] parts = equation.Split('=');
                 string newEq = $"({parts[0].Trim()}) - ({parts[1].Trim()})";
                 newEq = $"solve({newEq}, {target}, {min}, {max})";
@@ -65,6 +68,7 @@ namespace Bot.Commands
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
                 .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Graph)))
             {
+                await ctx.TriggerTypingAsync();
                 Bitmap bmp = new Bitmap(200, 200);
                 Graphics g = Graphics.FromImage(bmp);
                 g.Clear(Color.White);
@@ -103,8 +107,11 @@ namespace Bot.Commands
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
                 .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Currency)))
+            {
+                await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(
                     $"{amount} {inCurrency.currencyName} equals {CurrencyConverter.Convert(amount, inCurrency, outCurrency)} {outCurrency.currencyName}");
+            }
         }
 
         [Command("currency")]
@@ -112,9 +119,12 @@ namespace Bot.Commands
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
                 .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Currency)))
+            {
+                await ctx.TriggerTypingAsync();
                 await ctx.RespondPaginated(string.Join(", ",
                     CurrencyConverter.Currencies.Values.Select(s => $"{s.currencyName}/{s.currencySymbol} ({s.id})")
                         .OrderBy(s => s)));
+            }
         }
     }
 }

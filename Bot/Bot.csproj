@@ -145,9 +145,11 @@
         <Compile Include="Commands\Administration.cs" />
         <Compile Include="Commands\Math.cs" />
         <Compile Include="Commands\Misc.cs" />
-        <Compile Include="Commands\Music.cs" />
         <Compile Include="Commands\PublicStats.cs" />
         <Compile Include="Commands\Quotes.cs" />
+        <Compile Include="Converters\BoardConv.cs" />
+        <Compile Include="Converters\BooruConv.cs" />
+        <Compile Include="Converters\ConfigElementConv.cs" />
         <Compile Include="Converters\CurrencyConv.cs" />
         <Compile Include="MainForm.cs">
             <SubType>Form</SubType>
