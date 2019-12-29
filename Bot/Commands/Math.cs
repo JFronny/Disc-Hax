@@ -1,5 +1,3 @@
-#region
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -13,8 +11,6 @@ using DSharpPlus.CommandsNext.Attributes;
 using org.mariuszgromada.math.mxparser;
 using Shared;
 using Shared.Config;
-
-#endregion
 
 namespace Bot.Commands
 {

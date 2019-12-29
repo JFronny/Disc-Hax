@@ -1,6 +1,4 @@
-﻿#region
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -10,8 +8,6 @@ using System.Windows.Forms;
 using Chan.Net;
 using Chan.Net.JsonModel;
 using Thread = System.Threading.Thread;
-
-#endregion
 
 namespace Cleverbot
 {

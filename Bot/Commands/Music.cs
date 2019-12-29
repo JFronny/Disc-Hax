@@ -1,8 +1,4 @@
-﻿#region
-
-using DSharpPlus.CommandsNext;
-
-#endregion
+﻿using DSharpPlus.CommandsNext;
 
 namespace Bot.Commands
 {

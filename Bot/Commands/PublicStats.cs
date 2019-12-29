@@ -1,13 +1,9 @@
-#region
-
 using System.Threading.Tasks;
 using CC_Functions.Misc;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using Shared;
 using Shared.Config;
-
-#endregion
 
 namespace Bot.Commands
 {

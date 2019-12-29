@@ -1,5 +1,3 @@
-#region
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +9,6 @@ using DSharpPlus.CommandsNext.Attributes;
 using Octokit;
 using Shared;
 using Shared.Config;
-
-#endregion
 
 namespace Bot.Commands
 {

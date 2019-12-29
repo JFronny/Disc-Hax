@@ -1,6 +1,4 @@
-﻿#region
-
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using CC_Functions.Misc;
 using DSharpPlus;
@@ -9,8 +7,6 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using Shared;
 using Shared.Config;
-
-#endregion
 
 namespace Bot.Commands
 {

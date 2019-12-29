@@ -1,6 +1,4 @@
-﻿#region
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,8 +11,6 @@ using CC_Functions.Misc;
 using DSharpPlus;
 using Shared;
 using Shared.Config;
-
-#endregion
 
 namespace Bot
 {

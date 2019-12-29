@@ -1,6 +1,4 @@
-﻿#region
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
@@ -17,8 +15,6 @@ using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.EventHandling;
 using Shared;
 using Shared.Config;
-
-#endregion
 
 namespace Bot.Commands
 {
@@ -50,7 +46,7 @@ namespace Bot.Commands
 
         [Command("poll")]
         [Description(
-            "Run a poll with reactions. WARNING: Only normal emoticons (:laughing:, :grinning:) are allowed! Special emojis (:one:, :regional_indicator_d:) might cause problems")]
+            "Run a poll with reactions")]
         public async Task Poll(CommandContext ctx, [Description("What to ask")] string text,
             [Description("How long should the poll last.")]
             TimeSpan duration, [Description("What options should people have.")]
@@ -98,17 +94,17 @@ namespace Bot.Commands
 
         [Command("emotify")]
         [Description("Converts your text to emoticons")]
-        public async Task Emotify(CommandContext ctx, [Description("What should be converted")]
-            params string[] args)
+        public async Task Emotify(CommandContext ctx, [Description("What should be converted")] [RemainingText]
+            string text)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
                 .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Emojify)))
-                await ctx.RespondAsync(string.Join(" ", args.Select(s => s.emotify())));
+                await ctx.RespondAsyncFix(text.emotify());
         }
 
         [Command("preview")]
         [Description("Paginates a website for preview")]
-        public async Task PreviewSite(CommandContext ctx, [Description("URL to paginate site from")]
+        public async Task PreviewSite(CommandContext ctx, [Description("URL to paginate site from")] [RemainingText]
             string URL)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)

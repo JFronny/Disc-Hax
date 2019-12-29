@@ -1,6 +1,4 @@
-﻿#region
-
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,8 +8,6 @@ using DSharpPlus.EventArgs;
 using DSharpPlus.Net.WebSocket;
 using DSharpPlus.VoiceNext;
 using Newtonsoft.Json;
-
-#endregion
 
 namespace Moozy
 {

@@ -1,13 +1,9 @@
-﻿#region
-
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using CC_Functions.Misc;
-
-#endregion
 
 namespace Shared.Config
 {

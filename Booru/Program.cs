@@ -1,10 +1,6 @@
-﻿#region
-
-using System;
+﻿using System;
 using BooruSharp.Booru;
 using BooruSharp.Search.Post;
-
-#endregion
 
 namespace BooruT
 {

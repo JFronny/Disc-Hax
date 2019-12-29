@@ -1,6 +1,4 @@
-﻿#region
-
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Bot.Commands;
 using Bot.Converters;
@@ -15,8 +13,6 @@ using DSharpPlus.VoiceNext;
 using Shared;
 using Shared.Config;
 using Math = Bot.Commands.Math;
-
-#endregion
 
 namespace Bot
 {
