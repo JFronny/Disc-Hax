@@ -20,30 +20,23 @@ namespace Bot.Commands
 {
     public class Math : BaseCommandModule
     {
-        private readonly Function log;
-
-        public Math()
-        {
-            Console.Write("Creating extra math functions...");
-            log = new Function("log", new Logarithm());
-            Console.WriteLine(" Finished.");
-        }
-
         [Command("calc")]
         [Description(
-            "Calculates a result using mathparser.org\r\nExamples: \"sin(15^2)\", \"15 * (-12)\", \"solve( 2 * x - 4, x, 0, 10 )\", \"log(4, 2)\"\r\nRemember: sin() etc use radians! 2*pi radians equals 360°\r\nAlso: A result of NaN means, that you did something wrong and no result was found")]
+            "Calculates a result using mathparser.org\r\nExamples: \"sin(15^2)\", \"15 * (-12)\", \"solve( 2 * x - 4, x, 0, 10 )\", \"log(4, 2)\"\r\nRemember: sin() etc use radians! 2*pi radians equals 360°")]
         public async Task Calc(CommandContext ctx, [Description("Equation")] [RemainingText]
             string equation)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
                 .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Calc)))
             {
-                Expression ex = new Expression(equation, log);
-                #if DEBUG
+                Expression ex = new Expression(equation);
+#if DEBUG
                 ex.setVerboseMode();
-                #endif
+#endif
                 double result = ex.calculate();
-                await ctx.RespondAsyncFix(double.IsNaN(result) ? ex.getErrorMessage() : $"{ex.getExpressionString()} = {result}");
+                await ctx.RespondAsyncFix(double.IsNaN(result)
+                    ? ex.getErrorMessage()
+                    : $"{ex.getExpressionString()} = {result}");
             }
         }
 
@@ -62,7 +55,7 @@ namespace Bot.Commands
                 string[] parts = equation.Split('=');
                 string newEq = $"({parts[0].Trim()}) - ({parts[1].Trim()})";
                 newEq = $"solve({newEq}, {target}, {min}, {max})";
-                Expression ex = new Expression(newEq, log);
+                Expression ex = new Expression(newEq);
                 await ctx.RespondAsyncFix($"{ex.getExpressionString()} = {ex.calculate()}");
             }
         }
@@ -90,7 +83,7 @@ namespace Bot.Commands
                 List<PointF> points = new List<PointF>();
                 for (int x = -100; x < 100; x++)
                 {
-                    double result = new Expression(equation, new Argument("x", x / 10d), log).calculate();
+                    double result = new Expression(equation, new Argument("x", x / 10d)).calculate();
                     result *= 10;
                     if (!double.IsNaN(result) && result <= 200 && result >= -200)
                         points.Add(new PointF(x + 100, 100 - Convert.ToSingle(result)));
@@ -127,44 +120,5 @@ namespace Bot.Commands
                     CurrencyConverter.Currencies.Values.Select(s => $"{s.currencyName}/{s.currencySymbol} ({s.id})")
                         .OrderBy(s => s)));
         }
-    }
-
-    public class Logarithm : FunctionExtension
-    {
-        private double b;
-        private double x;
-
-        public Logarithm()
-        {
-            x = double.NaN;
-            b = double.NaN;
-        }
-
-        public Logarithm(double x, double b)
-        {
-            this.x = x;
-            this.b = b;
-        }
-
-        public int getParametersNumber() => 2;
-
-        public void setParameterValue(int argumentIndex, double argumentValue)
-        {
-            switch (argumentIndex)
-            {
-                case 0:
-                    x = argumentValue;
-                    break;
-                case 1:
-                    b = argumentValue;
-                    break;
-            }
-        }
-
-        public string getParameterName(int parameterIndex) => parameterIndex switch {0 => "x", 1 => "b"};
-
-        public double calculate() => System.Math.Log(x, b);
-
-        public FunctionExtension clone() => new Logarithm(x, b);
     }
 }

@@ -150,6 +150,8 @@ namespace Shared
                 deletion: PaginationDeletion.DeleteMessage);
         }
 
-        public static Task<DiscordMessage> RespondAsyncFix(this CommandContext ctx, string content = null, bool isTTS = false, DiscordEmbed embed = null) => ctx.RespondAsync(content.Replace("*", "\\*").Replace("_", "\\_"), isTTS, embed);
+        public static Task<DiscordMessage> RespondAsyncFix(this CommandContext ctx, string content = null,
+            bool isTTS = false, DiscordEmbed embed = null) =>
+            ctx.RespondAsync(content.Replace("*", "\\*").Replace("_", "\\_"), isTTS, embed);
     }
 }

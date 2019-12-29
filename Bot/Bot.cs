@@ -61,18 +61,15 @@ namespace Bot
                 $"{e.Context.User.Username} tried executing '{e.Command?.QualifiedName ?? "<unknown command>"}' but it errored: {e.Exception.GetType()}: {e.Exception.Message ?? "<no message>"}",
                 DateTime.Now);
             if (e.Exception is ChecksFailedException ex)
-            {
                 await e.Context.RespondAsync(embed: new DiscordEmbedBuilder
                 {
                     Title = "Access denied",
-                    Description = $"{DiscordEmoji.FromName(e.Context.Client, ":no_entry:")} You do not have the permissions required to execute this command.",
+                    Description =
+                        $"{DiscordEmoji.FromName(e.Context.Client, ":no_entry:")} You do not have the permissions required to execute this command.",
                     Color = new DiscordColor(0xFF0000)
                 }.Build());
-            }
             else if (!(e.Exception is CommandNotFoundException))
-            {
                 await e.Context.RespondAsyncFix($"The command failed: {e.Exception.Message}");
-            }
         }
 
         private Task Commands_CommandExecuted(CommandExecutionEventArgs e)
