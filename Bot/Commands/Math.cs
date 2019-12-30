@@ -15,6 +15,7 @@ using Shared.Config;
 namespace Bot.Commands
 {
     [Group("Math")]
+    [Description("Commands for calculating. Also includes money conversion")]
     public class Math : BaseCommandModule
     {
         [Command("calc")]
@@ -40,7 +41,7 @@ namespace Bot.Commands
 
         [Command("solve")]
         [Description(
-            "Solve a mathematical function. See calc for extra help. Format is: \"solve x -100 100 3 * x * 2 = 15 * x\"")]
+            "Solve a mathematical function. See calc for extra help.\r\nExample: \"solve x -100 100 3 * x * 2 = 15 * x\"")]
         public async Task Solve(CommandContext ctx, [Description("Variable to get function from")]
             string target, [Description("Minimum value for result")]
             string min, [Description("Maximum value for result")]

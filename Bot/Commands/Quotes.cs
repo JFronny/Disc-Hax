@@ -13,6 +13,7 @@ using Shared.Config;
 namespace Bot.Commands
 {
     [Group("quote")]
+    [Description("Random pieces of text from various sources")]
     public class Quotes : BaseCommandModule
     {
         private static string[] _beequotes;

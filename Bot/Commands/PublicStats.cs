@@ -8,6 +8,7 @@ using Shared.Config;
 namespace Bot.Commands
 {
     [Group("stat")]
+    [Description("Information that is not unique to this server")]
     public class PublicStats : BaseCommandModule
     {
         [Command("about")]
@@ -54,6 +55,18 @@ namespace Bot.Commands
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(
                     $"Invite Link: https://discordapp.com/oauth2/authorize?client_id={ctx.Client.CurrentApplication.Id}&scope=bot&permissions=8");
+            }
+        }
+        
+        [Command("github")]
+        [Aliases("website", "contribute", "issue")]
+        [Description("Pastes the github link")]
+        public async Task Github(CommandContext ctx)
+        {
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled).TRUE())
+            {
+                await ctx.TriggerTypingAsync();
+                await ctx.RespondAsync("Repo Link: https://github.com/JFronny/Disc-Hax");
             }
         }
     }

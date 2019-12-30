@@ -151,6 +151,7 @@
         <Compile Include="Converters\BooruConv.cs" />
         <Compile Include="Converters\ConfigElementConv.cs" />
         <Compile Include="Converters\CurrencyConv.cs" />
+        <Compile Include="HelpFormatter.cs" />
         <Compile Include="MainForm.cs">
             <SubType>Form</SubType>
         </Compile>

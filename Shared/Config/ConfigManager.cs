@@ -17,9 +17,6 @@ namespace Shared.Config
         public static ConfigUpdateEvent configUpdate;
         private static string getTypeStr(this IBotStruct self) => self.tryCast(out BotGuild guild) ? GUILD : CHANNEL;
 
-        private static XElement getXML(ulong ID, string ElName, out string XMLPath) =>
-            getXML(ID.ToString(), ElName, out XMLPath);
-
         private static XElement getXML(string ID, string ElName, out string XMLPath)
         {
             XMLPath = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Cfgs");
@@ -30,8 +27,6 @@ namespace Shared.Config
                 new XElement(ElName).Save(XMLPath);
             return XElement.Load(XMLPath);
         }
-
-        //private static XElement getXML(ulong ID, string ElName) => getXML(ID, ElName, out string leltisnotused);
 
         public static bool? get(IBotStruct ID, ConfigElement element, bool? defaultVal = false) =>
             get(ID.Id.ToString(), element, ID.getTypeStr(), defaultVal);

@@ -11,6 +11,7 @@ using Shared.Config;
 namespace Bot.Commands
 {
     [Group("admin")]
+    [Description("Commands for administration and debugging")]
     public class Administration : BaseCommandModule
     {
         [Command("ping")]
@@ -28,8 +29,7 @@ namespace Bot.Commands
 
         [Command("config")]
         [RequireUserPermissions(Permissions.Administrator)]
-        [Description(
-            "Prints or changes the DiscHax-instance config\r\nUsage: config [key] [value]\r\nExample: \"config\", \"config bees\", \"config bees true\"")]
+        [Description("Prints or changes the DiscHax-instance config")]
         public async Task ConfigCmd(CommandContext ctx)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)

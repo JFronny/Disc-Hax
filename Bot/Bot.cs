@@ -47,6 +47,7 @@ namespace Bot
             Commands.RegisterConverter(new BooruConv());
             Commands.RegisterConverter(new ConfigElementConv());
             Commands.RegisterConverter(new CurrencyConv());
+            Commands.SetHelpFormatter<HelpFormatter>();
             Client.DebugLogger.LogMessageReceived += DebugLogger_LogMessageReceived;
         }
 
@@ -55,6 +56,8 @@ namespace Bot
 
         private async Task Commands_CommandErrored(CommandErrorEventArgs e)
         {
+            if (e.Exception is UnwantedExecutionException)
+                return;
             e.Context.Client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax",
                 $"{e.Context.User.Username} tried executing '{e.Command?.QualifiedName ?? "<unknown command>"}' but it errored: {e.Exception.GetType()}: {e.Exception.Message ?? "<no message>"}",
                 DateTime.Now);

@@ -19,6 +19,7 @@ using Shared.Config;
 namespace Bot.Commands
 {
     [Group("misc")]
+    [Description("Random commands that didn't fit into other categories")]
     public class Misc : BaseCommandModule
     {
         private static readonly string[] answerList =

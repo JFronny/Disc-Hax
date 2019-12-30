@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Threading.Tasks;
 using BooruSharp.Booru;
 using BooruSharp.Search.Post;
@@ -17,22 +18,20 @@ using Shared.Config;
 namespace Bot.Commands
 {
     [Group("board")]
+    [Description("Commands to get random images from image-boards around the interwebz")]
     public class ImageBoards : BaseCommandModule
     {
-        public static readonly Dictionary<string, Booru> booruDict = new Dictionary<string, Booru>();
+        public static Dictionary<string, Booru> booruDict;
 
         public ImageBoards()
         {
             Console.Write("Instantiating Boorus...");
-            List<Booru> boorus = new List<Booru>
-            {
-                new Atfbooru(), new DanbooruDonmai(), new E621(), new E926(),
-                new Furrybooru(), new Konachan(), new Lolibooru(), new Realbooru(), new Rule34(),
-                new Safebooru(), new Sakugabooru(), new Xbooru(), new Yandere()
-            };
-            boorus.Sort((x, y) =>
-                x.ToString().Split('.')[2].ToLower().CompareTo(y.ToString().Split('.')[2].ToLower()));
-            boorus.ToList().ForEach(s => { booruDict.Add(s.ToString().Split('.')[2].ToLower(), s); });
+            booruDict = Assembly.GetAssembly(typeof(Booru)).GetTypes()
+                .Where(s => s.Namespace == "BooruSharp.Booru" && s.IsClass && !s.IsAbstract &&
+                            s.IsSubclassOf(typeof(Booru)))
+                .Select(s => (Booru) Activator.CreateInstance(s, new object[] {null}))
+                .OrderBy(s => s.ToString().Split('.')[2].ToLower()).ToList()
+                .ToDictionary(s => s.ToString().Split('.')[2].ToLower(), s => s);
             Console.WriteLine(" Finished.");
         }
 
@@ -122,14 +121,16 @@ namespace Bot.Commands
 
         [Command("booru")]
         [Description("Shows a random Image from your favourite *booru. See \"booru\" for a full list")]
-        public async Task Booru(CommandContext ctx, [Description("Include VERY questionable content?")]
+        public async Task Booru(CommandContext ctx, [Description("Include questionable content?")]
             bool qcont)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
                 .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Booru)))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync(qcont ? string.Join("; ", booruDict.Keys) : "safebooru");
+                await ctx.RespondAsync(qcont
+                    ? string.Join("; ", booruDict.Keys)
+                    : string.Join("; ", booruDict.Keys.Where(s => booruDict[s].IsSafe())));
             }
         }
 
@@ -140,21 +141,28 @@ namespace Bot.Commands
             params string[] tags)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
-                    .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Booru))
-                && (booru == booruDict["safebooru"] || ctx.Channel.getEvaluatedNSFW()))
+                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Booru)))
             {
                 await ctx.TriggerTypingAsync();
-                SearchResult? result = null;
-                while (result == null || result.Value.rating !=
-                       (ctx.Channel.getEvaluatedNSFW() ? Rating.Explicit : Rating.Safe))
+                SearchResult result = await booru.GetRandomImage(tags);
+                int triesLeft = 10;
+                while (result.rating != (ctx.Channel.getEvaluatedNSFW() ? Rating.Explicit : Rating.Safe) &&
+                       !booru.IsSafe())
+                {
+                    if (triesLeft == 0)
+                        throw new Exception("Failed to find image in a reasonable amount of tries");
                     result = await booru.GetRandomImage(tags);
+                    triesLeft--;
+                }
                 string val = Program.rnd.Next(10000, 99999).ToString();
                 using (WebClient wClient = new WebClient())
                 {
                     await ctx.RespondWithFileAsync($"{val}_img.jpg",
-                        wClient.OpenRead(result.Value.fileUrl), result.Value.source, embed: new DiscordEmbedBuilder
+                        wClient.OpenRead(result.fileUrl), embed: new DiscordEmbedBuilder
                         {
-                            Description = string.Join(", ", result.Value.tags)
+                            Description = "Tags: " + string.Join(", ", result.tags),
+                            Title = result.source ?? "Unknown source",
+                            Url = result.fileUrl.ToString()
                         }.Build());
                 }
             }
@@ -164,6 +172,6 @@ namespace Bot.Commands
         public async Task Booru(CommandContext ctx,
             [Description("Tags for image selection")]
             params string[] tags) =>
-            Booru(ctx, ctx.Channel.getEvaluatedNSFW() ? (Booru) new Rule34() : new Gelbooru(), tags);
+            await Booru(ctx, ctx.Channel.getEvaluatedNSFW() ? (Booru) new Rule34() : new Safebooru(), tags);
     }
 }
