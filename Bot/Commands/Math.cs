@@ -42,8 +42,8 @@ namespace Bot.Commands
         [Command("solve")]
         [Description(
             "Solve a mathematical function. See calc for extra help.\r\nExample: \"solve x -100 100 3 * x * 2 = 15 * x\"")]
-        public async Task Solve(CommandContext ctx, [Description("Variable to get function from")]
-            string target, [Description("Minimum value for result")]
+        public async Task Solve(CommandContext ctx, [Description("Variable to calculate")] string target,
+            [Description("Minimum value for result")]
             string min, [Description("Maximum value for result")]
             string max, [Description("Equation")] [RemainingText]
             string equation)

@@ -50,8 +50,8 @@
             <HintPath>..\packages\BooruSharp.1.4.6\lib\net45\BooruSharp.dll</HintPath>
         </Reference>
         <Reference Include="CC_Functions.Misc, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>..\packages\CC-Functions.Misc.1.0.4\lib\CC_Functions.Misc.dll</HintPath>
-            <Private>True</Private>
+          <HintPath>..\packages\CC-Functions.Misc.1.0.5\lib\CC_Functions.Misc.dll</HintPath>
+          <Private>True</Private>
         </Reference>
         <Reference Include="Chan.Net, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
             <HintPath>..\packages\Chan.Net.0.0.15\lib\net45\Chan.Net.dll</HintPath>
@@ -144,6 +144,7 @@
         <Compile Include="Commands\ImageBoards.cs" />
         <Compile Include="Commands\Administration.cs" />
         <Compile Include="Commands\Math.cs" />
+        <Compile Include="Commands\Minigames.cs" />
         <Compile Include="Commands\Misc.cs" />
         <Compile Include="Commands\PublicStats.cs" />
         <Compile Include="Commands\Quotes.cs" />
@@ -151,6 +152,7 @@
         <Compile Include="Converters\BooruConv.cs" />
         <Compile Include="Converters\ConfigElementConv.cs" />
         <Compile Include="Converters\CurrencyConv.cs" />
+        <Compile Include="Converters\RPSOptionConv.cs" />
         <Compile Include="HelpFormatter.cs" />
         <Compile Include="MainForm.cs">
             <SubType>Form</SubType>

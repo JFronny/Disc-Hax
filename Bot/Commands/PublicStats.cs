@@ -57,7 +57,7 @@ namespace Bot.Commands
                     $"Invite Link: https://discordapp.com/oauth2/authorize?client_id={ctx.Client.CurrentApplication.Id}&scope=bot&permissions=8");
             }
         }
-        
+
         [Command("github")]
         [Aliases("website", "contribute", "issue")]
         [Description("Pastes the github link")]

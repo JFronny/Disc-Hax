@@ -39,6 +39,7 @@ namespace Bot
             _ = Client.UseVoiceNext(new VoiceNextConfiguration());
             Commands.RegisterCommands<ImageBoards>();
             Commands.RegisterCommands<Administration>();
+            Commands.RegisterCommands<Minigames>();
             Commands.RegisterCommands<Misc>();
             Commands.RegisterCommands<Math>();
             Commands.RegisterCommands<Quotes>();
@@ -47,6 +48,7 @@ namespace Bot
             Commands.RegisterConverter(new BooruConv());
             Commands.RegisterConverter(new ConfigElementConv());
             Commands.RegisterConverter(new CurrencyConv());
+            Commands.RegisterConverter(new RPSOptionConv());
             Commands.SetHelpFormatter<HelpFormatter>();
             Client.DebugLogger.LogMessageReceived += DebugLogger_LogMessageReceived;
         }

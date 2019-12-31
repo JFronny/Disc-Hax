@@ -104,7 +104,7 @@ namespace Bot
             this.command = command;
             builder.Title = $"{command.QualifiedName} ({(command is CommandGroup ? "Group" : "Command")})";
             if (command.Aliases.Any())
-                builder.AddField("Aliases", string.Join(", ", "`" + command.Aliases + "`"));
+                builder.AddField("Aliases", string.Join(", ", command.Aliases.Select(s => "`" + s + "`")));
             if (command.Overloads.Any())
                 builder.AddField("Overloads", string.Join("\n\n",
                     command.Overloads.OrderBy(s => s.Priority).Select(s =>
@@ -113,12 +113,13 @@ namespace Bot
                                    s.Arguments.Select(a =>
                                    {
                                        string tmp = $"-   `{a.Name} ";
+                                       string type = CommandsNext.GetUserFriendlyTypeName(a.Type);
                                        if (a.IsCatchAll)
-                                           tmp += $"[{a.Type}...]";
+                                           tmp += $"[{type}...]";
                                        else if (a.IsOptional)
-                                           tmp += $"({a.Type})";
+                                           tmp += $"({type})";
                                        else
-                                           tmp += $"<{a.Type}>";
+                                           tmp += $"<{type}>";
                                        return tmp + $"`: {a.Description}";
                                    }));
                     })

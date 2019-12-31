@@ -18,6 +18,7 @@
         Graph,
         Currency,
         Magic8,
+        RockPaperScissor,
         Enabled
     }
 }
