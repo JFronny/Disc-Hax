@@ -91,7 +91,6 @@
     <ItemGroup>
         <Compile Include="CommandComparer.cs" />
         <Compile Include="Config\Common.cs" />
-        <Compile Include="Config\ConfigElement.cs" />
         <Compile Include="Config\ConfigManager.cs" />
         <Compile Include="Config\TokenManager.cs" />
         <Compile Include="Currency.cs" />

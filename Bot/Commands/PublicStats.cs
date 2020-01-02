@@ -15,7 +15,8 @@ namespace Bot.Commands
         [Description("Prints out the README file from the repository")]
         public async Task About(CommandContext ctx)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled).TRUE())
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
+                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondPaginated(HTMLProcessor.ToPlainText(
@@ -27,7 +28,8 @@ namespace Bot.Commands
         [Description("Gets the amount of connected Guilds")]
         public async Task GuildCount(CommandContext ctx)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled).TRUE())
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
+                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync($"Currently connected to {GuildSingleton.Count} Guilds");
@@ -38,7 +40,8 @@ namespace Bot.Commands
         [Description("Gets the amount of connected Guilds")]
         public async Task Changelog(CommandContext ctx)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled).TRUE())
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
+                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsyncFix((await Program.cli.Repository.Commit.GetAll("JFronny", "Disc-Hax"))[0].Commit
@@ -50,7 +53,8 @@ namespace Bot.Commands
         [Description("Gets the invite-link")]
         public async Task Invite(CommandContext ctx)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled).TRUE())
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
+                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(
@@ -63,7 +67,8 @@ namespace Bot.Commands
         [Description("Pastes the github link")]
         public async Task Github(CommandContext ctx)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled).TRUE())
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
+                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync("Repo Link: https://github.com/JFronny/Disc-Hax");

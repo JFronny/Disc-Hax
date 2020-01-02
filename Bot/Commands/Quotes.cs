@@ -71,8 +71,8 @@ namespace Bot.Commands
         [Description("Spits out a quote")]
         public async Task Fortune(CommandContext ctx)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Fortune)))
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
+                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
             {
                 await ctx.TriggerTypingAsync();
                 string[] quotes = ctx.Channel.getEvaluatedNSFW() ? fortunequotes_off : fortunequotes;
@@ -84,8 +84,8 @@ namespace Bot.Commands
         [Description("Sends a quote from the bee movie script as TTS")]
         public async Task Bees(CommandContext ctx)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Bees)))
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
+                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
             {
                 await ctx.TriggerTypingAsync();
                 int q = Program.rnd.Next(_beequotes.Length - 2);

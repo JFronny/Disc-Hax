@@ -146,7 +146,7 @@ namespace Bot
 
         public override CommandHelpMessage Build()
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled).TRUE())
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED).TRUE())
             {
                 if (command == null)
                     builder.AddField("Notes",

@@ -25,6 +25,7 @@ namespace Bot
         public MainForm()
         {
             InitializeComponent();
+            ToolTip tt = new ToolTip();
             ConfigManager.configUpdate += (sender, ID, element) =>
             {
                 if (ChannelDefined && ulong.TryParse(ID, out ulong q) && SelectedChannel.Id == q)
@@ -35,22 +36,22 @@ namespace Bot
                                 .SelectMany(s => s.Nodes.OfType<TreeNode>())
                                 .First(s => ((BotChannel) s.Tag).Id == q)));
                     });
-                if (element == ConfigElement.Enabled)
+                if (element == ConfigManager.ENABLED)
                     ClassExtensions.InvokeAction(this, (MethodInvoker) delegate { updateChecking(); });
             };
             settingsBoxes = new List<CheckBox>();
-            string[] array = Enum.GetNames(typeof(ConfigElement)).Where(s =>
-                    new List<string> {ConfigElement.Enabled.ToString(), ConfigElement.Nsfw.ToString()}.IndexOf(s) == -1)
+            string[] array = CommandArr.getC().Except(new[] {ConfigManager.ENABLED, ConfigManager.NSFW})
                 .ToArray();
             for (int i = 0; i < array.Length; i++)
             {
                 CheckBox box = new CheckBox();
-                box.Tag = GenericExtensions.ParseToEnum<ConfigElement>(array[i]);
-                box.Text = array[i];
+                box.Tag = array[i];
+                box.Text = array[i].Replace("method_", "");
+                tt.SetToolTip(box, $"Command: {box.Text}");
                 box.CheckStateChanged += (sender, e) =>
                 {
                     GenericExtensions.runIf(ChannelDefined,
-                        () => ConfigManager.set(SelectedChannel.Channel.getInstance(), (ConfigElement) box.Tag,
+                        () => ConfigManager.set(SelectedChannel.Channel.getInstance(), (string) box.Tag,
                             box.Checked,
                             true));
                 };
@@ -77,7 +78,7 @@ namespace Bot
             {
                 Text = gld.Guild.Name,
                 Tag = gld,
-                Checked = ConfigManager.get(gld, ConfigElement.Enabled).TRUE()
+                Checked = ConfigManager.get(gld, ConfigManager.ENABLED).TRUE()
             };
             IEnumerable<BotChannel> chns = gld.Guild.Channels.Where(xc => xc.Value.Type == ChannelType.Text)
                 .OrderBy(xc => xc.Value.Position).Select(xc => xc.Value.getInstance());
@@ -85,7 +86,7 @@ namespace Bot
             {
                 node.Nodes.Add(new TreeNode
                 {
-                    Text = s.Channel.Name, Tag = s, Checked = ConfigManager.get(s, ConfigElement.Enabled).TRUE()
+                    Text = s.Channel.Name, Tag = s, Checked = ConfigManager.get(s, ConfigManager.ENABLED).TRUE()
                 });
             });
             channelTree.TopNode.Nodes.Add(node);
@@ -130,9 +131,9 @@ namespace Bot
                     chatBox.Items.Clear();
                     SelectedChannel.Messages.Values.ToList().ForEach(s => chatBox.Items.Add(s));
                     nsfwBox.Checked = SelectedChannel.Channel.IsNSFW ||
-                                      ConfigManager.get(SelectedChannel, ConfigElement.Nsfw).TRUE();
+                                      ConfigManager.get(SelectedChannel, ConfigManager.NSFW).TRUE();
                     settingsBoxes.ForEach(s =>
-                        s.Checked = ConfigManager.get(SelectedChannel, (ConfigElement) s.Tag).TRUE());
+                        s.Checked = ConfigManager.get(SelectedChannel, (string) s.Tag).TRUE());
                     nsfwBox.Enabled = !SelectedChannel.Channel.IsNSFW;
                     clientSettingsPanel.Text = $"{SelectedGuild.Guild.Name} - {SelectedChannel.Channel.Name}";
                     clientSettingsPanel.Enabled = true;
@@ -160,7 +161,7 @@ namespace Bot
                 nodes = nodes.First().Nodes.OfType<TreeNode>();
                 nodes = nodes.Concat(nodes.SelectMany(s => s.Nodes.OfType<TreeNode>()));
                 nodes.ToList().ForEach(s =>
-                    s.Checked = ConfigManager.get((IBotStruct) s.Tag, ConfigElement.Enabled).TRUE());
+                    s.Checked = ConfigManager.get((IBotStruct) s.Tag, ConfigManager.ENABLED).TRUE());
             }
             catch (Exception e)
             {
@@ -199,9 +200,9 @@ namespace Bot
                     if (e.Node.Parent != null)
                     {
                         if (e.Node.Tag.tryCast(out BotChannel c))
-                            ConfigManager.set(c, ConfigElement.Enabled, e.Node.Checked, true);
+                            ConfigManager.set(c, ConfigManager.ENABLED, e.Node.Checked, true);
                         else if (e.Node.Tag.tryCast(out BotGuild g))
-                            ConfigManager.set(g, ConfigElement.Enabled, e.Node.Checked, true);
+                            ConfigManager.set(g, ConfigManager.ENABLED, e.Node.Checked, true);
                     }
                     else
                     {
@@ -221,10 +222,14 @@ namespace Bot
         }
 
         private void nsfwBox_CheckedChanged(object sender, EventArgs e) => GenericExtensions.runIf(ChannelDefined,
-            () => ConfigManager.set(SelectedChannel, ConfigElement.Nsfw, nsfwBox.Checked, true));
+            () => ConfigManager.set(SelectedChannel, ConfigManager.NSFW, nsfwBox.Checked, true));
 
-        private void debugButton_Click(object sender, EventArgs e) => GenericExtensions.runIf(ChannelDefined,
-            () => new Thread(() => MessageBox.Show(ConfigManager.getStr(SelectedChannel))).Start());
+        private void debugButton_Click(object sender, EventArgs e)
+        {
+            string tmp = ConfigManager.getStr(SelectedChannel);
+            Console.WriteLine(tmp);
+            MessageBox.Show(this, tmp, "", MessageBoxButtons.OK);
+        }
 
         private void SendMessage(string message, BotChannel channel, Action<Task> continuationAction = null)
         {
@@ -266,6 +271,7 @@ namespace Bot
                 string[] allowedNames = {"common.xml", "keys.secure"};
                 for (int i = 0; i < cfgs.Length; i++)
                 {
+                    //Clean files
                     XDocument el;
                     try
                     {
@@ -292,6 +298,21 @@ namespace Bot
                     {
                         if (!allowedNames.Contains(file))
                             File.Delete(cfgs[i]);
+                    }
+                    //Clean contents
+                    if (File.Exists(cfgs[i]) && cfgs[i] != allowedNames[1])
+                    {
+                        XElement root = el.Element("guild") ?? el.Element("channel") ?? el.Element("common");
+                        List<string> allowedVars = CommandArr.getC().ToList();
+                        if (cfgs[i] != allowedNames[0])
+                            allowedVars.AddRange(new[] {"prefix", "guildsBox"});
+                        else
+                            allowedVars.AddRange(new[] {"upperType", "upper"});
+                        List<XElement> filteredELs =
+                            root.Elements().Where(s => allowedVars.Contains(s.Name.LocalName)).ToList();
+                        root.RemoveAll();
+                        filteredELs.ForEach(s => root.Add(s));
+                        el.Save(cfgs[i]);
                     }
                 }
             }

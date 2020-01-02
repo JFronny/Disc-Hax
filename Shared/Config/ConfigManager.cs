@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -9,10 +10,12 @@ namespace Shared.Config
 {
     public static class ConfigManager
     {
-        public delegate void ConfigUpdateEvent(object sender, string ID, ConfigElement element);
+        public delegate void ConfigUpdateEvent(object sender, string ID, string element);
 
         private static readonly string CHANNEL = "channel";
         private static readonly string GUILD = "guild";
+        public static readonly string ENABLED = "enabled";
+        public static readonly string NSFW = "nsfw";
 
         public static ConfigUpdateEvent configUpdate;
         private static string getTypeStr(this IBotStruct self) => self.tryCast(out BotGuild guild) ? GUILD : CHANNEL;
@@ -28,14 +31,14 @@ namespace Shared.Config
             return XElement.Load(XMLPath);
         }
 
-        public static bool? get(IBotStruct ID, ConfigElement element, bool? defaultVal = false) =>
+        public static bool? get(IBotStruct ID, string element, bool? defaultVal = false) =>
             get(ID.Id.ToString(), element, ID.getTypeStr(), defaultVal);
 
-        public static bool? get(string ID, ConfigElement element, string configType,
+        public static bool? get(string ID, string element, string configType,
             bool? defaultVal = false)
         {
             XElement el = getXML(ID, configType, out _);
-            XElement self = el.Element(element.ToString().ToLower());
+            XElement self = el.Element(element.ToLower());
             if (self == null)
             {
                 set(ID, element, null, true, configType);
@@ -55,26 +58,27 @@ namespace Shared.Config
         public static string getStr(IBotStruct ID) => getStr(ID.Id.ToString(), ID.getTypeStr());
 
         public static string getStr(string ID, string configType) => string.Join("\r\n",
-            Enum.GetValues(typeof(ConfigElement)).OfType<ConfigElement>()
-                .Select(s => $"{s}: {get(ID, s, configType)}"));
+            getXML(ID, configType, out _).Elements()
+                .Where(s => !string.IsNullOrWhiteSpace(s.Value) && s.Value.Length <= 5)
+                .Select(s => $"{s.Name}: {s.Value}"));
 
-        public static void set(BotChannel channel, ConfigElement element, bool? val, bool disableFormChecks = false)
+        public static void set(BotChannel channel, string element, bool? val, bool disableFormChecks = false)
         {
             set(channel.Id.ToString(), element, val, disableFormChecks, CHANNEL,
                 new[] {new ValueTuple<string, string>(channel.Channel.GuildId.ToString(), GUILD)});
         }
 
-        public static void set(BotGuild guild, ConfigElement element, bool? val, bool disableFormChecks = false)
+        public static void set(BotGuild guild, string element, bool? val, bool disableFormChecks = false)
         {
             set(guild.Id.ToString(), element, val, disableFormChecks, GUILD,
                 new[] {new ValueTuple<string, string>("common", "common")});
         }
 
-        public static void set(string ID, ConfigElement element, bool? val, bool disableFormChecks, string configType,
+        public static void set(string ID, string element, bool? val, bool disableFormChecks, string configType,
             ValueTuple<string, string>[] upper = null)
         {
             XElement XML = getXML(ID, configType, out string XMLPath);
-            string el = element.ToString().ToLower();
+            string el = element.ToLower();
             if (XML.Elements(el).Count() == 0)
                 XML.Add(new XElement(el, val.ToString()));
             else
@@ -99,5 +103,12 @@ namespace Shared.Config
                 configUpdate?.Invoke(null, ID, element);
             XML.Save(XMLPath);
         }
+
+        public static bool? getMethodEnabled(IBotStruct ID, bool? defaultval = false, int frameN = 2) =>
+            getMethodEnabled(ID.Id.ToString(), ID.getTypeStr(), defaultval, frameN);
+
+        public static bool? getMethodEnabled(string ID, string configType, bool? defaultval = false, int frameN = 1) =>
+            get(ID, CommandComparer.GetName(new StackTrace().GetFrame(1).GetMethod()), configType,
+                defaultval);
     }
 }

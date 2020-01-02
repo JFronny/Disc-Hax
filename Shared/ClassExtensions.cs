@@ -101,7 +101,7 @@ namespace Shared
         }
 
         public static bool getEvaluatedNSFW(this DiscordChannel Channel) =>
-            Channel.IsNSFW || ConfigManager.get(Channel.getInstance(), ConfigElement.Nsfw).TRUE();
+            Channel.IsNSFW || ConfigManager.get(Channel.getInstance(), ConfigManager.NSFW).TRUE();
 
         public static string emotify(this string self)
         {

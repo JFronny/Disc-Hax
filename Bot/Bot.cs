@@ -46,7 +46,6 @@ namespace Bot
             Commands.RegisterCommands<PublicStats>();
             Commands.RegisterConverter(new BoardConv());
             Commands.RegisterConverter(new BooruConv());
-            Commands.RegisterConverter(new ConfigElementConv());
             Commands.RegisterConverter(new CurrencyConv());
             Commands.RegisterConverter(new RPSOptionConv());
             Commands.SetHelpFormatter<HelpFormatter>();

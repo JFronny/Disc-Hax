@@ -54,8 +54,8 @@ namespace Bot.Commands
             TimeSpan duration, [Description("What options should people have.")]
             params DiscordEmoji[] options)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Poll)))
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
+                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
             {
                 await ctx.TriggerTypingAsync();
                 DiscordMessage msg = await ctx.RespondAsync(embed: new DiscordEmbedBuilder
@@ -77,8 +77,8 @@ namespace Bot.Commands
             [Description("Bytes to generate. One byte equals two characters")]
             int bytes, [Description("Time before exiting")] TimeSpan time)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Quicktype)))
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
+                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
             {
                 await ctx.TriggerTypingAsync();
                 InteractivityExtension interactivity = ctx.Client.GetInteractivity();
@@ -100,8 +100,8 @@ namespace Bot.Commands
         public async Task Emotify(CommandContext ctx, [Description("What should be converted")] [RemainingText]
             string text)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Emojify)))
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
+                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsyncFix(text.emotify());
@@ -113,8 +113,8 @@ namespace Bot.Commands
         public async Task PreviewSite(CommandContext ctx, [Description("URL to paginate site from")] [RemainingText]
             Uri URL)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.PreviewSite)))
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
+                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
             {
                 await ctx.TriggerTypingAsync();
                 if (URL.IsLocal())
@@ -141,8 +141,8 @@ namespace Bot.Commands
         public async Task Magic8(CommandContext ctx, [Description("Question to answer")] [RemainingText]
             string question)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Magic8)))
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
+                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
             {
                 await ctx.TriggerTypingAsync();
                 Rectangle size = new Rectangle(0, 0, 400, 400);

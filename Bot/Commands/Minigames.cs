@@ -18,8 +18,8 @@ namespace Bot.Commands
         public async Task Currency(CommandContext ctx, [Description("Input (=Rock/Paper/Scissor)")]
             RPSOptionConv.RPSOption Option)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.RockPaperScissor)))
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
+                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
             {
                 await ctx.TriggerTypingAsync();
                 string output;

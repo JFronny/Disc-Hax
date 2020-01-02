@@ -24,8 +24,8 @@ namespace Bot.Commands
         public async Task Calc(CommandContext ctx, [Description("Equation")] [RemainingText]
             string equation)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Calc)))
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
+                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
             {
                 await ctx.TriggerTypingAsync();
                 Expression ex = new Expression(equation);
@@ -48,8 +48,8 @@ namespace Bot.Commands
             string max, [Description("Equation")] [RemainingText]
             string equation)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Calc)))
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
+                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
             {
                 await ctx.TriggerTypingAsync();
                 string[] parts = equation.Split('=');
@@ -66,8 +66,8 @@ namespace Bot.Commands
         public async Task Graph(CommandContext ctx, [Description("Equation")] [RemainingText]
             string equation)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Graph)))
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
+                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
             {
                 await ctx.TriggerTypingAsync();
                 Bitmap bmp = new Bitmap(200, 200);
@@ -106,8 +106,8 @@ namespace Bot.Commands
             [Description("Output currency in ISO")]
             Currency outCurrency, [Description("Amount to convert")] double amount)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Currency)))
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
+                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(
@@ -118,8 +118,8 @@ namespace Bot.Commands
         [Command("currency")]
         public async Task Currency(CommandContext ctx)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Enabled)
-                .AND(ConfigManager.get(ctx.Channel.getInstance(), ConfigElement.Currency)))
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
+                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondPaginated(string.Join(", ",
