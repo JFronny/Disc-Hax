@@ -145,9 +145,9 @@
             // 
             this.nsfwBox.Anchor =
                 ((System.Windows.Forms.AnchorStyles) ((System.Windows.Forms.AnchorStyles.Bottom |
-                                                       System.Windows.Forms.AnchorStyles.Right)));
+                                                       System.Windows.Forms.AnchorStyles.Left)));
             this.nsfwBox.AutoSize = true;
-            this.nsfwBox.Location = new System.Drawing.Point(16, 355);
+            this.nsfwBox.Location = new System.Drawing.Point(6, 356);
             this.nsfwBox.Name = "nsfwBox";
             this.nsfwBox.Size = new System.Drawing.Size(91, 19);
             this.nsfwBox.TabIndex = 9;

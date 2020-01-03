@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -231,7 +232,15 @@ namespace Bot
         private void debugButton_Click(object sender, EventArgs e)
         {
             if (SelectedChannel != null)
-                MessageBox.Show(this, ConfigManager.getStr(SelectedChannel), "", MessageBoxButtons.OK);
+            {
+                if (SelectBox.Show(new[] {"Open File", "Show"}, "What should we do?") == "Show")
+                    MessageBox.Show(this, ConfigManager.getStr(SelectedChannel), "", MessageBoxButtons.OK);
+                else
+                {
+                    ConfigManager.getXML(SelectedChannel.Id.ToString(), ConfigManager.CHANNEL, out string xmlPath);
+                    Process.Start("notepad", xmlPath);
+                }
+            }
         }
 
         private void SendMessage(string message, BotChannel channel, Action<Task> continuationAction = null)
@@ -311,7 +320,7 @@ namespace Bot
                         if (cfgs[i] != allowedNames[0])
                             allowedVars.AddRange(new[] {"prefix", "guildsBox"});
                         else
-                            allowedVars.AddRange(new[] {"upperType", "upper"});
+                            allowedVars.AddRange(new[] {"upperType", "upper", "Users"});
                         List<XElement> filteredELs =
                             root.Elements().Where(s => allowedVars.Contains(s.Name.LocalName)).ToList();
                         root.RemoveAll();

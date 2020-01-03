@@ -147,6 +147,7 @@
     <Compile Include="Commands\Math.cs" />
     <Compile Include="Commands\Minigames.cs" />
     <Compile Include="Commands\Misc.cs" />
+    <Compile Include="Commands\Money.cs" />
     <Compile Include="Commands\PublicStats.cs" />
     <Compile Include="Commands\Quotes.cs" />
     <Compile Include="Converters\BoardConv.cs" />
