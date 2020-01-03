@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CC_Functions.Misc;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
@@ -15,6 +16,7 @@ using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.EventHandling;
 using Shared;
 using Shared.Config;
+using ImageFormat = System.Drawing.Imaging.ImageFormat;
 
 namespace Bot.Commands
 {
@@ -49,6 +51,7 @@ namespace Bot.Commands
         [Command("poll")]
         [Description(
             "Run a poll with reactions")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Poll(CommandContext ctx, [Description("What to ask")] string text,
             [Description("How long should the poll last.")]
             TimeSpan duration, [Description("What options should people have.")]
@@ -73,6 +76,7 @@ namespace Bot.Commands
 
         [Command("quicktype")]
         [Description("Waits for a response containing a generated code")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task QuickType(CommandContext ctx,
             [Description("Bytes to generate. One byte equals two characters")]
             int bytes, [Description("Time before exiting")] TimeSpan time)
@@ -97,6 +101,7 @@ namespace Bot.Commands
 
         [Command("emotify")]
         [Description("Converts your text to emoticons")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Emotify(CommandContext ctx, [Description("What should be converted")] [RemainingText]
             string text)
         {
@@ -108,8 +113,24 @@ namespace Bot.Commands
             }
         }
 
+        [Command("leetify")]
+        [Aliases("1337ify")]
+        [Description("Leetifies your text")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Leetify(CommandContext ctx, [Description("What should be leetified")] [RemainingText]
+            string text)
+        {
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
+                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            {
+                await ctx.TriggerTypingAsync();
+                await ctx.RespondAsyncFix(text.leetify());
+            }
+        }
+
         [Command("preview")]
         [Description("Paginates a website for preview")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task PreviewSite(CommandContext ctx, [Description("URL to paginate site from")] [RemainingText]
             Uri URL)
         {
@@ -138,6 +159,7 @@ namespace Bot.Commands
 
         [Command("magic8")]
         [Description("The answer to your questions")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Magic8(CommandContext ctx, [Description("Question to answer")] [RemainingText]
             string question)
         {

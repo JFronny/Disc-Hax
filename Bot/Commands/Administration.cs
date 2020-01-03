@@ -3,6 +3,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CC_Functions.Misc;
 using DSharpPlus;
@@ -22,6 +23,7 @@ namespace Bot.Commands
         [Command("ping")]
         [Aliases("pong")]
         [Description("Responds with \"Pong\" if the bot is active")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Ping(CommandContext ctx) =>
             await Ping(ctx.Channel, (c1, c2, c3) => ctx.RespondAsync(c1, c2, c3));
 
@@ -35,6 +37,7 @@ namespace Bot.Commands
         [Command("config")]
         [RequireUserPermissions(Permissions.Administrator)]
         [Description("Prints or changes the DiscHax-instance config")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task ConfigCmd(CommandContext ctx)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
@@ -47,6 +50,7 @@ namespace Bot.Commands
 
         [Command("config")]
         [RequireUserPermissions(Permissions.Administrator)]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task ConfigCmd(CommandContext ctx, [Description("Config element to print")]
             string element)
         {
@@ -62,6 +66,7 @@ namespace Bot.Commands
 
         [Command("config")]
         [RequireUserPermissions(Permissions.Administrator)]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task ConfigCmd(CommandContext ctx, [Description("Config element to change")]
             string element, [Description("New value")] bool value)
         {
@@ -78,6 +83,7 @@ namespace Bot.Commands
 
         [Command("avatar")]
         [Aliases("icon")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Avatar(CommandContext ctx, [Description("User to get icon from")] DiscordUser user)
         {
             await ctx.TriggerTypingAsync();

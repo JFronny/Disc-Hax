@@ -20,6 +20,8 @@ namespace Bot
         private bool busy;
         public bool ChannelDefined;
 
+        public TreeView ChannelTree => channelTree;
+
         private bool recCheck = true;
 
         public MainForm()
@@ -63,7 +65,7 @@ namespace Bot
             chatBox.Enabled = true;
             chatSend.Enabled = true;
             BotGuild[] arr = GuildSingleton.getAll();
-            for (int i = 0; i < arr.Length; i++) AddGuild(arr[i]);
+                for (int i = 0; i < arr.Length; i++) AddGuild(arr[i]);
         }
 
         public Task BotThread { get; set; }
@@ -89,7 +91,9 @@ namespace Bot
                     Text = s.Channel.Name, Tag = s, Checked = ConfigManager.get(s, ConfigManager.ENABLED).TRUE()
                 });
             });
-            channelTree.TopNode.Nodes.Add(node);
+            //if (channelTree.TopNode == null)
+                channelTree.Nodes[0].Nodes.Add(node);
+            //channelTree.TopNode.Nodes.Add(node);
             node.Expand();
             node.ExpandAll();
             channelTree.Nodes[0].Expand();
@@ -140,7 +144,7 @@ namespace Bot
                 }
                 catch (InvalidCastException e1)
                 {
-                    Console.WriteLine(e1.ToString());
+                    Program.Bot.Client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax", "channelTree_AfterSelect: cast failed", DateTime.Now, e1);
                 }
             }
             else
@@ -165,7 +169,7 @@ namespace Bot
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                Program.Bot.Client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax", "updateChecking failed", DateTime.Now, e);
             }
             finally
             {
@@ -226,9 +230,8 @@ namespace Bot
 
         private void debugButton_Click(object sender, EventArgs e)
         {
-            string tmp = ConfigManager.getStr(SelectedChannel);
-            Console.WriteLine(tmp);
-            MessageBox.Show(this, tmp, "", MessageBoxButtons.OK);
+            if (SelectedChannel != null)
+                MessageBox.Show(this, ConfigManager.getStr(SelectedChannel), "", MessageBoxButtons.OK);
         }
 
         private void SendMessage(string message, BotChannel channel, Action<Task> continuationAction = null)
@@ -268,7 +271,8 @@ namespace Bot
                 string[] channels = channelTree.Nodes[0].Nodes.OfType<TreeNode>()
                     .SelectMany(s => s.Nodes.OfType<TreeNode>()).Select(s => ((IBotStruct) s.Tag).Id.ToString())
                     .ToArray();
-                string[] allowedNames = {"common.xml", "keys.secure"};
+                string[] allowedNames = {"common.xml"};
+                cfgs = cfgs.Where(s => Path.GetFileName(s) != "keys.secure").ToArray();
                 for (int i = 0; i < cfgs.Length; i++)
                 {
                     //Clean files
@@ -300,7 +304,7 @@ namespace Bot
                             File.Delete(cfgs[i]);
                     }
                     //Clean contents
-                    if (File.Exists(cfgs[i]) && cfgs[i] != allowedNames[1])
+                    if (File.Exists(cfgs[i]))
                     {
                         XElement root = el.Element("guild") ?? el.Element("channel") ?? el.Element("common");
                         List<string> allowedVars = CommandArr.getC().ToList();
@@ -324,5 +328,7 @@ namespace Bot
             Hide();
             Dispose();
         }
+
+        private void tokenButton_Click(object sender, EventArgs e) => new TokenForm(TokenManager.DiscordToken, TokenManager.CurrencyconverterapiToken).Show();
     }
 }

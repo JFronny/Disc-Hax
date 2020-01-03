@@ -60,7 +60,7 @@ namespace Bot
             if (e.Exception is UnwantedExecutionException)
                 return;
             e.Context.Client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax",
-                $"{e.Context.User.Username} tried executing '{e.Command?.QualifiedName ?? "<unknown command>"}' but it errored: {e.Exception.GetType()}: {e.Exception.Message ?? "<no message>"}",
+                $"{e.Context.User.Username} tried executing '{e.Command?.QualifiedName ?? "<unknown command>"}' but it errored: {e.Exception}",
                 DateTime.Now);
             if (e.Exception is ChecksFailedException ex)
                 await e.Context.RespondAsync(embed: new DiscordEmbedBuilder

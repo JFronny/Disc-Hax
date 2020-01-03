@@ -39,16 +39,12 @@ namespace Shared.Config
             if (!Directory.Exists(Path.GetDirectoryName(containerFile)))
                 Directory.CreateDirectory(Path.GetDirectoryName(containerFile));
             if (!File.Exists(containerFile))
-                SaveXE(new XElement("container",
-                    new XElement("discord", Interaction.InputBox("Please enter your discord Token")),
-                    new XElement("currencyconverterapi",
-                        Interaction.InputBox("Please enter your currencyconverterapi.com Token"))
-                ));
+                new TokenForm("", "", true).ShowDialog();
             byte[] bytes = HID.DecryptLocal(File.ReadAllBytes(containerFile));
             return XElement.Parse(Encoding.UTF8.GetString(bytes));
         }
 
-        private static void SaveXE(XElement el)
+        public static void SaveXE(XElement el)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(el.ToString());
             File.WriteAllBytes(containerFile, HID.EncryptLocal(bytes));

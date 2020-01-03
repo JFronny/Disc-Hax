@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using BooruSharp.Booru;
 using BooruSharp.Search.Post;
@@ -38,6 +39,7 @@ namespace Bot.Commands
         [Command("4chan")]
         [Description(
             "Sends a random image from the board. If no board is specified, a list of boards will be displayed.")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Chan(CommandContext ctx)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
@@ -50,6 +52,7 @@ namespace Bot.Commands
         }
 
         [Command("4chan")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Chan(CommandContext ctx, [Description("Board to select image from")]
             Board board)
         {
@@ -85,6 +88,7 @@ namespace Bot.Commands
 
         [Command("waifu")]
         [Description("Shows you a random waifu from thiswaifudoesnotexist.net")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Waifu(CommandContext ctx)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
@@ -93,6 +97,7 @@ namespace Bot.Commands
         }
 
         [Command("waifu")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Waifu(CommandContext ctx,
             [Description("Set to true to force execution, even on non-NSFW channels")]
             bool forceExecution)
@@ -121,6 +126,7 @@ namespace Bot.Commands
 
         [Command("booru")]
         [Description("Shows a random Image from your favourite *booru. See \"booru\" for a full list")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Booru(CommandContext ctx, [Description("Include questionable content?")]
             bool qcont)
         {
@@ -135,6 +141,7 @@ namespace Bot.Commands
         }
 
         [Command("booru")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Booru(CommandContext ctx, [Description("Booru to select image from")]
             Booru booru,
             [Description("Tags for image selection")]
@@ -169,6 +176,7 @@ namespace Bot.Commands
         }
 
         [Command("booru")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Booru(CommandContext ctx,
             [Description("Tags for image selection")]
             params string[] tags) =>

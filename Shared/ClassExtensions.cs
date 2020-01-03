@@ -136,6 +136,43 @@ namespace Shared
             }).ToArray());
         }
 
+        public static string leetify(this string self)
+        {
+            return string.Join("", self.ToLower().ToCharArray().Select(s =>
+            {
+                return char.ToLower(s) switch
+                {
+                    'a' => "4",
+                    'b' => "8",
+                    'c' => "(",
+                    'd' => "[)",
+                    'e' => "3",
+                    'f' => "|=",
+                    'g' => "9",
+                    'h' => "||",
+                    'i' => "!",
+                    'j' => ".]",
+                    'k' => "|<",
+                    'l' => "1",
+                    'm' => "|Y|",
+                    'n' => "/\\/",
+                    'o' => "0",
+                    'p' => "|>",
+                    'q' => "0,",
+                    'r' => "|2",
+                    's' => "5",
+                    't' => "7",
+                    'u' => "[_]",
+                    'v' => "\\/",
+                    'w' => "\\v/",
+                    'x' => "}{",
+                    'y' => "9",
+                    'z' => "2",
+                    _ => s.ToString()
+                };
+            }).ToArray());
+        }
+
         public static void RemoveAt<T, G>(this Dictionary<T, G> dict, int index) =>
             dict.Remove(dict.Keys.OfType<T>().ToArray()[index]);
 

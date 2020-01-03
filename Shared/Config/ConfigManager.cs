@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using CC_Functions.Misc;
@@ -104,11 +105,17 @@ namespace Shared.Config
             XML.Save(XMLPath);
         }
 
-        public static bool? getMethodEnabled(IBotStruct ID, bool? defaultval = false, int frameN = 2) =>
-            getMethodEnabled(ID.Id.ToString(), ID.getTypeStr(), defaultval, frameN);
+        public static bool? getMethodEnabled(IBotStruct ID, bool? defaultval = false, [CallerMemberName]string method = "") =>
+            getMethodEnabled(ID.Id.ToString(), ID.getTypeStr(), defaultval, method);
 
-        public static bool? getMethodEnabled(string ID, string configType, bool? defaultval = false, int frameN = 1) =>
-            get(ID, CommandComparer.GetName(new StackTrace().GetFrame(1).GetMethod()), configType,
+        private static bool? getMethodEnabled(string ID, string configType, bool? defaultval, string callerName)
+        {
+            string tmp1 = CommandComparer.GetName(callerName);
+            bool? tmp = get(ID, tmp1, configType,
                 defaultval);
+            Console.WriteLine($"CommandComparer.GetName({callerName})={tmp1}");
+            Console.WriteLine($"cfg({callerName})={tmp}");
+            return tmp;
+        }
     }
 }

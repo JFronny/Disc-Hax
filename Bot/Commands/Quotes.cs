@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CC_Functions.Misc;
 using DSharpPlus.CommandsNext;
@@ -69,6 +70,7 @@ namespace Bot.Commands
 
         [Command("fortune")]
         [Description("Spits out a quote")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Fortune(CommandContext ctx)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
@@ -82,6 +84,7 @@ namespace Bot.Commands
 
         [Command("beemovie")]
         [Description("Sends a quote from the bee movie script as TTS")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Bees(CommandContext ctx)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)

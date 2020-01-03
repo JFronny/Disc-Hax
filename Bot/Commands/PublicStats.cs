@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CC_Functions.Misc;
 using DSharpPlus.CommandsNext;
@@ -13,6 +14,7 @@ namespace Bot.Commands
     {
         [Command("about")]
         [Description("Prints out the README file from the repository")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task About(CommandContext ctx)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
@@ -26,6 +28,7 @@ namespace Bot.Commands
 
         [Command("guildcount")]
         [Description("Gets the amount of connected Guilds")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task GuildCount(CommandContext ctx)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
@@ -38,6 +41,7 @@ namespace Bot.Commands
 
         [Command("changelog")]
         [Description("Gets the amount of connected Guilds")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Changelog(CommandContext ctx)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
@@ -51,6 +55,7 @@ namespace Bot.Commands
 
         [Command("invite")]
         [Description("Gets the invite-link")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Invite(CommandContext ctx)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
@@ -65,6 +70,7 @@ namespace Bot.Commands
         [Command("github")]
         [Aliases("website", "contribute", "issue")]
         [Description("Pastes the github link")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Github(CommandContext ctx)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)

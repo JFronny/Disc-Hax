@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Bot.Converters;
 using CC_Functions.Misc;
@@ -10,11 +11,12 @@ using Shared.Config;
 namespace Bot.Commands
 {
     [Group("game")]
-    [Description("Commands for calculating. Also includes money conversion")]
+    [Description("Simple games")]
     public class Minigames : BaseCommandModule
     {
         [Command("rps")]
         [Description("Play Rock-Paper-Scissors")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Currency(CommandContext ctx, [Description("Input (=Rock/Paper/Scissor)")]
             RPSOptionConv.RPSOption Option)
         {

@@ -156,7 +156,7 @@ namespace Bot
             if (form != null)
             {
                 form.SetProperty(x => x.Text, "DiscHax Bot Menu");
-                form.channelTree.InvokeAction(new Action(form.channelTree.Nodes.Clear));
+                form.ChannelTree.InvokeAction(new Action(form.ChannelTree.Nodes.Clear));
                 form.SelectedGuild = default;
                 form.SelectedChannel = default;
             }
@@ -182,7 +182,7 @@ namespace Bot
             foreach (KeyValuePair<ulong, DiscordChannel> channel in e.Guild.Channels)
                 e.Guild.getInstance().Channels.Add(channel.Key, new BotChannel(channel.Value));
             if (form != null && !form.IsDisposed)
-                form.channelTree.InvokeAction(new Action<BotGuild>(form.AddGuild), tmp);
+                form.ChannelTree.InvokeAction(new Action<BotGuild>(form.AddGuild), tmp);
             return Task.CompletedTask;
         }
 
@@ -190,7 +190,7 @@ namespace Bot
         {
             GuildSingleton.Remove(e.Guild.Id);
             if (form != null && !form.IsDisposed)
-                form.channelTree.InvokeAction(new Action<ulong>(form.RemoveGuild), e.Guild.Id);
+                form.ChannelTree.InvokeAction(new Action<ulong>(form.RemoveGuild), e.Guild.Id);
             return Task.CompletedTask;
         }
 
@@ -210,7 +210,7 @@ namespace Bot
         {
             e.Message.Channel.getInstance().Messages.Add(e.Message.Id, new BotMessage(e.Message));
             if (form != null && !form.IsDisposed)
-                form.channelTree.InvokeAction(new Action<BotMessage, BotChannel>(form.AddMessage),
+                form.ChannelTree.InvokeAction(new Action<BotMessage, BotChannel>(form.AddMessage),
                     new BotMessage(e.Message), new BotChannel(e.Channel));
             return Task.CompletedTask;
         }
