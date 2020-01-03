@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using CC_Functions.Misc;
+using DSharpPlus.Entities;
 
 namespace Shared.Config
 {
@@ -13,15 +13,15 @@ namespace Shared.Config
     {
         public delegate void ConfigUpdateEvent(object sender, string ID, string element);
 
-        private static readonly string CHANNEL = "channel";
-        private static readonly string GUILD = "guild";
+        public static readonly string CHANNEL = "channel";
+        public static readonly string GUILD = "guild";
         public static readonly string ENABLED = "enabled";
         public static readonly string NSFW = "nsfw";
 
         public static ConfigUpdateEvent configUpdate;
         private static string getTypeStr(this IBotStruct self) => self.tryCast(out BotGuild guild) ? GUILD : CHANNEL;
 
-        private static XElement getXML(string ID, string ElName, out string XMLPath)
+        public static XElement getXML(string ID, string ElName, out string XMLPath)
         {
             XMLPath = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Cfgs");
             if (!Directory.Exists(XMLPath))
@@ -105,7 +105,8 @@ namespace Shared.Config
             XML.Save(XMLPath);
         }
 
-        public static bool? getMethodEnabled(IBotStruct ID, bool? defaultval = false, [CallerMemberName]string method = "") =>
+        public static bool? getMethodEnabled(IBotStruct ID, bool? defaultval = false,
+            [CallerMemberName] string method = "") =>
             getMethodEnabled(ID.Id.ToString(), ID.getTypeStr(), defaultval, method);
 
         private static bool? getMethodEnabled(string ID, string configType, bool? defaultval, string callerName)
@@ -117,5 +118,30 @@ namespace Shared.Config
             Console.WriteLine($"cfg({callerName})={tmp}");
             return tmp;
         }
+
+        public static decimal getMoney(BotGuild ID, DiscordUser user)
+        {
+            XElement el = getXML(ID.Id.ToString(), CHANNEL, out string XMLPath);
+            if (el.Element("Users") == null)
+                el.Add(new XElement("Users"));
+            if (el.Element("Users").Element("user" + user.Id) == null)
+                el.Element("Users").Add(new XElement("user" + user.Id, ((decimal) 0).ToString()));
+            el.Save(XMLPath);
+            return decimal.Parse(el.Element("Users").Element("user" + user.Id).Value);
+        }
+
+        public static void setMoney(BotGuild ID, DiscordUser user, decimal money)
+        {
+            XElement el = getXML(ID.Id.ToString(), CHANNEL, out string XMLPath);
+            if (el.Element("Users") == null)
+                el.Add(new XElement("Users"));
+            if (el.Element("Users").Element("user" + user.Id) == null)
+                el.Element("Users").Add(new XElement("user" + user.Id));
+            el.Element("Users").Element("user" + user.Id).Value = money.ToString();
+            el.Save(XMLPath);
+        }
+
+        public static void incrementMoney(BotGuild ID, DiscordUser user, decimal amount) =>
+            setMoney(ID, user, getMoney(ID, user) + amount);
     }
 }

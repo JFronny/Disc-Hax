@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Bot.Commands;
 using Bot.Converters;
+using CC_Functions.Misc;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Exceptions;
@@ -42,6 +43,7 @@ namespace Bot
             Commands.RegisterCommands<Minigames>();
             Commands.RegisterCommands<Misc>();
             Commands.RegisterCommands<Math>();
+            Commands.RegisterCommands<Money>();
             Commands.RegisterCommands<Quotes>();
             Commands.RegisterCommands<PublicStats>();
             Commands.RegisterConverter(new BoardConv());
@@ -57,21 +59,24 @@ namespace Bot
 
         private async Task Commands_CommandErrored(CommandErrorEventArgs e)
         {
-            if (e.Exception is UnwantedExecutionException)
-                return;
-            e.Context.Client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax",
-                $"{e.Context.User.Username} tried executing '{e.Command?.QualifiedName ?? "<unknown command>"}' but it errored: {e.Exception}",
-                DateTime.Now);
-            if (e.Exception is ChecksFailedException ex)
-                await e.Context.RespondAsync(embed: new DiscordEmbedBuilder
-                {
-                    Title = "Access denied",
-                    Description =
-                        $"{DiscordEmoji.FromName(e.Context.Client, ":no_entry:")} You do not have the permissions required to execute this command.",
-                    Color = new DiscordColor(0xFF0000)
-                }.Build());
-            else if (!(e.Exception is CommandNotFoundException))
-                await e.Context.RespondAsyncFix($"The command failed: {e.Exception.Message}");
+            if (ConfigManager.get(e.Context.Channel.Id.ToString(), ConfigManager.ENABLED, ConfigManager.CHANNEL).TRUE())
+            {
+                if (e.Exception is UnwantedExecutionException)
+                    return;
+                e.Context.Client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax",
+                    $"{e.Context.User.Username} tried executing '{e.Command?.QualifiedName ?? "<unknown command>"}' but it errored: {e.Exception}",
+                    DateTime.Now);
+                if (e.Exception is ChecksFailedException ex)
+                    await e.Context.RespondAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Title = "Access denied",
+                        Description =
+                            $"{DiscordEmoji.FromName(e.Context.Client, ":no_entry:")} You do not have the permissions required to execute this command.",
+                        Color = new DiscordColor(0xFF0000)
+                    }.Build());
+                else if (!(e.Exception is CommandNotFoundException))
+                    await e.Context.RespondAsyncFix($"The command failed: {e.Exception.Message}");
+            }
         }
 
         private Task Commands_CommandExecuted(CommandExecutionEventArgs e)
