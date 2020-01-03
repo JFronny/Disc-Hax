@@ -22,6 +22,6 @@ namespace Shared
         public static string GetName(MethodBase obj) =>
             GetName(((CommandAttribute) obj.GetCustomAttributes(typeof(CommandAttribute), false)[0]).Name);
 
-        public static string GetName(string obj) => $"method_{obj}".ToLower() .Replace(" ", "");
+        public static string GetName(string obj) => $"method_{obj}".ToLower().Replace(" ", "");
     }
 }

@@ -6,7 +6,8 @@ namespace Shared.Config
 {
     public partial class TokenForm : Form
     {
-        private bool overwriteXML;
+        private readonly bool overwriteXML;
+
         public TokenForm(string DiscordToken, string CurrencyconverterapiToken, bool overwriteXML = false)
         {
             InitializeComponent();

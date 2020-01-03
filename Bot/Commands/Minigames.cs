@@ -113,7 +113,8 @@ namespace Bot.Commands
         [Description("Play Slots.")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Slots(CommandContext ctx, [Description("Amount of coinst to bet")]
-            decimal bet, [Description("Whether to skip the animation")] bool fast)
+            decimal bet, [Description("Whether to skip the animation")]
+            bool fast)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
                 .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
@@ -153,7 +154,7 @@ namespace Bot.Commands
                 if (pool[0] == pool[1] || pool[1] == pool[2])
                 {
                     if (pool[0] != pool[2])
-                        winnings = bet * (decimal)(pool[1] switch
+                        winnings = bet * (decimal) (pool[1] switch
                         {
                             0 => 0.5,
                             1 => 2,
@@ -173,7 +174,7 @@ namespace Bot.Commands
                 }
                 winnings -= bet;
                 await msg.ModifyAsync(
-                    $"| {getSlot(pool[0])} | {getSlot(pool[1])} | {getSlot(pool[2])} |\nYou {(winnings > 0 ? "won" : "lost")} {Abs((double)winnings)} coins.");
+                    $"| {getSlot(pool[0])} | {getSlot(pool[1])} | {getSlot(pool[2])} |\nYou {(winnings > 0 ? "won" : "lost")} {Abs((double) winnings)} coins.");
                 ConfigManager.incrementMoney(ctx.Guild.getInstance(), ctx.User, winnings);
             }
         }

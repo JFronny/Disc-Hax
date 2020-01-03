@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CC_Functions.Misc;
 using DSharpPlus;
@@ -27,24 +26,27 @@ namespace Bot.Commands
                 await ctx.RespondAsync($"You have {ConfigManager.getMoney(ctx.Guild.getInstance(), ctx.User)} coins");
             }
         }
-        
+
         [Command("balance")]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task GetMoney(CommandContext ctx, [Description("User whose balance to get")] DiscordUser user)
+        public async Task GetMoney(CommandContext ctx, [Description("User whose balance to get")]
+            DiscordUser user)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
                 .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync($"{user.Username} has {ConfigManager.getMoney(ctx.Guild.getInstance(), user)} coins");
+                await ctx.RespondAsync(
+                    $"{user.Username} has {ConfigManager.getMoney(ctx.Guild.getInstance(), user)} coins");
             }
         }
-        
+
         [Command("balance")]
         [RequireUserPermissions(Permissions.Administrator)]
         [Description("Sets the money you have/someone has")]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task SetMoney(CommandContext ctx, [Description("User whose balance to set")] DiscordUser user, [Description("New value")] decimal money)
+        public async Task SetMoney(CommandContext ctx, [Description("User whose balance to set")]
+            DiscordUser user, [Description("New value")] decimal money)
         {
             if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
                 .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
@@ -52,7 +54,8 @@ namespace Bot.Commands
                 await ctx.TriggerTypingAsync();
                 decimal original = ConfigManager.getMoney(ctx.Guild.getInstance(), user);
                 ConfigManager.setMoney(ctx.Guild.getInstance(), user, money);
-                await ctx.RespondAsync($"{user.Username} now has {ConfigManager.getMoney(ctx.Guild.getInstance(), user)} coins instead of {original}");
+                await ctx.RespondAsync(
+                    $"{user.Username} now has {ConfigManager.getMoney(ctx.Guild.getInstance(), user)} coins instead of {original}");
             }
         }
     }

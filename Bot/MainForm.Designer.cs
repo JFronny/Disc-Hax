@@ -32,7 +32,7 @@
             System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Guilds");
             System.ComponentModel.ComponentResourceManager resources =
                 new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            this.channelTree = new System.Windows.Forms.TreeView();
+            this.ChannelTree = new System.Windows.Forms.TreeView();
             this.chatBox = new System.Windows.Forms.ListBox();
             this.chatPanel = new System.Windows.Forms.Panel();
             this.chatSend = new System.Windows.Forms.TextBox();
@@ -56,20 +56,20 @@
             // 
             // channelTree
             // 
-            this.channelTree.CheckBoxes = true;
-            this.channelTree.Dock = System.Windows.Forms.DockStyle.Left;
-            this.channelTree.Enabled = false;
-            this.channelTree.Location = new System.Drawing.Point(0, 0);
-            this.channelTree.Name = "channelTree";
+            this.ChannelTree.CheckBoxes = true;
+            this.ChannelTree.Dock = System.Windows.Forms.DockStyle.Left;
+            this.ChannelTree.Enabled = false;
+            this.ChannelTree.Location = new System.Drawing.Point(0, 0);
+            this.ChannelTree.Name = "ChannelTree";
             treeNode1.Name = "Guilds";
             treeNode1.Text = "Guilds";
-            this.channelTree.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {treeNode1});
-            this.channelTree.Size = new System.Drawing.Size(193, 437);
-            this.channelTree.TabIndex = 0;
-            this.channelTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.channelTree_AfterCheck);
-            this.channelTree.AfterCollapse +=
+            this.ChannelTree.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {treeNode1});
+            this.ChannelTree.Size = new System.Drawing.Size(193, 437);
+            this.ChannelTree.TabIndex = 0;
+            this.ChannelTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.channelTree_AfterCheck);
+            this.ChannelTree.AfterCollapse +=
                 new System.Windows.Forms.TreeViewEventHandler(this.channelTree_AfterCollapse);
-            this.channelTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.channelTree_AfterSelect);
+            this.ChannelTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.channelTree_AfterSelect);
             // 
             // chatBox
             // 
@@ -259,7 +259,7 @@
             this.Controls.Add(this.splitter1);
             this.Controls.Add(this.chatPanel);
             this.Controls.Add(this.splitter2);
-            this.Controls.Add(this.channelTree);
+            this.Controls.Add(this.ChannelTree);
             this.Controls.Add(this.settingsPanel);
             this.Icon = ((System.Drawing.Icon) (resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(645, 364);
@@ -292,7 +292,6 @@
         private System.Windows.Forms.Button tokenButton;
         private System.Windows.Forms.Splitter splitter1;
         private System.Windows.Forms.Splitter splitter2;
-        private System.Windows.Forms.TreeView channelTree;
     }
 }
 

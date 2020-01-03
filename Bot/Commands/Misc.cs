@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CC_Functions.Misc;
-using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
@@ -16,7 +16,6 @@ using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.EventHandling;
 using Shared;
 using Shared.Config;
-using ImageFormat = System.Drawing.Imaging.ImageFormat;
 
 namespace Bot.Commands
 {
