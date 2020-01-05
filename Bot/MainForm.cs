@@ -92,9 +92,7 @@ namespace Bot
                     Text = s.Channel.Name, Tag = s, Checked = ConfigManager.get(s, ConfigManager.ENABLED).TRUE()
                 });
             });
-            //if (channelTree.TopNode == null)
             ChannelTree.Nodes[0].Nodes.Add(node);
-            //channelTree.TopNode.Nodes.Add(node);
             node.Expand();
             node.ExpandAll();
             ChannelTree.Nodes[0].Expand();
@@ -135,8 +133,7 @@ namespace Bot
                     ChannelDefined = true;
                     chatBox.Items.Clear();
                     SelectedChannel.Messages.Values.ToList().ForEach(s => chatBox.Items.Add(s));
-                    nsfwBox.Checked = SelectedChannel.Channel.IsNSFW ||
-                                      ConfigManager.get(SelectedChannel, ConfigManager.NSFW).TRUE();
+                    nsfwBox.Checked = SelectedChannel.Channel.IsNSFW || SelectedChannel.getEvaluatedNSFW();
                     settingsBoxes.ForEach(s =>
                         s.Checked = ConfigManager.get(SelectedChannel, (string) s.Tag).TRUE());
                     nsfwBox.Enabled = !SelectedChannel.Channel.IsNSFW;
@@ -242,7 +239,7 @@ namespace Bot
                 else
                 {
                     ConfigManager.getXML(SelectedChannel.Id.ToString(), ConfigManager.CHANNEL, out string xmlPath);
-                    Process.Start("notepad", xmlPath);
+                    Process.Start(xmlPath);
                 }
             }
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -13,10 +14,10 @@ namespace Shared.Config
     {
         public delegate void ConfigUpdateEvent(object sender, string ID, string element);
 
-        public static readonly string CHANNEL = "channel";
-        public static readonly string GUILD = "guild";
-        public static readonly string ENABLED = "enabled";
-        public static readonly string NSFW = "nsfw";
+        public const string CHANNEL = "channel";
+        public const string GUILD = "guild";
+        public const string ENABLED = "enabled";
+        public const string NSFW = "nsfw";
 
         public static ConfigUpdateEvent configUpdate;
         private static string getTypeStr(this IBotStruct self) => self.tryCast(out BotGuild guild) ? GUILD : CHANNEL;
@@ -32,11 +33,11 @@ namespace Shared.Config
             return XElement.Load(XMLPath);
         }
 
-        public static bool? get(IBotStruct ID, string element, bool? defaultVal = false) =>
+        public static bool? get(IBotStruct ID, string element, bool? defaultVal = true) =>
             get(ID.Id.ToString(), element, ID.getTypeStr(), defaultVal);
 
         public static bool? get(string ID, string element, string configType,
-            bool? defaultVal = false)
+            bool? defaultVal = true)
         {
             XElement el = getXML(ID, configType, out _);
             XElement self = el.Element(element.ToLower());
@@ -105,8 +106,10 @@ namespace Shared.Config
             XML.Save(XMLPath);
         }
 
-        public static bool? getMethodEnabled(IBotStruct ID, bool? defaultval = false,
-            [CallerMemberName] string method = "") =>
+        public static bool? getMethodEnabled(IBotStruct ID, bool? defaultval = true,
+            [CallerMemberName] string method = "") => getMethodEnabled_ext(ID, defaultval, method);
+
+        public static bool? getMethodEnabled_ext(IBotStruct ID, bool? defaultval = true, string method = "") =>
             getMethodEnabled(ID.Id.ToString(), ID.getTypeStr(), defaultval, method);
 
         private static bool? getMethodEnabled(string ID, string configType, bool? defaultval, string callerName)
@@ -143,5 +146,8 @@ namespace Shared.Config
 
         public static void incrementMoney(BotGuild ID, DiscordUser user, decimal amount) =>
             setMoney(ID, user, getMoney(ID, user) + amount);
+
+        public static Dictionary<ulong, decimal> getAllMoney(BotGuild ID) => ID.Guild.Members.Where(s => !s.Value.IsBot)
+            .ToDictionary(s => s.Key, s => getMoney(ID, s.Value));
     }
 }

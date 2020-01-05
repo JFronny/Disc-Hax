@@ -103,6 +103,9 @@ namespace Bot
         {
             this.command = command;
             builder.Title = $"{command.QualifiedName} ({(command is CommandGroup ? "Group" : "Command")})";
+            if (ConfigManager
+                .getMethodEnabled_ext(ctx.Channel.getInstance(), method: CommandComparer.GetName(command.Name)).FALSE())
+                builder.Title += " (disabled)";
             if (command.Aliases.Any())
                 builder.AddField("Aliases", string.Join(", ", command.Aliases.Select(s => "`" + s + "`")));
             if (command.Overloads.Any())

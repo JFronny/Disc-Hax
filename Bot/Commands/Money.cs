@@ -1,4 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CC_Functions.Misc;
 using DSharpPlus;
@@ -56,6 +58,24 @@ namespace Bot.Commands
                 ConfigManager.setMoney(ctx.Guild.getInstance(), user, money);
                 await ctx.RespondAsync(
                     $"{user.Username} now has {ConfigManager.getMoney(ctx.Guild.getInstance(), user)} coins instead of {original}");
+            }
+        }
+
+        [Command("scoreboard")]
+        [RequireUserPermissions(Permissions.Administrator)]
+        [Description("Gets the members with the biggest wallet")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Scoreboard(CommandContext ctx)
+        {
+            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
+                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            {
+                await ctx.TriggerTypingAsync();
+                KeyValuePair<ulong, decimal>[] tmp = ConfigManager.getAllMoney(ctx.Guild.getInstance())
+                    .OrderByDescending(s => s.Value).ToArray();
+                tmp = tmp.Length > 10 ? tmp.Where((s, i) => i < 10).ToArray() : tmp;
+                await ctx.RespondAsync(
+                    $"Richest members:\r\n{string.Join("\n", tmp.Select(s => $"{ctx.Guild.Members[s.Key].DisplayName}: {s.Value}"))}");
             }
         }
     }

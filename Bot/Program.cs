@@ -212,8 +212,9 @@ namespace Bot
             if (form != null && !form.IsDisposed)
                 form.ChannelTree.InvokeAction(new Action<BotMessage, BotChannel>(form.AddMessage),
                     new BotMessage(e.Message), new BotChannel(e.Channel));
-            ConfigManager.incrementMoney(e.Guild.getInstance(), e.Author,
-                rnd.Next(0, Math.Max(e.Message.Content.Length / 25, 20)));
+            if (!e.Author.IsBot)
+                ConfigManager.incrementMoney(e.Guild.getInstance(), e.Author,
+                    rnd.Next(0, Math.Max(e.Message.Content.Length / 25, 20)));
             return Task.CompletedTask;
         }
 
