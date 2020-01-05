@@ -123,6 +123,23 @@ namespace Bot
                     Bot.Client.ClientErrored += Bot_ClientErrored;
                     TokenSource = new CancellationTokenSource();
                     BotThread = Task.Run(BotThreadCallback);
+                    new Thread(() =>
+                    {
+                        while (true)
+                            try
+                            {
+                                Thread.Sleep(5000);
+                                if (Bot == null)
+                                    return;
+                                foreach (KeyValuePair<ulong, DiscordGuild> guild in Bot.Client.Guilds)
+                                    guild.Value.getInstance().evalBans();
+                            }
+                            catch (Exception e)
+                            {
+                                Bot.Client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax",
+                                    $"A crash occured in the ban-evaluation Thread: {e}", DateTime.Now, e);
+                            }
+                    }).Start();
                     if (showForm)
                     {
                         form = new MainForm();
@@ -213,7 +230,7 @@ namespace Bot
                 form.ChannelTree.InvokeAction(new Action<BotMessage, BotChannel>(form.AddMessage),
                     new BotMessage(e.Message), new BotChannel(e.Channel));
             if (!e.Author.IsBot)
-                ConfigManager.incrementMoney(e.Guild.getInstance(), e.Author,
+                e.Guild.getInstance().incrementMoney(e.Guild.Members[e.Author.Id],
                     rnd.Next(0, Math.Max(e.Message.Content.Length / 25, 20)));
             return Task.CompletedTask;
         }

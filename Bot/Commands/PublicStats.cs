@@ -9,6 +9,7 @@ using Shared.Config;
 namespace Bot.Commands
 {
     [Group("stat")]
+    [Aliases("s")]
     [Description("Information that is not unique to this server")]
     public class PublicStats : BaseCommandModule
     {
@@ -17,8 +18,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task About(CommandContext ctx)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
-                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondPaginated(HTMLProcessor.ToPlainText(
@@ -31,8 +32,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task GuildCount(CommandContext ctx)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
-                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync($"Currently connected to {GuildSingleton.Count} Guilds");
@@ -44,8 +45,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Changelog(CommandContext ctx)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
-                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsyncFix((await Program.cli.Repository.Commit.GetAll("JFronny", "Disc-Hax"))[0].Commit
@@ -58,8 +59,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Invite(CommandContext ctx)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
-                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(
@@ -73,8 +74,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Github(CommandContext ctx)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
-                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync("Repo Link: https://github.com/JFronny/Disc-Hax");

@@ -42,8 +42,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Chan(CommandContext ctx)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
-                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(
@@ -56,8 +56,8 @@ namespace Bot.Commands
         public async Task Chan(CommandContext ctx, [Description("Board to select image from")]
             Board board)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
-                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (ctx.Channel.getEvaluatedNSFW())
@@ -91,8 +91,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Waifu(CommandContext ctx)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
-                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
                 await Waifu(ctx, false);
         }
 
@@ -102,8 +102,8 @@ namespace Bot.Commands
             [Description("Set to true to force execution, even on non-NSFW channels")]
             bool forceExecution)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
-                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (ctx.Channel.getEvaluatedNSFW() || forceExecution)
@@ -130,8 +130,8 @@ namespace Bot.Commands
         public async Task Booru(CommandContext ctx, [Description("Include questionable content?")]
             bool qcont)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
-                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(qcont
@@ -147,8 +147,8 @@ namespace Bot.Commands
             [Description("Tags for image selection")]
             params string[] tags)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
-                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 SearchResult result = await booru.GetRandomImage(tags);

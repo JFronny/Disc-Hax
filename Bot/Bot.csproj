@@ -144,6 +144,7 @@
     <Compile Include="CommandArr.cs" />
     <Compile Include="Commands\ImageBoards.cs" />
     <Compile Include="Commands\Administration.cs" />
+    <Compile Include="Commands\LocalStats.cs" />
     <Compile Include="Commands\Math.cs" />
     <Compile Include="Commands\Minigames.cs" />
     <Compile Include="Commands\Misc.cs" />

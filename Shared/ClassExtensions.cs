@@ -70,7 +70,7 @@ namespace Shared
         }
 
         public static bool getEvaluatedNSFW(this DiscordChannel Channel) =>
-            Channel.IsNSFW || ConfigManager.get(Channel.getInstance(), ConfigManager.NSFW, false).TRUE();
+            Channel.IsNSFW || Channel.getInstance().get(ConfigManager.NSFW, false).TRUE();
 
         public static bool getEvaluatedNSFW(this BotChannel Channel) => Channel.Channel.getEvaluatedNSFW();
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -17,6 +18,7 @@ using ImageFormat = System.Drawing.Imaging.ImageFormat;
 namespace Bot.Commands
 {
     [Group("admin")]
+    [Aliases("a")]
     [Description("Commands for administration and debugging")]
     public class Administration : BaseCommandModule
     {
@@ -30,7 +32,7 @@ namespace Bot.Commands
         public static async Task Ping(DiscordChannel Channel,
             Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (ConfigManager.get(Channel.getInstance(), ConfigManager.ENABLED).TRUE())
+            if (Channel.getInstance().get(ConfigManager.ENABLED).TRUE())
                 await postMessage($"Pong! ({Program.Bot.Client.Ping}ms)", false, null);
         }
 
@@ -40,11 +42,11 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task ConfigCmd(CommandContext ctx)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
-                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync(ConfigManager.getStr(ctx.Channel.getInstance()));
+                await ctx.RespondAsync(ctx.Channel.getInstance().getStr());
             }
         }
 
@@ -54,13 +56,13 @@ namespace Bot.Commands
         public async Task ConfigCmd(CommandContext ctx, [Description("Config element to print")]
             string element)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
-                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (!CommandArr.getC().Contains(element))
                     throw new ArgumentException($"Element ({element}) not in CommandArr");
-                await ctx.RespondAsync($"{element}: {ConfigManager.get(ctx.Channel.getInstance(), element)}");
+                await ctx.RespondAsync($"{element}: {ctx.Channel.getInstance().get(element)}");
             }
         }
 
@@ -70,19 +72,204 @@ namespace Bot.Commands
         public async Task ConfigCmd(CommandContext ctx, [Description("Config element to change")]
             string element, [Description("New value")] bool value)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
-                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (!CommandArr.getC().Contains(element))
                     throw new ArgumentException($"Element ({element}) not in CommandArr");
-                ConfigManager.set(ctx.Channel.getInstance(), element, value);
+                ctx.Channel.getInstance().set(element, value);
                 await ctx.RespondAsync($"Set {element} to {value}");
+            }
+        }
+
+        [Command("ban")]
+        [RequireUserPermissions(Permissions.BanMembers)]
+        [Description("Bans the selected user")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Ban(CommandContext ctx, DiscordMember member,
+            [Description("Reason for the ban")] [RemainingText]
+            string reason)
+        {
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                await member.BanAsync(reason: reason);
+                await ctx.RespondAsync($"Banned {member.DisplayName}.");
+            }
+        }
+
+        [Command("ban")]
+        [RequireUserPermissions(Permissions.BanMembers)]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Ban(CommandContext ctx, DiscordMember member,
+            [Description("Period of time to ban the member for")]
+            TimeSpan time, [Description("Reason for the ban")] [RemainingText]
+            string reason)
+        {
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                await ctx.Guild.BanMemberAsync(member, reason: $"{reason}\nBanned until {DateTime.Now + time:g}");
+                ctx.Guild.getInstance().addTimedBan(member, time);
+                await ctx.RespondAsync($"Banned {member.DisplayName}.");
+            }
+        }
+
+        [Command("unban")]
+        [RequireUserPermissions(Permissions.BanMembers)]
+        [Description("Unbans the selected user")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Unban(CommandContext ctx, DiscordUser user,
+            [Description("Reason for the unban")] [RemainingText]
+            string reason)
+        {
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                await ctx.Guild.UnbanMemberAsync(user, reason);
+                ctx.Guild.getInstance().unbanUserIfBanned(user.Id);
+                await ctx.RespondAsync($"Unbanned {user.Username}.");
+            }
+        }
+
+        [Command("bans")]
+        [RequireUserPermissions(Permissions.BanMembers)]
+        [Description("Lists all banned users")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Bans(CommandContext ctx)
+        {
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                IEnumerable<string> bans = (await ctx.Guild.GetBansAsync())
+                    .Select(s =>
+                        $"User: {s.User.Username}\nReason: {s.Reason}\nTimed: {(ctx.Guild.getInstance().isUserTimeBanned(s.User.Id) ? $"Yes, {ctx.Guild.getInstance().getBanTimeLeft(s.User.Id):g} left" : "No")}");
+                await ctx.RespondPaginated($"Banned Users:\n{string.Join("\n\n", bans)}");
+            }
+        }
+
+        [Command("softban")]
+        [RequireUserPermissions(Permissions.BanMembers)]
+        [Description("Kicks the member and deletes their messages")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Softban(CommandContext ctx, [Description("Member to softban")] DiscordMember member,
+            [Description("Reason for the softban")] [RemainingText]
+            string reason)
+        {
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                await member.BanAsync(7, reason);
+                await member.UnbanAsync();
+                await ctx.RespondAsync($"Softbanned {member.Username}.");
+            }
+        }
+
+        [Command("kick")]
+        [RequireUserPermissions(Permissions.KickMembers)]
+        [Description("Kicks the member")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Kick(CommandContext ctx, [Description("Member to softban")] DiscordMember member,
+            [Description("Reason for the softban")] [RemainingText]
+            string reason)
+        {
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                await member.RemoveAsync(reason);
+                await ctx.RespondAsync($"Kicked {member.Username}.");
+            }
+        }
+
+        [Command("nick")]
+        [Description("Gives the member a new nickname")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Nick(CommandContext ctx, [Description("New nickname")] string Nickname,
+            [Description("Member to softban")] DiscordMember member = null)
+        {
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                if (member == null)
+                    member = ctx.Member;
+                Permissions userPer = ctx.Member.PermissionsIn(ctx.Channel);
+                if ((member.Id == ctx.Member.Id && userPer.HasPermission(Permissions.ChangeNickname)) ||
+                    userPer.HasPermission(Permissions.ManageNicknames))
+                {
+                    await member.ModifyAsync(s => s.Nickname = Nickname);
+                    await ctx.RespondAsync($"Set the nickname of {member.Username} to {Nickname}.");
+                }
+                else
+                {
+                    throw new Exception("I cannot allow you to do that.");
+                }
+            }
+        }
+
+        [Command("mute")]
+        [RequireUserPermissions(Permissions.MuteMembers)]
+        [Description("(Un)Mutes the member")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Mute(CommandContext ctx, [Description("Member to (Un)Mute")] DiscordMember member,
+            [Description("Set to \"true\" to mute, false to undo")] bool mute,
+            [Description("Reason for the (Un)Mute")] [RemainingText] string reason)
+        {
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                await member.SetMuteAsync(mute, reason);
+                await ctx.RespondAsync($"{(mute ? "Muted" : "Unmuted")} {member.Username}.");
+            }
+        }
+
+        [Command("deaf")]
+        [RequireUserPermissions(Permissions.DeafenMembers)]
+        [Description("(Un)Deafen the member")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Deaf(CommandContext ctx, [Description("Member to (Un)Deafen")] DiscordMember member,
+            [Description("Set to \"true\" to deafen, false to undo")] bool deafen,
+            [Description("Reason for the (Un)Deafen")] [RemainingText] string reason)
+        {
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                await member.SetDeafAsync(deafen, reason);
+                await ctx.RespondAsync($"{(deafen ? "Deafened" : "Undeafened")} {member.Username}.");
+            }
+        }
+
+        [Command("cooldown")]
+        [RequireUserPermissions(Permissions.DeafenMembers)]
+        [Description("Sets a custom cooldown for this channel")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Cooldown(CommandContext ctx, int cooldown)
+        {
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            {
+                if (cooldown <= 21600 && cooldown >= 0)
+                {
+                    await ctx.Channel.ModifyAsync(x => x.PerUserRateLimit = cooldown);
+                    await ctx.RespondAsync($"Set cooldown to {cooldown} seconds.");
+                    return;
+                }
+                await ctx.RespondAsync($"Invalid cooldown: {cooldown}");
             }
         }
 
         [Command("avatar")]
         [Aliases("icon")]
+        [Description("Gets the avatar of the specified user")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Avatar(CommandContext ctx, [Description("User to get icon from")] DiscordUser user)
         {
@@ -94,6 +281,22 @@ namespace Bot.Commands
             ms.Position = 0;
             await ctx.RespondWithFileAsync("avatar.jpg", ms, $"Avatar of {user.Username}");
             wc.Dispose();
+        }
+
+        [Command("sudo")]
+        [Aliases("s")]
+        [Hidden]
+        [RequireOwner]
+        public async Task SudoAsync(CommandContext ctx, [Description("Member to sudo")]DiscordMember m, [Description("Command to sudo"), RemainingText]string command)
+        {
+            await ctx.TriggerTypingAsync();
+            if (ctx.Client.CurrentApplication.Owners.All(x => x.Id != ctx.User.Id))
+            {
+                await ctx.RespondAsync("You do not have permission to use this command!");
+                return;
+            }
+            await ctx.CommandsNext.ExecuteCommandAsync(ctx.CommandsNext.CreateFakeContext(m, ctx.Channel, command,
+                Common.prefix, ctx.CommandsNext.FindCommand(command, out string _)));
         }
     }
 }

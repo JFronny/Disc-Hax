@@ -14,6 +14,7 @@ using Shared.Config;
 namespace Bot.Commands
 {
     [Group("quote")]
+    [Aliases("q")]
     [Description("Random pieces of text from various sources")]
     public class Quotes : BaseCommandModule
     {
@@ -73,8 +74,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Fortune(CommandContext ctx)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
-                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 string[] quotes = ctx.Channel.getEvaluatedNSFW() ? fortunequotes_off : fortunequotes;
@@ -87,8 +88,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Bees(CommandContext ctx)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
-                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 int q = Program.rnd.Next(_beequotes.Length - 2);

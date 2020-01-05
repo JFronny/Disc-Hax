@@ -103,8 +103,8 @@ namespace Bot
         {
             this.command = command;
             builder.Title = $"{command.QualifiedName} ({(command is CommandGroup ? "Group" : "Command")})";
-            if (ConfigManager
-                .getMethodEnabled_ext(ctx.Channel.getInstance(), method: CommandComparer.GetName(command.Name)).FALSE())
+            if (ctx.Channel.getInstance()
+                .getMethodEnabled_ext(method: CommandComparer.GetName(command.Name)).FALSE())
                 builder.Title += " (disabled)";
             if (command.Aliases.Any())
                 builder.AddField("Aliases", string.Join(", ", command.Aliases.Select(s => "`" + s + "`")));
@@ -149,7 +149,7 @@ namespace Bot
 
         public override CommandHelpMessage Build()
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED).TRUE())
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED).TRUE())
             {
                 if (command == null)
                     builder.AddField("Notes",

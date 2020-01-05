@@ -40,6 +40,7 @@ namespace Bot
             _ = Client.UseVoiceNext(new VoiceNextConfiguration());
             Commands.RegisterCommands<ImageBoards>();
             Commands.RegisterCommands<Administration>();
+            Commands.RegisterCommands<LocalStats>();
             Commands.RegisterCommands<Minigames>();
             Commands.RegisterCommands<Misc>();
             Commands.RegisterCommands<Math>();

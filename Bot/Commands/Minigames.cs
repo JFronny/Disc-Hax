@@ -14,6 +14,7 @@ using static System.Math;
 namespace Bot.Commands
 {
     [Group("game")]
+    [Aliases("g")]
     [Description("Simple games")]
     public class Minigames : BaseCommandModule
     {
@@ -23,8 +24,8 @@ namespace Bot.Commands
         public async Task RPS(CommandContext ctx, [Description("Input (=Rock/Paper/Scissor)")]
             RPSOptionConv.RPSOption Option)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
-                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 string output;
@@ -52,11 +53,11 @@ namespace Bot.Commands
             RPSOptionConv.RPSOption Option, [Description("Amount of coinst to bet")]
             decimal bet)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
-                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                if (bet > ConfigManager.getMoney(ctx.Guild.getInstance(), ctx.User) || bet < 0)
+                if (bet > ctx.Guild.getInstance().getMoney(ctx.Member) || bet < 0)
                 {
                     await ctx.RespondAsync("You don't have that much");
                     return;
@@ -76,7 +77,7 @@ namespace Bot.Commands
                     _ => throw new Exception($"This should not happen! (diff={diff})")
                 };
                 output += " won";
-                ConfigManager.incrementMoney(ctx.Guild.getInstance(), ctx.User, -bet * diff);
+                ctx.Guild.getInstance().incrementMoney(ctx.Member, -bet * diff);
                 await ctx.RespondAsync(output);
             }
         }
@@ -86,8 +87,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Slots(CommandContext ctx)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
-                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(@":first_place::first_place::grey_question: - 0.5x
@@ -116,11 +117,11 @@ namespace Bot.Commands
             decimal bet, [Description("Whether to skip the animation")]
             bool fast)
         {
-            if (ConfigManager.get(ctx.Channel.getInstance(), ConfigManager.ENABLED)
-                .AND(ConfigManager.getMethodEnabled(ctx.Channel.getInstance())))
+            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getInstance().getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                if (bet > ConfigManager.getMoney(ctx.Guild.getInstance(), ctx.User) || bet < 0)
+                if (bet > ctx.Guild.getInstance().getMoney(ctx.Member) || bet < 0)
                 {
                     await ctx.RespondAsync("You don't have that much");
                     return;
@@ -175,7 +176,7 @@ namespace Bot.Commands
                 winnings -= bet;
                 await msg.ModifyAsync(
                     $"| {getSlot(pool[0])} | {getSlot(pool[1])} | {getSlot(pool[2])} |\nYou {(winnings > 0 ? "won" : "lost")} {Abs((double) winnings)} coins.");
-                ConfigManager.incrementMoney(ctx.Guild.getInstance(), ctx.User, winnings);
+                ctx.Guild.getInstance().incrementMoney(ctx.Member, winnings);
             }
         }
 
