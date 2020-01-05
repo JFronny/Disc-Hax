@@ -74,8 +74,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Fortune(CommandContext ctx)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 string[] quotes = ctx.Channel.getEvaluatedNSFW() ? fortunequotes_off : fortunequotes;
@@ -88,8 +88,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Bees(CommandContext ctx)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 int q = Program.rnd.Next(_beequotes.Length - 2);

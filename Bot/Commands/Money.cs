@@ -22,11 +22,11 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task GetMoney(CommandContext ctx)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync($"You have {ctx.Guild.getInstance().getMoney(ctx.Member)} coins");
+                await ctx.RespondAsync($"You have {ctx.Guild.getMoney(ctx.Member)} coins");
             }
         }
 
@@ -35,12 +35,12 @@ namespace Bot.Commands
         public async Task GetMoney(CommandContext ctx, [Description("User whose balance to get")]
             DiscordMember user)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(
-                    $"{user.Username} has {ctx.Guild.getInstance().getMoney(user)} coins");
+                    $"{user.Username} has {ctx.Guild.getMoney(user)} coins");
             }
         }
 
@@ -51,14 +51,14 @@ namespace Bot.Commands
         public async Task SetMoney(CommandContext ctx, [Description("User whose balance to set")]
             DiscordMember user, [Description("New value")] decimal money)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                decimal original = ctx.Guild.getInstance().getMoney(user);
-                ctx.Guild.getInstance().setMoney(user, money);
+                decimal original = ctx.Guild.getMoney(user);
+                ctx.Guild.setMoney(user, money);
                 await ctx.RespondAsync(
-                    $"{user.Username} now has {ctx.Guild.getInstance().getMoney(user)} coins instead of {original}");
+                    $"{user.Username} now has {ctx.Guild.getMoney(user)} coins instead of {original}");
             }
         }
 
@@ -68,11 +68,11 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Scoreboard(CommandContext ctx)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                KeyValuePair<ulong, decimal>[] tmp = ctx.Guild.getInstance().getAllMoney()
+                KeyValuePair<ulong, decimal>[] tmp = ctx.Guild.getAllMoney()
                     .OrderByDescending(s => s.Value).ToArray();
                 tmp = tmp.Length > 10 ? tmp.Where((s, i) => i < 10).ToArray() : tmp;
                 await ctx.RespondAsync(
@@ -86,17 +86,17 @@ namespace Bot.Commands
         public async Task GiveMoney(CommandContext ctx, [Description("User to give money to")]
             DiscordMember user, [Description("Money to give")] decimal money)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                if (money > ctx.Guild.getInstance().getMoney(ctx.Member) || money < 0)
+                if (money > ctx.Guild.getMoney(ctx.Member) || money < 0)
                 {
                     await ctx.RespondAsync("You don't have that much");
                     return;
                 }
-                ctx.Guild.getInstance().incrementMoney(user, money);
-                ctx.Guild.getInstance().incrementMoney(ctx.Member, -money);
+                ctx.Guild.incrementMoney(user, money);
+                ctx.Guild.incrementMoney(ctx.Member, -money);
                 await ctx.RespondAsync($"Gave {user.Username} {money} coins.");
             }
         }

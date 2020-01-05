@@ -19,13 +19,7 @@ namespace Shared
     public delegate void SetPropertyDelegate<TCtl, TProp>(TCtl control, Expression<Func<TCtl, TProp>> propexpr,
         TProp value) where TCtl : Control;
 
-    public delegate TProp GetPropertyDelegate<TCtl, TProp>(TCtl control, Expression<Func<TProp>> propexpr)
-        where TCtl : Control;
-
     public delegate void InvokeActionDelegate<TCtl>(TCtl control, Delegate dlg, params object[] args)
-        where TCtl : Control;
-
-    public delegate TResult InvokeFuncDelegate<TCtl, TResult>(TCtl control, Delegate dlg, params object[] args)
         where TCtl : Control;
 
     public static class ClassExtensions
@@ -70,9 +64,7 @@ namespace Shared
         }
 
         public static bool getEvaluatedNSFW(this DiscordChannel Channel) =>
-            Channel.IsNSFW || Channel.getInstance().get(ConfigManager.NSFW, false).TRUE();
-
-        public static bool getEvaluatedNSFW(this BotChannel Channel) => Channel.Channel.getEvaluatedNSFW();
+            Channel.IsNSFW || Channel.get(ConfigManager.NSFW, false).TRUE();
 
         public static string emotify(this string self)
         {
@@ -144,9 +136,6 @@ namespace Shared
             }).ToArray());
         }
 
-        public static void RemoveAt<T, G>(this Dictionary<T, G> dict, int index) =>
-            dict.Remove(dict.Keys.OfType<T>().ToArray()[index]);
-
         public static Task RespondPaginated(this CommandContext ctx, string message)
         {
             InteractivityExtension interactivity = ctx.Client.GetInteractivity();
@@ -165,5 +154,7 @@ namespace Shared
             return Dns.GetHostAddresses(self.Host).Count(host => IPAddress.IsLoopback(host) || local.Contains(host)) >
                    0;
         }
+
+        public static string GetString(this DiscordMessage msg) => $"<{(msg.Author.IsCurrent ? "SELF>" : msg.Author.IsBot ? $"BOT>[{msg.Author.Username}]" : $"USER>[{msg.Author.Username}]")}{msg.Content}";
     }
 }

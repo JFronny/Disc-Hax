@@ -22,7 +22,6 @@ namespace Shared.Config
         public const string BANS = "Bans";
 
         public static ConfigUpdateEvent configUpdate;
-        private static string getTypeStr(this IBotStruct self) => self.tryCast(out BotGuild guild) ? GUILD : CHANNEL;
 
         public static XElement getXML(string ID, string ElName, out string XMLPath)
         {
@@ -42,8 +41,11 @@ namespace Shared.Config
             }
         }
 
-        public static bool? get(this IBotStruct ID, string element, bool? defaultVal = true) =>
-            get(ID.Id.ToString(), element, ID.getTypeStr(), defaultVal);
+        public static bool? get(this DiscordGuild ID, string element, bool? defaultVal = true) =>
+            get(ID.Id.ToString(), element, GUILD, defaultVal);
+
+        public static bool? get(this DiscordChannel ID, string element, bool? defaultVal = true) =>
+            get(ID.Id.ToString(), element, CHANNEL, defaultVal);
 
         public static bool? get(string ID, string element, string configType,
             bool? defaultVal = true)
@@ -66,20 +68,21 @@ namespace Shared.Config
             return GenericExtensions.ParseBool(self.Value);
         }
 
-        public static string getStr(this IBotStruct ID) => getStr(ID.Id.ToString(), ID.getTypeStr());
+        public static string getStr(this DiscordChannel ID) => getStr(ID.Id.ToString(), CHANNEL);
+        public static string getStr(this DiscordGuild ID) => getStr(ID.Id.ToString(), GUILD);
 
         public static string getStr(string ID, string configType) => string.Join("\r\n",
             getXML(ID, configType, out _).Elements()
                 .Where(s => !string.IsNullOrWhiteSpace(s.Value) && s.Value.Length <= 5)
                 .Select(s => $"{s.Name}: {s.Value}"));
 
-        public static void set(this BotChannel channel, string element, bool? val, bool disableFormChecks = false)
+        public static void set(this DiscordChannel channel, string element, bool? val, bool disableFormChecks = false)
         {
             set(channel.Id.ToString(), element, val, disableFormChecks, CHANNEL,
-                new[] {new ValueTuple<string, string>(channel.Channel.GuildId.ToString(), GUILD)});
+                new[] {new ValueTuple<string, string>(channel.GuildId.ToString(), GUILD)});
         }
 
-        public static void set(this BotGuild guild, string element, bool? val, bool disableFormChecks = false)
+        public static void set(this DiscordGuild guild, string element, bool? val, bool disableFormChecks = false)
         {
             set(guild.Id.ToString(), element, val, disableFormChecks, GUILD,
                 new[] {new ValueTuple<string, string>("common", "common")});
@@ -115,11 +118,11 @@ namespace Shared.Config
             XML.Save(XMLPath);
         }
 
-        public static bool? getMethodEnabled(this IBotStruct ID, bool? defaultval = true,
+        public static bool? getMethodEnabled(this DiscordChannel ID, bool? defaultval = true,
             [CallerMemberName] string method = "") => getMethodEnabled_ext(ID, defaultval, method);
 
-        public static bool? getMethodEnabled_ext(this IBotStruct ID, bool? defaultval = true, string method = "") =>
-            getMethodEnabled(ID.Id.ToString(), ID.getTypeStr(), defaultval, method);
+        public static bool? getMethodEnabled_ext(this DiscordChannel ID, bool? defaultval = true, string method = "") =>
+            getMethodEnabled(ID.Id.ToString(), CHANNEL, defaultval, method);
 
         private static bool? getMethodEnabled(string ID, string configType, bool? defaultval, string callerName)
         {
@@ -131,7 +134,7 @@ namespace Shared.Config
             return tmp;
         }
 
-        public static decimal getMoney(this BotGuild ID, DiscordMember user)
+        public static decimal getMoney(this DiscordGuild ID, DiscordMember user)
         {
             XElement el = getXML(ID.Id.ToString(), GUILD, out string XMLPath);
             if (el.Element(USERS) == null)
@@ -142,7 +145,7 @@ namespace Shared.Config
             return decimal.Parse(el.Element(USERS).Element("user" + user.Id).Value);
         }
 
-        public static void setMoney(this BotGuild ID, DiscordMember user, decimal money)
+        public static void setMoney(this DiscordGuild ID, DiscordMember user, decimal money)
         {
             XElement el = getXML(ID.Id.ToString(), GUILD, out string XMLPath);
             if (el.Element(USERS) == null)
@@ -153,16 +156,16 @@ namespace Shared.Config
             el.Save(XMLPath);
         }
 
-        public static void incrementMoney(this BotGuild ID, DiscordMember user, decimal amount) =>
+        public static void incrementMoney(this DiscordGuild ID, DiscordMember user, decimal amount) =>
             setMoney(ID, user, getMoney(ID, user) + amount);
 
-        public static Dictionary<ulong, decimal> getAllMoney(this BotGuild ID)
+        public static Dictionary<ulong, decimal> getAllMoney(this DiscordGuild ID)
         {
-            return ID.Guild.Members.Where(s => !s.Value.IsBot && ID.Guild.Members.ContainsKey(s.Key))
+            return ID.Members.Where(s => !s.Value.IsBot && ID.Members.ContainsKey(s.Key))
                 .ToDictionary(s => s.Key, s => getMoney(ID, s.Value));
         }
 
-        public static void addTimedBan(this BotGuild ID, DiscordMember user, TimeSpan span)
+        public static void addTimedBan(this DiscordGuild ID, DiscordMember user, TimeSpan span)
         {
             XElement el = getXML(ID.Id.ToString(), GUILD, out string XMLPath);
             if (el.Element(BANS) == null)
@@ -175,7 +178,7 @@ namespace Shared.Config
             el.Save(XMLPath);
         }
 
-        public static void evalBans(this BotGuild ID)
+        public static void evalBans(this DiscordGuild ID)
         {
             XElement el = getXML(ID.Id.ToString(), GUILD, out string XMLPath);
             if (el.Element(BANS) == null)
@@ -185,21 +188,21 @@ namespace Shared.Config
                     ulong.Parse(s.Name.LocalName.Replace("user", "")),
                     DateTime.Parse(s.Value))))
             {
-                if (ID.Guild.GetBansAsync().GetAwaiter().GetResult().Count(s => s.User.Id == v.Key) == 0)
+                if (ID.GetBansAsync().GetAwaiter().GetResult().Count(s => s.User.Id == v.Key) == 0)
                 {
                     el.Element(BANS).Element("user" + v.Key).Remove();
                     continue;
                 }
                 if (v.Value <= DateTime.Now)
                 {
-                    ID.Guild.UnbanMemberAsync(v.Key, "Timed ban timed out");
+                    ID.UnbanMemberAsync(v.Key, "Timed ban timed out");
                     el.Element(BANS).Element("user" + v.Key).Remove();
                 }
             }
             el.Save(XMLPath);
         }
 
-        public static bool isUserTimeBanned(this BotGuild ID, ulong User)
+        public static bool isUserTimeBanned(this DiscordGuild ID, ulong User)
         {
             XElement el = getXML(ID.Id.ToString(), GUILD, out string XMLPath);
             if (el.Element(BANS) == null)
@@ -209,7 +212,7 @@ namespace Shared.Config
             return output;
         }
 
-        public static TimeSpan getBanTimeLeft(this BotGuild ID, ulong User)
+        public static TimeSpan getBanTimeLeft(this DiscordGuild ID, ulong User)
         {
             XElement el = getXML(ID.Id.ToString(), GUILD, out string XMLPath);
             if (el.Element(BANS) == null)
@@ -221,7 +224,7 @@ namespace Shared.Config
             return output;
         }
 
-        public static void unbanUserIfBanned(this BotGuild ID, ulong User)
+        public static void unbanUserIfBanned(this DiscordGuild ID, ulong User)
         {
             XElement el = getXML(ID.Id.ToString(), GUILD, out string XMLPath);
             if (el.Element(BANS) == null)

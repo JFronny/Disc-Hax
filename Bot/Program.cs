@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -132,7 +133,7 @@ namespace Bot
                                 if (Bot == null)
                                     return;
                                 foreach (KeyValuePair<ulong, DiscordGuild> guild in Bot.Client.Guilds)
-                                    guild.Value.getInstance().evalBans();
+                                    guild.Value.evalBans();
                             }
                             catch (Exception e)
                             {
@@ -195,51 +196,34 @@ namespace Bot
 
         private static Task AddGuild(GuildCreateEventArgs e)
         {
-            BotGuild tmp = GuildSingleton.Add(e.Guild);
-            foreach (KeyValuePair<ulong, DiscordChannel> channel in e.Guild.Channels)
-                e.Guild.getInstance().Channels.Add(channel.Key, new BotChannel(channel.Value));
             if (form != null && !form.IsDisposed)
-                form.ChannelTree.InvokeAction(new Action<BotGuild>(form.AddGuild), tmp);
+                form.ChannelTree.InvokeAction(new Action<DiscordGuild>(form.AddGuild), e.Guild);
             return Task.CompletedTask;
         }
 
         private static Task RemoveGuild(GuildDeleteEventArgs e)
         {
-            GuildSingleton.Remove(e.Guild.Id);
             if (form != null && !form.IsDisposed)
                 form.ChannelTree.InvokeAction(new Action<ulong>(form.RemoveGuild), e.Guild.Id);
             return Task.CompletedTask;
         }
 
-        private static Task AddChannel(ChannelCreateEventArgs e)
-        {
-            e.Guild.getInstance().Channels.Add(e.Channel.Id, new BotChannel(e.Channel));
-            return Task.CompletedTask;
-        }
+        private static Task AddChannel(ChannelCreateEventArgs e) => Task.CompletedTask;
 
-        private static Task RemoveChannel(ChannelDeleteEventArgs e)
-        {
-            e.Guild.getInstance().Channels.Remove(e.Channel.Id);
-            return Task.CompletedTask;
-        }
+        private static Task RemoveChannel(ChannelDeleteEventArgs e) => Task.CompletedTask;
 
         private static Task AddMessage(MessageCreateEventArgs e)
         {
-            e.Message.Channel.getInstance().Messages.Add(e.Message.Id, new BotMessage(e.Message));
             if (form != null && !form.IsDisposed)
-                form.ChannelTree.InvokeAction(new Action<BotMessage, BotChannel>(form.AddMessage),
-                    new BotMessage(e.Message), new BotChannel(e.Channel));
+                form.ChannelTree.InvokeAction(new Action<DiscordMessage, DiscordChannel>(form.AddMessage),
+                    e.Message, e.Channel);
             if (!e.Author.IsBot)
-                e.Guild.getInstance().incrementMoney(e.Guild.Members[e.Author.Id],
+                e.Guild.incrementMoney(e.Guild.Members[e.Author.Id],
                     rnd.Next(0, Math.Max(e.Message.Content.Length / 25, 20)));
             return Task.CompletedTask;
         }
 
-        private static Task RemoveMessage(MessageDeleteEventArgs e)
-        {
-            e.Channel.getInstance().Messages.Remove(e.Message.Id);
-            return Task.CompletedTask;
-        }
+        private static Task RemoveMessage(MessageDeleteEventArgs e) => Task.CompletedTask;
 
         private static Task Bot_ClientErrored(ClientErrorEventArgs e)
         {

@@ -10,6 +10,7 @@ using System.Xml.Linq;
 using Bot.Commands;
 using CC_Functions.Misc;
 using DSharpPlus;
+using DSharpPlus.Entities;
 using Shared;
 using Shared.Config;
 
@@ -35,7 +36,7 @@ namespace Bot
                         channelTree_AfterSelect(null, new TreeViewEventArgs(
                             ChannelTree.Nodes[0].Nodes.OfType<TreeNode>()
                                 .SelectMany(s => s.Nodes.OfType<TreeNode>())
-                                .First(s => ((BotChannel) s.Tag).Id == q)));
+                                .First(s => ((DiscordChannel) s.Tag).Id == q)));
                     });
                 if (element == ConfigManager.ENABLED)
                     ClassExtensions.InvokeAction(this, (MethodInvoker) delegate { updateChecking(); });
@@ -52,7 +53,7 @@ namespace Bot
                 box.CheckStateChanged += (sender, e) =>
                 {
                     GenericExtensions.runIf(ChannelDefined,
-                        () => SelectedChannel.Channel.getInstance().set((string) box.Tag,
+                        () => SelectedChannel.set((string) box.Tag,
                             box.Checked,
                             true));
                 };
@@ -63,8 +64,9 @@ namespace Bot
             ChannelTree.Enabled = true;
             chatBox.Enabled = true;
             chatSend.Enabled = true;
-            BotGuild[] arr = GuildSingleton.getAll();
-            for (int i = 0; i < arr.Length; i++) AddGuild(arr[i]);
+            DiscordGuild[] arr = Program.Bot.Client.Guilds.Values.ToArray();
+            for (int i = 0; i < arr.Length; i++)
+                AddGuild(arr[i]);
         }
 
         public TreeView ChannelTree { get; private set; }
@@ -72,24 +74,24 @@ namespace Bot
         public Task BotThread { get; set; }
         public Bot Bot { get; set; }
         public CancellationTokenSource TokenSource { get; set; }
-        public BotGuild SelectedGuild { get; set; }
-        public BotChannel SelectedChannel { get; set; }
+        public DiscordGuild SelectedGuild { get; set; }
+        public DiscordChannel SelectedChannel { get; set; }
 
-        public void AddGuild(BotGuild gld)
+        public void AddGuild(DiscordGuild gld)
         {
             TreeNode node = new TreeNode
             {
-                Text = gld.Guild.Name,
+                Text = gld.Name,
                 Tag = gld,
                 Checked = gld.get(ConfigManager.ENABLED).TRUE()
             };
-            IEnumerable<BotChannel> chns = gld.Guild.Channels.Where(xc => xc.Value.Type == ChannelType.Text)
-                .OrderBy(xc => xc.Value.Position).Select(xc => xc.Value.getInstance());
+            IEnumerable<DiscordChannel> chns = gld.Channels.Where(xc => xc.Value.Type == ChannelType.Text)
+                .OrderBy(xc => xc.Value.Position).Select(xc => xc.Value);
             chns.ToList().ForEach(s =>
             {
                 node.Nodes.Add(new TreeNode
                 {
-                    Text = s.Channel.Name, Tag = s, Checked = s.get(ConfigManager.ENABLED).TRUE()
+                    Text = s.Name, Tag = s, Checked = s.get(ConfigManager.ENABLED).TRUE()
                 });
             });
             ChannelTree.Nodes[0].Nodes.Add(node);
@@ -101,15 +103,15 @@ namespace Bot
 
         public void RemoveGuild(ulong id)
         {
-            ChannelTree.TopNode.Nodes.OfType<TreeNode>().Where(s => ((BotGuild) s.Tag).Id == id).ToList()
+            ChannelTree.TopNode.Nodes.OfType<TreeNode>().Where(s => ((DiscordGuild) s.Tag).Id == id).ToList()
                 .ForEach(s => ChannelTree.Nodes.Remove(s));
         }
 
-        public void AddMessage(BotMessage msg, BotChannel channel)
+        public void AddMessage(DiscordMessage msg, DiscordChannel channel)
         {
             try
             {
-                string logMsg = msg.Message.getInstance().ToString();
+                string logMsg = msg.GetString();
                 if (ChannelDefined && channel.Id == SelectedChannel.Id)
                 {
                     chatBox.Items.Add(logMsg);
@@ -122,22 +124,22 @@ namespace Bot
             }
         }
 
-        public void channelTree_AfterSelect(object sender, TreeViewEventArgs e)
+        public async void channelTree_AfterSelect(object sender, TreeViewEventArgs e)
         {
             if (e.Node != null && e.Node.Tag != null && e.Node.Parent != null && e.Node.Parent.Tag != null)
             {
                 try
                 {
-                    SelectedGuild = (BotGuild) e.Node.Parent.Tag;
-                    SelectedChannel = (BotChannel) e.Node.Tag;
+                    SelectedGuild = (DiscordGuild) e.Node.Parent.Tag;
+                    SelectedChannel = (DiscordChannel) e.Node.Tag;
                     ChannelDefined = true;
                     chatBox.Items.Clear();
-                    SelectedChannel.Messages.Values.ToList().ForEach(s => chatBox.Items.Add(s));
-                    nsfwBox.Checked = SelectedChannel.Channel.IsNSFW || SelectedChannel.getEvaluatedNSFW();
+                    (await SelectedChannel.GetMessagesAsync(100)).ToList().ForEach(s => chatBox.Items.Add(s.GetString()));
+                    nsfwBox.Checked = SelectedChannel.IsNSFW || SelectedChannel.getEvaluatedNSFW();
                     settingsBoxes.ForEach(s =>
                         s.Checked = SelectedChannel.get((string) s.Tag).TRUE());
-                    nsfwBox.Enabled = !SelectedChannel.Channel.IsNSFW;
-                    clientSettingsPanel.Text = $"{SelectedGuild.Guild.Name} - {SelectedChannel.Channel.Name}";
+                    nsfwBox.Enabled = !SelectedChannel.IsNSFW;
+                    clientSettingsPanel.Text = $"{SelectedGuild.Name} - {SelectedChannel.Name}";
                     clientSettingsPanel.Enabled = true;
                 }
                 catch (InvalidCastException e1)
@@ -164,7 +166,14 @@ namespace Bot
                 nodes = nodes.First().Nodes.OfType<TreeNode>();
                 nodes = nodes.Concat(nodes.SelectMany(s => s.Nodes.OfType<TreeNode>()));
                 nodes.ToList().ForEach(s =>
-                    s.Checked = ((IBotStruct) s.Tag).get(ConfigManager.ENABLED).TRUE());
+                {
+                    if (s.Tag.GetType() == typeof(DiscordChannel))
+                        s.Checked = ((DiscordChannel)s.Tag).get(ConfigManager.ENABLED).TRUE();
+                    else if (s.Tag.GetType() == typeof(DiscordGuild))
+                        s.Checked = ((DiscordGuild) s.Tag).get(ConfigManager.ENABLED).TRUE();
+                    else
+                        Program.Bot.Client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax", $"Unexpected Type ({s.Tag.GetType()}) in MainForm.updateChecking()", DateTime.Now);
+                });
             }
             catch (Exception e)
             {
@@ -203,9 +212,9 @@ namespace Bot
                     busy = false;
                     if (e.Node.Parent != null)
                     {
-                        if (e.Node.Tag.tryCast(out BotChannel c))
+                        if (e.Node.Tag.tryCast(out DiscordChannel c))
                             c.set(ConfigManager.ENABLED, e.Node.Checked, true);
-                        else if (e.Node.Tag.tryCast(out BotGuild g))
+                        else if (e.Node.Tag.tryCast(out DiscordGuild g))
                             g.set(ConfigManager.ENABLED, e.Node.Checked, true);
                     }
                     else
@@ -244,18 +253,18 @@ namespace Bot
             }
         }
 
-        private void SendMessage(string message, BotChannel channel, Action<Task> continuationAction = null)
+        private void SendMessage(string message, DiscordChannel channel, Action<Task> continuationAction = null)
         {
             if (string.IsNullOrWhiteSpace(message))
                 return;
             _ = continuationAction == null
-                ? Task.Run(() => channel.Channel.SendMessageAsync(message))
-                : Task.Run(() => channel.Channel.SendMessageAsync(message)).ContinueWith(continuationAction);
+                ? Task.Run(() => channel.SendMessageAsync(message))
+                : Task.Run(() => channel.SendMessageAsync(message)).ContinueWith(continuationAction);
         }
 
         private void pingButton_Click(object sender, EventArgs e) => GenericExtensions.runIf(ChannelDefined,
-            () => _ = Administration.Ping(SelectedChannel.Channel,
-                (c1, c2, c3) => SelectedChannel.Channel.SendMessageAsync(c1, c2, c3)));
+            () => _ = Administration.Ping(SelectedChannel,
+                (c1, c2, c3) => SelectedChannel.SendMessageAsync(c1, c2, c3)));
 
         private void resetButton_Click(object sender, EventArgs e)
         {
@@ -269,15 +278,15 @@ namespace Bot
 
         private void channelTree_AfterCollapse(object sender, TreeViewEventArgs e) => ChannelTree.Nodes[0].Expand();
 
-        private void cleanButton_Click(object sender, EventArgs e)
+        private async void cleanButton_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Are you sure you want to delete unused configs?", "", MessageBoxButtons.YesNo) ==
                 DialogResult.Yes)
             {
                 string[] cfgs =
                     Directory.GetFiles(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"Cfgs"));
-                string[] guilds = GuildSingleton.getAll().Select(s => s.Id.ToString()).ToArray();
-                string[] channels = GuildSingleton.getAll().SelectMany(s => s.Channels).Select(s => s.Key.ToString())
+                string[] guilds = Program.Bot.Client.Guilds.Select(s => s.Key.ToString()).ToArray();
+                string[] channels = Program.Bot.Client.Guilds.SelectMany(s => s.Value.Channels).Select(s => s.Key.ToString())
                     .ToArray();
                 string[] allowedNames = {"common.xml"};
                 cfgs = cfgs.Where(s => Path.GetFileName(s) != "keys.secure").ToArray();

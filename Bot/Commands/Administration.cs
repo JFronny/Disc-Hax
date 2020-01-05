@@ -32,7 +32,7 @@ namespace Bot.Commands
         public static async Task Ping(DiscordChannel Channel,
             Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (Channel.getInstance().get(ConfigManager.ENABLED).TRUE())
+            if (Channel.get(ConfigManager.ENABLED).TRUE())
                 await postMessage($"Pong! ({Program.Bot.Client.Ping}ms)", false, null);
         }
 
@@ -42,11 +42,11 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task ConfigCmd(CommandContext ctx)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync(ctx.Channel.getInstance().getStr());
+                await ctx.RespondAsync(ctx.Channel.getStr());
             }
         }
 
@@ -56,13 +56,13 @@ namespace Bot.Commands
         public async Task ConfigCmd(CommandContext ctx, [Description("Config element to print")]
             string element)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (!CommandArr.getC().Contains(element))
                     throw new ArgumentException($"Element ({element}) not in CommandArr");
-                await ctx.RespondAsync($"{element}: {ctx.Channel.getInstance().get(element)}");
+                await ctx.RespondAsync($"{element}: {ctx.Channel.get(element)}");
             }
         }
 
@@ -72,13 +72,13 @@ namespace Bot.Commands
         public async Task ConfigCmd(CommandContext ctx, [Description("Config element to change")]
             string element, [Description("New value")] bool value)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (!CommandArr.getC().Contains(element))
                     throw new ArgumentException($"Element ({element}) not in CommandArr");
-                ctx.Channel.getInstance().set(element, value);
+                ctx.Channel.set(element, value);
                 await ctx.RespondAsync($"Set {element} to {value}");
             }
         }
@@ -91,8 +91,8 @@ namespace Bot.Commands
             [Description("Reason for the ban")] [RemainingText]
             string reason)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await member.BanAsync(reason: reason);
@@ -108,12 +108,12 @@ namespace Bot.Commands
             TimeSpan time, [Description("Reason for the ban")] [RemainingText]
             string reason)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.Guild.BanMemberAsync(member, reason: $"{reason}\nBanned until {DateTime.Now + time:g}");
-                ctx.Guild.getInstance().addTimedBan(member, time);
+                ctx.Guild.addTimedBan(member, time);
                 await ctx.RespondAsync($"Banned {member.DisplayName}.");
             }
         }
@@ -126,12 +126,12 @@ namespace Bot.Commands
             [Description("Reason for the unban")] [RemainingText]
             string reason)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.Guild.UnbanMemberAsync(user, reason);
-                ctx.Guild.getInstance().unbanUserIfBanned(user.Id);
+                ctx.Guild.unbanUserIfBanned(user.Id);
                 await ctx.RespondAsync($"Unbanned {user.Username}.");
             }
         }
@@ -142,13 +142,13 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Bans(CommandContext ctx)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 IEnumerable<string> bans = (await ctx.Guild.GetBansAsync())
                     .Select(s =>
-                        $"User: {s.User.Username}\nReason: {s.Reason}\nTimed: {(ctx.Guild.getInstance().isUserTimeBanned(s.User.Id) ? $"Yes, {ctx.Guild.getInstance().getBanTimeLeft(s.User.Id):g} left" : "No")}");
+                        $"User: {s.User.Username}\nReason: {s.Reason}\nTimed: {(ctx.Guild.isUserTimeBanned(s.User.Id) ? $"Yes, {ctx.Guild.getBanTimeLeft(s.User.Id):g} left" : "No")}");
                 await ctx.RespondPaginated($"Banned Users:\n{string.Join("\n\n", bans)}");
             }
         }
@@ -161,8 +161,8 @@ namespace Bot.Commands
             [Description("Reason for the softban")] [RemainingText]
             string reason)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await member.BanAsync(7, reason);
@@ -179,8 +179,8 @@ namespace Bot.Commands
             [Description("Reason for the softban")] [RemainingText]
             string reason)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await member.RemoveAsync(reason);
@@ -194,8 +194,8 @@ namespace Bot.Commands
         public async Task Nick(CommandContext ctx, [Description("New nickname")] string Nickname,
             [Description("Member to softban")] DiscordMember member = null)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (member == null)
@@ -222,8 +222,8 @@ namespace Bot.Commands
             [Description("Set to \"true\" to mute, false to undo")] bool mute,
             [Description("Reason for the (Un)Mute")] [RemainingText] string reason)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await member.SetMuteAsync(mute, reason);
@@ -239,8 +239,8 @@ namespace Bot.Commands
             [Description("Set to \"true\" to deafen, false to undo")] bool deafen,
             [Description("Reason for the (Un)Deafen")] [RemainingText] string reason)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await member.SetDeafAsync(deafen, reason);
@@ -254,8 +254,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Cooldown(CommandContext ctx, int cooldown)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 if (cooldown <= 21600 && cooldown >= 0)
                 {

@@ -22,8 +22,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task User(CommandContext ctx, [Description("User to print")] DiscordUser user)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(string.Join("\n", typeof(DiscordUser).GetProperties().Select(s => $"{s.Name}: {s.GetValue(user)}")));
@@ -36,8 +36,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Member(CommandContext ctx, [Description("Member to print")] DiscordMember member)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(string.Join("\n", typeof(DiscordMember).GetProperties().Select(s => $"{s.Name}: {s.GetValue(member)}")));
@@ -50,8 +50,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Role(CommandContext ctx, [Description("Role to print")] DiscordRole role)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(string.Join("\n", typeof(DiscordRole).GetProperties().Select(s => $"{s.Name}: {s.GetValue(role)}")));
@@ -64,11 +64,11 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Member(CommandContext ctx)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync("Config:\n" + ctx.Channel.getInstance().getStr() + "\n\nProperties:\n" + string.Join("\n", typeof(DiscordChannel).GetProperties().Select(s => $"{s.Name}: {s.GetValue(ctx.Channel)}")));
+                await ctx.RespondAsync("Config:\n" + ctx.Channel.getStr() + "\n\nProperties:\n" + string.Join("\n", typeof(DiscordChannel).GetProperties().Select(s => $"{s.Name}: {s.GetValue(ctx.Channel)}")));
             }
         }
         
@@ -78,11 +78,11 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Guild(CommandContext ctx)
         {
-            if (ctx.Channel.getInstance().get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getInstance().getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync("Config:\n" + ctx.Guild.getInstance().getStr() + "\n\nProperties:\n" + string.Join("\n", typeof(DiscordGuild).GetProperties().Select(s => $"{s.Name}: {s.GetValue(ctx.Guild)}")));
+                await ctx.RespondAsync("Config:\n" + ctx.Guild.getStr() + "\n\nProperties:\n" + string.Join("\n", typeof(DiscordGuild).GetProperties().Select(s => $"{s.Name}: {s.GetValue(ctx.Guild)}")));
             }
         }
     }
