@@ -1,12 +1,10 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
 using CC_Functions.Misc;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using Shared;
 using Shared.Config;
 
 namespace Bot.Commands
@@ -26,10 +24,11 @@ namespace Bot.Commands
                 .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync(string.Join("\n", typeof(DiscordUser).GetProperties().Select(s => $"{s.Name}: {s.GetValue(user)}")));
+                await ctx.RespondAsync(string.Join("\n",
+                    typeof(DiscordUser).GetProperties().Select(s => $"{s.Name}: {s.GetValue(user)}")));
             }
         }
-        
+
         [Command("member")]
         [Aliases("m")]
         [Description("Prints out information about the specified member")]
@@ -40,10 +39,11 @@ namespace Bot.Commands
                 .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync(string.Join("\n", typeof(DiscordMember).GetProperties().Select(s => $"{s.Name}: {s.GetValue(member)}")));
+                await ctx.RespondAsync(string.Join("\n",
+                    typeof(DiscordMember).GetProperties().Select(s => $"{s.Name}: {s.GetValue(member)}")));
             }
         }
-        
+
         [Command("role")]
         [Aliases("r")]
         [Description("Prints out information about the specified role")]
@@ -54,10 +54,11 @@ namespace Bot.Commands
                 .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync(string.Join("\n", typeof(DiscordRole).GetProperties().Select(s => $"{s.Name}: {s.GetValue(role)}")));
+                await ctx.RespondAsync(string.Join("\n",
+                    typeof(DiscordRole).GetProperties().Select(s => $"{s.Name}: {s.GetValue(role)}")));
             }
         }
-        
+
         [Command("channel")]
         [Aliases("c")]
         [Description("Prints out information about the current channel")]
@@ -68,10 +69,12 @@ namespace Bot.Commands
                 .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync("Config:\n" + ctx.Channel.getStr() + "\n\nProperties:\n" + string.Join("\n", typeof(DiscordChannel).GetProperties().Select(s => $"{s.Name}: {s.GetValue(ctx.Channel)}")));
+                await ctx.RespondAsync("Config:\n" + ctx.Channel.getStr() + "\n\nProperties:\n" + string.Join("\n",
+                                           typeof(DiscordChannel).GetProperties()
+                                               .Select(s => $"{s.Name}: {s.GetValue(ctx.Channel)}")));
             }
         }
-        
+
         [Command("guild")]
         [Aliases("g")]
         [Description("Prints out information about the current guild")]
@@ -82,7 +85,9 @@ namespace Bot.Commands
                 .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync("Config:\n" + ctx.Guild.getStr() + "\n\nProperties:\n" + string.Join("\n", typeof(DiscordGuild).GetProperties().Select(s => $"{s.Name}: {s.GetValue(ctx.Guild)}")));
+                await ctx.RespondAsync("Config:\n" + ctx.Guild.getStr() + "\n\nProperties:\n" + string.Join("\n",
+                                           typeof(DiscordGuild).GetProperties()
+                                               .Select(s => $"{s.Name}: {s.GetValue(ctx.Guild)}")));
             }
         }
     }

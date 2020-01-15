@@ -1,5 +1,4 @@
 ﻿using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -9,28 +8,38 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Bot.Commands;
+using Bot.Converters;
 using Bot.Properties;
+using CC_Functions.Misc;
 using DSharpPlus;
+using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using DSharpPlus.Interactivity;
+using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Net.WebSocket;
+using DSharpPlus.VoiceNext;
 using Octokit;
 using Shared;
 using Shared.Config;
 using Application = System.Windows.Forms.Application;
+using Math = Bot.Commands.Math;
 
 namespace Bot
 {
     internal static class Program
     {
-        public static Random rnd = new Random();
-        public static Task BotThread;
-        public static Bot Bot;
-        public static CancellationTokenSource TokenSource;
-        public static MainForm form;
-        private static NotifyIcon notifyIcon;
-        private static ApplicationContext ctx;
-        public static GitHubClient cli;
+        public static readonly Random Rnd = new Random();
+        public static DiscordClient Bot;
+        private static CancellationTokenSource _tokenSource;
+        private static MainForm _form;
+        private static NotifyIcon _notifyIcon;
+        private static ApplicationContext _ctx;
+        public static GitHubClient Github;
+        public static Perspective Perspective;
+        private static CommandsNextExtension Commands { get; set; }
 
         [STAThread]
         private static void Main(string[] args)
@@ -44,14 +53,13 @@ namespace Bot
             Application.SetCompatibleTextRenderingDefault(false);
             string appGuid = ((GuidAttribute) Assembly.GetExecutingAssembly()
                 .GetCustomAttributes(typeof(GuidAttribute), false).GetValue(0)).Value;
-            string mutexId = string.Format("Global\\{{{0}}}", appGuid);
-            bool createdNew;
+            string mutexId = $"Global\\{{{appGuid}}}";
             MutexAccessRule allowEveryoneRule = new MutexAccessRule(
                 new SecurityIdentifier(WellKnownSidType.WorldSid, null), MutexRights.FullControl,
                 AccessControlType.Allow);
             MutexSecurity securitySettings = new MutexSecurity();
             securitySettings.AddAccessRule(allowEveryoneRule);
-            using (Mutex mutex = new Mutex(false, mutexId, out createdNew, securitySettings))
+            using (Mutex mutex = new Mutex(false, mutexId, out bool _, securitySettings))
             {
                 bool hasHandle = false;
                 try
@@ -70,7 +78,7 @@ namespace Bot
                         hasHandle = true;
                     }
                     Console.WriteLine("Initializing");
-                    notifyIcon = new NotifyIcon
+                    _notifyIcon = new NotifyIcon
                     {
                         Text = "DiscHax", Icon = Resources.TextTemplate, Visible = true, ContextMenu = new ContextMenu()
                     };
@@ -80,22 +88,23 @@ namespace Bot
                         formItem.Index = 0;
                         formItem.Click += (sender, e) =>
                         {
-                            if (form != null && !form.IsDisposed)
-                                form.Dispose();
-                            form = new MainForm();
-                            form.Show();
+                            if (_form != null && !_form.IsDisposed)
+                                _form.Dispose();
+                            _form = new MainForm();
+                            _form.Show();
                         };
-                        notifyIcon.ContextMenu.MenuItems.Add(formItem);
+                        _notifyIcon.ContextMenu.MenuItems.Add(formItem);
                     }
                     MenuItem exitItem = new MenuItem("Exit");
                     exitItem.Click += (sender, e) =>
                     {
-                        Bot.Client.DisconnectAsync();
-                        Bot.Client.Dispose();
-                        ctx.ExitThread();
+                        Bot.DisconnectAsync();
+                        Bot.Dispose();
+                        _ctx.ExitThread();
                     };
-                    notifyIcon.ContextMenu.MenuItems.Add(exitItem);
-                    cli = new GitHubClient(new ProductHeaderValue("DiscHax"));
+                    _notifyIcon.ContextMenu.MenuItems.Add(exitItem);
+                    Github = new GitHubClient(new ProductHeaderValue("DiscHax"));
+                    Perspective = new Perspective(TokenManager.PerspectiveToken);
                     DiscordConfiguration cfg = new DiscordConfiguration
                     {
                         Token = TokenManager.DiscordToken,
@@ -108,22 +117,53 @@ namespace Bot
 #endif
                         UseInternalLogHandler = false
                     };
-                    TokenManager.CurrencyconverterapiToken.ToString();
                     if (Type.GetType("Mono.Runtime") != null)
                         cfg.WebSocketClientFactory = WebSocketSharpClient.CreateNew;
-                    Bot = new Bot(cfg);
-                    Bot.Client.Ready += Bot_Ready;
-                    Bot.Client.GuildAvailable += AddGuild;
-                    Bot.Client.GuildCreated += AddGuild;
-                    Bot.Client.GuildUnavailable += RemoveGuild;
-                    Bot.Client.GuildDeleted += RemoveGuild;
-                    Bot.Client.ChannelCreated += AddChannel;
-                    Bot.Client.ChannelDeleted += RemoveChannel;
-                    Bot.Client.MessageCreated += AddMessage;
-                    Bot.Client.MessageDeleted += RemoveMessage;
-                    Bot.Client.ClientErrored += Bot_ClientErrored;
-                    TokenSource = new CancellationTokenSource();
-                    BotThread = Task.Run(BotThreadCallback);
+                    Bot = new DiscordClient(cfg);
+                    //
+                    //
+                    Commands = Bot.UseCommandsNext(new CommandsNextConfiguration
+                    {
+                        StringPrefixes = new[] {Common.prefix},
+                        EnableDms = false
+                    });
+                    Commands.CommandExecuted += Commands_CommandExecuted;
+                    Commands.CommandErrored += Commands_CommandErrored;
+                    Bot.UseInteractivity(new InteractivityConfiguration
+                    {
+                        PaginationBehaviour = PaginationBehaviour.Ignore,
+                        Timeout = TimeSpan.FromMinutes(2)
+                    });
+                    Bot.UseVoiceNext(new VoiceNextConfiguration());
+                    Commands.RegisterCommands<ImageBoards>();
+                    Commands.RegisterCommands<Administration>();
+                    Commands.RegisterCommands<LocalStats>();
+                    Commands.RegisterCommands<Minigames>();
+                    Commands.RegisterCommands<Misc>();
+                    Commands.RegisterCommands<Math>();
+                    Commands.RegisterCommands<Money>();
+                    Commands.RegisterCommands<Quotes>();
+                    Commands.RegisterCommands<PublicStats>();
+                    Commands.RegisterConverter(new BoardConv());
+                    Commands.RegisterConverter(new BooruConv());
+                    Commands.RegisterConverter(new CurrencyConv());
+                    Commands.RegisterConverter(new RPSOptionConv());
+                    Commands.SetHelpFormatter<HelpFormatter>();
+                    Bot.DebugLogger.LogMessageReceived += DebugLogger_LogMessageReceived;
+                    //
+                    //
+                    Bot.Ready += Bot_Ready;
+                    Bot.GuildAvailable += AddGuild;
+                    Bot.GuildCreated += AddGuild;
+                    Bot.GuildUnavailable += RemoveGuild;
+                    Bot.GuildDeleted += RemoveGuild;
+                    Bot.ChannelCreated += AddChannel;
+                    Bot.ChannelDeleted += RemoveChannel;
+                    Bot.MessageCreated += AddMessage;
+                    Bot.MessageDeleted += RemoveMessage;
+                    Bot.ClientErrored += Bot_ClientErrored;
+                    _tokenSource = new CancellationTokenSource();
+                    Task.Run(BotThreadCallback);
                     new Thread(() =>
                     {
                         while (true)
@@ -132,24 +172,24 @@ namespace Bot
                                 Thread.Sleep(5000);
                                 if (Bot == null)
                                     return;
-                                foreach (KeyValuePair<ulong, DiscordGuild> guild in Bot.Client.Guilds)
+                                foreach (KeyValuePair<ulong, DiscordGuild> guild in Bot.Guilds)
                                     guild.Value.evalBans();
                             }
                             catch (Exception e)
                             {
-                                Bot.Client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax",
+                                Bot.DebugLogger.LogMessage(LogLevel.Error, "DiscHax",
                                     $"A crash occured in the ban-evaluation Thread: {e}", DateTime.Now, e);
                             }
                     }).Start();
                     if (showForm)
                     {
-                        form = new MainForm();
-                        form.Show();
+                        _form = new MainForm();
+                        _form.Show();
                     }
-                    ctx = new ApplicationContext();
-                    Application.Run(ctx);
-                    TokenSource.Cancel();
-                    notifyIcon.Visible = false;
+                    _ctx = new ApplicationContext();
+                    Application.Run(_ctx);
+                    _tokenSource.Cancel();
+                    _notifyIcon.Visible = false;
                 }
                 finally
                 {
@@ -161,34 +201,34 @@ namespace Bot
 
         private static async Task BotThreadCallback()
         {
-            await Bot.StartAsync().ConfigureAwait(false);
+            await Bot.ConnectAsync().ConfigureAwait(false);
             try
             {
-                await Task.Delay(-1, TokenSource.Token).ConfigureAwait(false);
+                await Task.Delay(-1, _tokenSource.Token).ConfigureAwait(false);
             }
             catch
             {
+                // ignored
             }
 
-            await Bot.StopAsync().ConfigureAwait(false);
-            if (form != null)
+            await Bot.DisconnectAsync().ConfigureAwait(false);
+            if (_form != null)
             {
-                form.SetProperty(x => x.Text, "DiscHax Bot Menu");
-                form.ChannelTree.InvokeAction(new Action(form.ChannelTree.Nodes.Clear));
-                form.SelectedGuild = default;
-                form.SelectedChannel = default;
+                _form.SetProperty(x => x.Text, "DiscHax Bot Menu");
+                _form.ChannelTree.InvokeAction(new Action(_form.ChannelTree.Nodes.Clear));
+                _form.SelectedGuild = default;
+                _form.SelectedChannel = default;
             }
 
             Bot = null;
-            TokenSource = null;
-            BotThread = null;
+            _tokenSource = null;
         }
 
         private static Task Bot_Ready(ReadyEventArgs e)
         {
-            if (form != null && !form.IsDisposed)
-                form.SetProperty(xf => xf.Text, "DiscHax Bot Menu (connected)");
-            Bot.Client.DebugLogger.LogMessage(LogLevel.Info, "DiscHax",
+            if (_form != null && !_form.IsDisposed)
+                _form.SetProperty(xf => xf.Text, "DiscHax Bot Menu (connected)");
+            Bot.DebugLogger.LogMessage(LogLevel.Info, "DiscHax",
                 $"Your invite Link: https://discordapp.com/oauth2/authorize?client_id={e.Client.CurrentApplication.Id}&scope=bot&permissions=8",
                 DateTime.Now);
             return Task.CompletedTask;
@@ -196,15 +236,15 @@ namespace Bot
 
         private static Task AddGuild(GuildCreateEventArgs e)
         {
-            if (form != null && !form.IsDisposed)
-                form.ChannelTree.InvokeAction(new Action<DiscordGuild>(form.AddGuild), e.Guild);
+            if (_form != null && !_form.IsDisposed)
+                _form.ChannelTree.InvokeAction(new Action<DiscordGuild>(_form.AddGuild), e.Guild);
             return Task.CompletedTask;
         }
 
         private static Task RemoveGuild(GuildDeleteEventArgs e)
         {
-            if (form != null && !form.IsDisposed)
-                form.ChannelTree.InvokeAction(new Action<ulong>(form.RemoveGuild), e.Guild.Id);
+            if (_form != null && !_form.IsDisposed)
+                _form.ChannelTree.InvokeAction(new Action<ulong>(_form.RemoveGuild), e.Guild.Id);
             return Task.CompletedTask;
         }
 
@@ -214,12 +254,12 @@ namespace Bot
 
         private static Task AddMessage(MessageCreateEventArgs e)
         {
-            if (form != null && !form.IsDisposed)
-                form.ChannelTree.InvokeAction(new Action<DiscordMessage, DiscordChannel>(form.AddMessage),
+            if (_form != null && !_form.IsDisposed)
+                _form.ChannelTree.InvokeAction(new Action<DiscordMessage, DiscordChannel>(_form.AddMessage),
                     e.Message, e.Channel);
             if (!e.Author.IsBot)
                 e.Guild.incrementMoney(e.Guild.Members[e.Author.Id],
-                    rnd.Next(0, Math.Max(e.Message.Content.Length / 25, 20)));
+                    Rnd.Next(0, System.Math.Max(e.Message.Content.Length / 25, 20)));
             return Task.CompletedTask;
         }
 
@@ -227,8 +267,43 @@ namespace Bot
 
         private static Task Bot_ClientErrored(ClientErrorEventArgs e)
         {
-            Bot.Client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax", $"Exception in {e.EventName}: {e.Exception}",
+            Bot.DebugLogger.LogMessage(LogLevel.Error, "DiscHax", $"Exception in {e.EventName}: {e.Exception}",
                 DateTime.Now);
+            return Task.CompletedTask;
+        }
+
+        private static void DebugLogger_LogMessageReceived(object sender, DebugLogMessageEventArgs e)
+        {
+            Console.WriteLine(
+                $"[{e.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")}] [{e.Application}] [{e.Level}] {e.Message}");
+        }
+
+        private static async Task Commands_CommandErrored(CommandErrorEventArgs e)
+        {
+            if (ConfigManager.get(e.Context.Channel.Id.ToString(), ConfigManager.ENABLED, ConfigManager.CHANNEL).TRUE())
+            {
+                if (e.Exception is UnwantedExecutionException)
+                    return;
+                e.Context.Client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax",
+                    $"{e.Context.User.Username} tried executing '{e.Command?.QualifiedName ?? "<unknown command>"}' but it errored: {e.Exception}",
+                    DateTime.Now);
+                if (e.Exception is ChecksFailedException)
+                    await e.Context.RespondAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Title = "Access denied",
+                        Description =
+                            $"{DiscordEmoji.FromName(e.Context.Client, ":no_entry:")} You do not have the permissions required to execute this command.",
+                        Color = new DiscordColor(0xFF0000)
+                    }.Build());
+                else if (!(e.Exception is CommandNotFoundException))
+                    await e.Context.RespondAsyncFix($"The command failed: {e.Exception.Message}");
+            }
+        }
+
+        private static Task Commands_CommandExecuted(CommandExecutionEventArgs e)
+        {
+            e.Context.Client.DebugLogger.LogMessage(LogLevel.Info, "DiscHax",
+                $"{e.Context.User.Username} successfully executed '{e.Command.QualifiedName}'", DateTime.Now);
             return Task.CompletedTask;
         }
     }

@@ -46,7 +46,8 @@ namespace Bot.Commands
         {
             Console.Write(".");
             IEnumerable<RepositoryContent> files =
-                Program.cli.Repository.Content.GetAllContents("shlomif", "fortune-mod", path).GetAwaiter().GetResult();
+                Program.Github.Repository.Content.GetAllContents("shlomif", "fortune-mod", path).GetAwaiter()
+                    .GetResult();
             Console.Write(".");
             IEnumerable<string> disallowednames = new[] {"CMakeLists.txt", null};
             Console.Write(".");
@@ -79,7 +80,7 @@ namespace Bot.Commands
             {
                 await ctx.TriggerTypingAsync();
                 string[] quotes = ctx.Channel.getEvaluatedNSFW() ? fortunequotes_off : fortunequotes;
-                await ctx.RespondAsyncFix(quotes[Program.rnd.Next(quotes.Length)], true);
+                await ctx.RespondAsyncFix(quotes[Program.Rnd.Next(quotes.Length)], true);
             }
         }
 
@@ -92,7 +93,7 @@ namespace Bot.Commands
                 .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                int q = Program.rnd.Next(_beequotes.Length - 2);
+                int q = Program.Rnd.Next(_beequotes.Length - 2);
                 await ctx.RespondAsyncFix(
                     (_beequotes[q] + "\n\n" + _beequotes[q + 1] + "\n\n" + _beequotes[q + 2]).Replace("\n", "\r\n"),
                     true);

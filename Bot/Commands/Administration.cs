@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CC_Functions.Misc;
 using DSharpPlus;
@@ -33,7 +34,7 @@ namespace Bot.Commands
             Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
             if (Channel.get(ConfigManager.ENABLED).TRUE())
-                await postMessage($"Pong! ({Program.Bot.Client.Ping}ms)", false, null);
+                await postMessage($"Pong! ({Program.Bot.Ping}ms)", false, null);
         }
 
         [Command("config")]
@@ -42,8 +43,7 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task ConfigCmd(CommandContext ctx)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED).TRUE())
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(ctx.Channel.getStr());
@@ -56,8 +56,7 @@ namespace Bot.Commands
         public async Task ConfigCmd(CommandContext ctx, [Description("Config element to print")]
             string element)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED).TRUE())
             {
                 await ctx.TriggerTypingAsync();
                 if (!CommandArr.getC().Contains(element))
@@ -72,8 +71,7 @@ namespace Bot.Commands
         public async Task ConfigCmd(CommandContext ctx, [Description("Config element to change")]
             string element, [Description("New value")] bool value)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.get(ConfigManager.ENABLED).TRUE())
             {
                 await ctx.TriggerTypingAsync();
                 if (!CommandArr.getC().Contains(element))
@@ -219,8 +217,10 @@ namespace Bot.Commands
         [Description("(Un)Mutes the member")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Mute(CommandContext ctx, [Description("Member to (Un)Mute")] DiscordMember member,
-            [Description("Set to \"true\" to mute, false to undo")] bool mute,
-            [Description("Reason for the (Un)Mute")] [RemainingText] string reason)
+            [Description("Set to \"true\" to mute, false to undo")]
+            bool mute,
+            [Description("Reason for the (Un)Mute")] [RemainingText]
+            string reason)
         {
             if (ctx.Channel.get(ConfigManager.ENABLED)
                 .AND(ctx.Channel.getMethodEnabled()))
@@ -236,8 +236,10 @@ namespace Bot.Commands
         [Description("(Un)Deafen the member")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Deaf(CommandContext ctx, [Description("Member to (Un)Deafen")] DiscordMember member,
-            [Description("Set to \"true\" to deafen, false to undo")] bool deafen,
-            [Description("Reason for the (Un)Deafen")] [RemainingText] string reason)
+            [Description("Set to \"true\" to deafen, false to undo")]
+            bool deafen,
+            [Description("Reason for the (Un)Deafen")] [RemainingText]
+            string reason)
         {
             if (ctx.Channel.get(ConfigManager.ENABLED)
                 .AND(ctx.Channel.getMethodEnabled()))
@@ -257,6 +259,7 @@ namespace Bot.Commands
             if (ctx.Channel.get(ConfigManager.ENABLED)
                 .AND(ctx.Channel.getMethodEnabled()))
             {
+                await ctx.TriggerTypingAsync();
                 if (cooldown <= 21600 && cooldown >= 0)
                 {
                     await ctx.Channel.ModifyAsync(x => x.PerUserRateLimit = cooldown);
@@ -284,10 +287,12 @@ namespace Bot.Commands
         }
 
         [Command("sudo")]
-        [Aliases("s")]
         [Hidden]
         [RequireOwner]
-        public async Task SudoAsync(CommandContext ctx, [Description("Member to sudo")]DiscordMember m, [Description("Command to sudo"), RemainingText]string command)
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task SudoAsync(CommandContext ctx, [Description("Member to sudo")] DiscordMember m,
+            [Description("Command to sudo")] [RemainingText]
+            string command)
         {
             await ctx.TriggerTypingAsync();
             if (ctx.Client.CurrentApplication.Owners.All(x => x.Id != ctx.User.Id))
@@ -297,6 +302,44 @@ namespace Bot.Commands
             }
             await ctx.CommandsNext.ExecuteCommandAsync(ctx.CommandsNext.CreateFakeContext(m, ctx.Channel, command,
                 Common.prefix, ctx.CommandsNext.FindCommand(command, out string _)));
+        }
+
+        [Command("purge")]
+        [Description("Purge commands by user or regex")]
+        [RequirePermissions(Permissions.Administrator)]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Purge(CommandContext ctx, [Description("User to delete posts from")]
+            DiscordMember member, [Description("Amount of messages to search")]
+            int span = 50, [Description("Reason for deletion")] string reason = null)
+        {
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                IEnumerable<DiscordMessage> messages = await ctx.Channel.GetMessagesAsync(span);
+                messages = messages.Where(s => ctx.Guild.Members.First(a => a.Key == s.Author.Id).Value == member);
+                await ctx.Channel.DeleteMessagesAsync(messages, reason);
+                await ctx.RespondAsync($"Deleted {messages.Count()} messages");
+            }
+        }
+
+        [Command("purge")]
+        [RequirePermissions(Permissions.Administrator)]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Purge(CommandContext ctx, [Description("Regex for messages")] string regex,
+            [Description("Amount of messages to search")]
+            int span, [Description("Reason for deletion")] string reason = null)
+        {
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                IEnumerable<DiscordMessage> messages = await ctx.Channel.GetMessagesAsync(span);
+                Regex rex = new Regex(regex);
+                messages = messages.Where(s => rex.IsMatch(s.Content));
+                await ctx.Channel.DeleteMessagesAsync(messages, reason);
+                await ctx.RespondAsync($"Deleted {messages.Count()} messages");
+            }
         }
     }
 }

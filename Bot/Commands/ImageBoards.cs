@@ -63,7 +63,7 @@ namespace Bot.Commands
                 if (ctx.Channel.getEvaluatedNSFW())
                 {
                     Thread[] threads = board.GetThreads().ToArray();
-                    Thread t = threads[Program.rnd.Next(threads.Length)];
+                    Thread t = threads[Program.Rnd.Next(threads.Length)];
                     using (WebClient wClient = new WebClient())
                     {
                         await ctx.RespondWithFileAsync($"{t.PostNumber}.jpg",
@@ -108,7 +108,7 @@ namespace Bot.Commands
                 await ctx.TriggerTypingAsync();
                 if (ctx.Channel.getEvaluatedNSFW() || forceExecution)
                 {
-                    int img = Program.rnd.Next(6000);
+                    int img = Program.Rnd.Next(6000);
                     using (WebClient wClient = new WebClient())
                     {
                         await ctx.RespondWithFileAsync($"{img}.jpg",
@@ -161,7 +161,7 @@ namespace Bot.Commands
                     result = await booru.GetRandomImage(tags);
                     triesLeft--;
                 }
-                string val = Program.rnd.Next(10000, 99999).ToString();
+                string val = Program.Rnd.Next(10000, 99999).ToString();
                 using (WebClient wClient = new WebClient())
                 {
                     await ctx.RespondWithFileAsync($"{val}_img.jpg",

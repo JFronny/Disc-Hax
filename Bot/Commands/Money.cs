@@ -7,7 +7,6 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using Shared;
 using Shared.Config;
 
 namespace Bot.Commands
@@ -83,8 +82,8 @@ namespace Bot.Commands
         [Command("give")]
         [Description("Give someone money")]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task GiveMoney(CommandContext ctx, [Description("User to give money to")]
-            DiscordMember user, [Description("Money to give")] decimal money)
+        public async Task GiveMoney(CommandContext ctx, [Description("User to give money to")] DiscordMember user,
+            [Description("Money to give")] decimal money)
         {
             if (ctx.Channel.get(ConfigManager.ENABLED)
                 .AND(ctx.Channel.getMethodEnabled()))

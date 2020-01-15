@@ -66,7 +66,7 @@ namespace Bot.Commands
                     Title = "Poll time!",
                     Description = text
                 }.Build());
-                ReadOnlyCollection<PollEmoji> pollResult = await Bot.instance.Client.GetInteractivity()
+                ReadOnlyCollection<PollEmoji> pollResult = await Program.Bot.GetInteractivity()
                     .DoPollAsync(msg, options, timeout: duration);
                 IEnumerable<string> results = pollResult.Where(xkvp => options.Contains(xkvp.Emoji))
                     .Select(xkvp => $"{xkvp.Emoji}: {xkvp.Voted.Count}");
@@ -87,7 +87,7 @@ namespace Bot.Commands
                 await ctx.TriggerTypingAsync();
                 InteractivityExtension interactivity = ctx.Client.GetInteractivity();
                 byte[] codebytes = new byte[bytes];
-                Program.rnd.NextBytes(codebytes);
+                Program.Rnd.NextBytes(codebytes);
                 string code = BitConverter.ToString(codebytes).ToLower().Replace("-", "");
                 await ctx.RespondAsync($"The first one to type the following code gets a reward: {code.emotify()}");
                 InteractivityResult<DiscordMessage> msg =
@@ -193,7 +193,7 @@ namespace Bot.Commands
                 Font font = SystemFonts.DefaultFont;
                 font = new Font(font.FontFamily, font.Size * (180f / g.MeasureString("QWERTBTESTSTR", font).Width));
                 //Text
-                g.DrawString(answerList[Program.rnd.Next(answerList.Length)], font, Brushes.White, size,
+                g.DrawString(answerList[Program.Rnd.Next(answerList.Length)], font, Brushes.White, size,
                     new StringFormat
                     {
                         LineAlignment = StringAlignment.Center,
@@ -220,11 +220,31 @@ namespace Bot.Commands
                 .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
+                HttpWebRequest req = (HttpWebRequest) WebRequest.Create(url);
                 req.AllowAutoRedirect = true;
                 req.MaximumAutomaticRedirections = 100;
                 WebResponse resp = req.GetResponse();
                 await ctx.RespondAsyncFix($"Response is: {resp.ResponseUri}");
+            }
+        }
+
+        [Command("toxicity")]
+        [Aliases("tox")]
+        [Description("Calculate the specified users toxicity")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Toxicity(CommandContext ctx, [Description("Member to calculate")] DiscordMember member)
+        {
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                IReadOnlyList<DiscordMessage> msg = await ctx.Channel.GetMessagesAsync();
+                IEnumerable<string> messages = msg.Where(s => s.Author.Id == member.Id).Select(x => x.Content);
+                messages = messages.Concat(msg.SelectMany(s => s.Embeds)
+                    .SelectMany(s => new[] {s.Title, s.Description}.Where(a => !string.IsNullOrWhiteSpace(a))));
+                string str = string.Join("\n", messages);
+                await ctx.RespondAsyncFix(
+                    $"Toxicity: {(await Program.Perspective.RequestAnalysis(str)).AttributeScores.First().Value.SummaryScore.Value}");
             }
         }
     }

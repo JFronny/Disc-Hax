@@ -13,7 +13,7 @@ namespace Shared.Config
 
         public static string DiscordToken
         {
-            get => LoadXE().Element("discord").Value;
+            get => LoadXE().Element("discord")?.Value;
             set
             {
                 XElement el = LoadXE();
@@ -24,11 +24,22 @@ namespace Shared.Config
 
         public static string CurrencyconverterapiToken
         {
-            get => LoadXE().Element("currencyconverterapi").Value;
+            get => LoadXE().Element("currencyconverterapi")?.Value;
             set
             {
                 XElement el = LoadXE();
                 el.Element("currencyconverterapi").Value = value;
+                SaveXE(el);
+            }
+        }
+
+        public static string PerspectiveToken
+        {
+            get => LoadXE().Element("perspective")?.Value;
+            set
+            {
+                XElement el = LoadXE();
+                el.Element("perspective").Value = value;
                 SaveXE(el);
             }
         }
@@ -38,9 +49,16 @@ namespace Shared.Config
             if (!Directory.Exists(Path.GetDirectoryName(containerFile)))
                 Directory.CreateDirectory(Path.GetDirectoryName(containerFile));
             if (!File.Exists(containerFile))
-                new TokenForm("", "", true).ShowDialog();
+                new TokenForm("", "", "", true).ShowDialog();
             byte[] bytes = HID.DecryptLocal(File.ReadAllBytes(containerFile));
-            return XElement.Parse(Encoding.UTF8.GetString(bytes));
+            XElement retEl = XElement.Parse(Encoding.UTF8.GetString(bytes));
+            if (retEl.Element("discord") == null)
+                retEl.Add(new XElement("discord", ""));
+            if (retEl.Element("currencyconverterapi") == null)
+                retEl.Add(new XElement("currencyconverterapi", ""));
+            if (retEl.Element("perspective") == null)
+                retEl.Add(new XElement("perspective", ""));
+            return retEl;
         }
 
         public static void SaveXE(XElement el)

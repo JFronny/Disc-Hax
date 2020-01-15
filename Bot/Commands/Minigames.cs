@@ -7,7 +7,6 @@ using CC_Functions.Misc;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using Shared;
 using Shared.Config;
 using static System.Math;
 
@@ -31,7 +30,7 @@ namespace Bot.Commands
                 string output;
                 RPSOptionConv.RPSOption rpsOption =
                     (RPSOptionConv.RPSOption) RPSOptionConv.soptions.GetValue(
-                        Program.rnd.Next(RPSOptionConv.soptions.Length));
+                        Program.Rnd.Next(RPSOptionConv.soptions.Length));
                 output = $"You chose: {Option}, I chose {rpsOption}. This means ";
                 int diff = (int) rpsOption - (int) Option;
                 diff = diff switch {-2 => 1, 2 => -1, _ => diff};
@@ -65,7 +64,7 @@ namespace Bot.Commands
                 string output;
                 RPSOptionConv.RPSOption rpsOption =
                     (RPSOptionConv.RPSOption) RPSOptionConv.soptions.GetValue(
-                        Program.rnd.Next(RPSOptionConv.soptions.Length));
+                        Program.Rnd.Next(RPSOptionConv.soptions.Length));
                 output = $"You chose: {Option}, I chose {rpsOption}. This means ";
                 int diff = (int) rpsOption - (int) Option;
                 diff = diff switch {-2 => 1, 2 => -1, _ => diff};
@@ -126,26 +125,26 @@ namespace Bot.Commands
                     await ctx.RespondAsync("You don't have that much");
                     return;
                 }
-                int[] pool = {Program.rnd.Next(5), Program.rnd.Next(5), Program.rnd.Next(5)};
+                int[] pool = {Program.Rnd.Next(5), Program.Rnd.Next(5), Program.Rnd.Next(5)};
                 DiscordMessage msg = await ctx.RespondAsync("| :grey_question: | :grey_question: | :grey_question: |");
                 if (!fast)
                 {
                     for (int i = 0; i < 4; i++)
                     {
                         await msg.ModifyAsync(
-                            $"| {getSlot(Program.rnd.Next(5))} | :grey_question: | :grey_question: |");
+                            $"| {getSlot(Program.Rnd.Next(5))} | :grey_question: | :grey_question: |");
                         await Task.Delay(1000);
                     }
                     for (int i = 0; i < 4; i++)
                     {
                         await msg.ModifyAsync(
-                            $"| {getSlot(pool[0])} | {getSlot(Program.rnd.Next(5))} | :grey_question: |");
+                            $"| {getSlot(pool[0])} | {getSlot(Program.Rnd.Next(5))} | :grey_question: |");
                         await Task.Delay(1000);
                     }
                     for (int i = 0; i < 4; i++)
                     {
                         await msg.ModifyAsync(
-                            $"| {getSlot(pool[0])} | {getSlot(pool[1])} | {getSlot(Program.rnd.Next(5))} |");
+                            $"| {getSlot(pool[0])} | {getSlot(pool[1])} | {getSlot(Program.Rnd.Next(5))} |");
                         await Task.Delay(1000);
                     }
                     await msg.ModifyAsync($"| {getSlot(pool[0])} | {getSlot(pool[1])} | {getSlot(pool[2])} |");

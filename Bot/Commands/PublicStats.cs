@@ -23,7 +23,7 @@ namespace Bot.Commands
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondPaginated(HTMLProcessor.ToPlainText(
-                    await (await Program.cli.Repository.Content.GetReadme("JFronny", "Disc-Hax")).GetHtmlContent()));
+                    await (await Program.Github.Repository.Content.GetReadme("JFronny", "Disc-Hax")).GetHtmlContent()));
             }
         }
 
@@ -36,7 +36,7 @@ namespace Bot.Commands
                 .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync($"Currently connected to {Program.Bot.Client.Guilds.Count} Guilds");
+                await ctx.RespondAsync($"Currently connected to {Program.Bot.Guilds.Count} Guilds");
             }
         }
 
@@ -49,7 +49,8 @@ namespace Bot.Commands
                 .AND(ctx.Channel.getMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsyncFix((await Program.cli.Repository.Commit.GetAll("JFronny", "Disc-Hax"))[0].Commit
+                await ctx.RespondAsyncFix((await Program.Github.Repository.Commit.GetAll("JFronny", "Disc-Hax"))[0]
+                    .Commit
                     .Message);
             }
         }

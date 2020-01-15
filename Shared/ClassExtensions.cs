@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Net;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using CC_Functions.Misc;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
@@ -16,53 +12,8 @@ using Shared.Config;
 
 namespace Shared
 {
-    public delegate void SetPropertyDelegate<TCtl, TProp>(TCtl control, Expression<Func<TCtl, TProp>> propexpr,
-        TProp value) where TCtl : Control;
-
-    public delegate void InvokeActionDelegate<TCtl>(TCtl control, Delegate dlg, params object[] args)
-        where TCtl : Control;
-
     public static class ClassExtensions
     {
-        public static void SetProperty<TCtl, TProp>(this TCtl control, Expression<Func<TCtl, TProp>> propexpr,
-            TProp value) where TCtl : Control
-        {
-            if (control == null)
-                throw new ArgumentNullException(nameof(control));
-
-            if (propexpr == null)
-                throw new ArgumentNullException(nameof(propexpr));
-            if (control.InvokeRequired)
-            {
-                control.Invoke(new SetPropertyDelegate<TCtl, TProp>(SetProperty), control, propexpr, value);
-                return;
-            }
-
-            MemberExpression propexprm = propexpr.Body as MemberExpression;
-            if (propexprm == null)
-                throw new ArgumentException("Invalid member expression.", nameof(propexpr));
-            PropertyInfo prop = propexprm.Member as PropertyInfo;
-            if (prop == null)
-                throw new ArgumentException("Invalid property supplied.", nameof(propexpr));
-            prop.SetValue(control, value);
-        }
-
-        public static void InvokeAction<TCtl>(this TCtl control, Delegate dlg, params object[] args)
-            where TCtl : Control
-        {
-            if (control == null)
-                throw new ArgumentNullException(nameof(control));
-            if (dlg == null)
-                throw new ArgumentNullException(nameof(dlg));
-            if (control.InvokeRequired)
-            {
-                control.Invoke(new InvokeActionDelegate<TCtl>(InvokeAction), control, dlg, args);
-                return;
-            }
-
-            dlg.DynamicInvoke(args);
-        }
-
         public static bool getEvaluatedNSFW(this DiscordChannel Channel) =>
             Channel.IsNSFW || Channel.get(ConfigManager.NSFW, false).TRUE();
 
@@ -155,6 +106,7 @@ namespace Shared
                    0;
         }
 
-        public static string GetString(this DiscordMessage msg) => $"<{(msg.Author.IsCurrent ? "SELF>" : msg.Author.IsBot ? $"BOT>[{msg.Author.Username}]" : $"USER>[{msg.Author.Username}]")}{msg.Content}";
+        public static string GetString(this DiscordMessage msg) =>
+            $"<{(msg.Author.IsCurrent ? "SELF>" : msg.Author.IsBot ? $"BOT>[{msg.Author.Username}]" : $"USER>[{msg.Author.Username}]")}{msg.Content}";
     }
 }

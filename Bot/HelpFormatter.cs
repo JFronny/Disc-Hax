@@ -1,7 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using CC_Functions.Misc;
-using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Converters;
 using DSharpPlus.CommandsNext.Entities;
@@ -11,82 +11,6 @@ using Shared.Config;
 
 namespace Bot
 {
-    public class DefHelpFormatter : BaseHelpFormatter
-    {
-        public readonly DiscordEmbedBuilder EmbedBuilder =
-            new DiscordEmbedBuilder().WithTitle("Help").WithColor(0x007FFF);
-
-        /// <summary>
-        ///     Creates a new default help formatter.
-        /// </summary>
-        /// <param name="ctx">Context in which this formatter is being invoked.</param>
-        public DefHelpFormatter(CommandContext ctx) : base(ctx)
-        {
-        }
-
-        private Command Command { get; set; }
-
-        /// <summary>
-        ///     Sets the command this help message will be for.
-        /// </summary>
-        /// <param name="command">Command for which the help message is being produced.</param>
-        /// <returns>This help formatter.</returns>
-        public override BaseHelpFormatter WithCommand(Command command)
-        {
-            Command = command;
-            EmbedBuilder.WithDescription(
-                $"{Formatter.InlineCode(command.Name)}: {command.Description ?? "No description provided."}");
-            if (command is CommandGroup cgroup && cgroup.IsExecutableWithoutSubcommands)
-                EmbedBuilder.WithDescription(
-                    $"{EmbedBuilder.Description}\n\nThis group can be executed as a standalone command.");
-            if (command.Aliases?.Any() == true)
-                EmbedBuilder.AddField("Aliases", string.Join(", ", command.Aliases.Select(Formatter.InlineCode)));
-            if (command.Overloads?.Any() == true)
-            {
-                string str = string.Join("\n", command.Overloads.OrderByDescending(x => x.Priority).Select(ovl =>
-                {
-                    string tmp = '`' + command.QualifiedName + string.Join("",
-                                     ovl.Arguments.Select(arg =>
-                                         (arg.IsOptional || arg.IsCatchAll ? " [" : " <")
-                                         + arg.Name
-                                         + (arg.IsCatchAll ? "..." : "")
-                                         + (arg.IsOptional || arg.IsCatchAll ? ']' : '>')));
-                    tmp += "\n`";
-                    tmp += string.Join("\n`",
-                        ovl.Arguments.Select(s => s.Name + " (" + CommandsNext.GetUserFriendlyTypeName(s.Type) +
-                                                  ")`: " + s.Description ?? "No description provided."));
-                    return tmp;
-                }));
-                EmbedBuilder.AddField("Arguments", str);
-            }
-            return this;
-        }
-
-        /// <summary>
-        ///     Sets the subcommands for this command, if applicable. This method will be called with filtered data.
-        /// </summary>
-        /// <param name="subcommands">Subcommands for this command group.</param>
-        /// <returns>This help formatter.</returns>
-        public override BaseHelpFormatter WithSubcommands(IEnumerable<Command> subcommands)
-        {
-            EmbedBuilder.AddField(Command != null ? "Subcommands" : "Commands",
-                string.Join(", ", subcommands.Select(x => Formatter.InlineCode(x.Name))));
-            return this;
-        }
-
-        /// <summary>
-        ///     Construct the help message.
-        /// </summary>
-        /// <returns>Data for the help message.</returns>
-        public override CommandHelpMessage Build()
-        {
-            if (Command == null)
-                EmbedBuilder.WithDescription(
-                    "Listing all top-level commands and groups. Specify a command to see more information.");
-            return new CommandHelpMessage(embed: EmbedBuilder.Build());
-        }
-    }
-
     public class HelpFormatter : BaseHelpFormatter
     {
         private readonly DiscordEmbedBuilder builder;
@@ -132,17 +56,17 @@ namespace Bot
 
         public override BaseHelpFormatter WithSubcommands(IEnumerable<Command> subcommands)
         {
-            builder.AddField("SubCommands",
-                string.Join("\n", subcommands
-                    .Where(s => !s.IsHidden)
-                    .Select(s => $"`{s.Name}`" + (string.IsNullOrEmpty(s.Description) ? "" : ": " + s.Description)
-                                               + (s is CommandGroup group
-                                                   ? "\n    SubCommands:" + string.Join(", ", group.Children
-                                                         .Where(a => !a.IsHidden)
-                                                         .Distinct(new CommandComparer())
-                                                         .Select(a => $"`{a.Name}`"))
-                                                   : ""))
-                ));
+            string text = string.Join("\n", subcommands
+                .Where(s => !s.IsHidden)
+                .Select(s => s is CommandGroup group
+                    ? $"{s.Name}: " + string.Join(" ", group.Children
+                          .Where(a => !a.IsHidden)
+                          .Distinct(new CommandComparer())
+                          .Select(a => $"`{a.Name}`"))
+                    : $"`{s.Name}`")
+            );
+            Console.WriteLine(text.Length);
+            builder.AddField("Commands", text);
             return this;
         }
 

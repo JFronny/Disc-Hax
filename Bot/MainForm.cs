@@ -39,7 +39,7 @@ namespace Bot
                                 .First(s => ((DiscordChannel) s.Tag).Id == q)));
                     });
                 if (element == ConfigManager.ENABLED)
-                    ClassExtensions.InvokeAction(this, (MethodInvoker) delegate { updateChecking(); });
+                    this.InvokeAction((MethodInvoker) delegate { updateChecking(); });
             };
             settingsBoxes = new List<CheckBox>();
             string[] array = CommandArr.getC().Except(new[] {ConfigManager.ENABLED, ConfigManager.NSFW})
@@ -64,7 +64,7 @@ namespace Bot
             ChannelTree.Enabled = true;
             chatBox.Enabled = true;
             chatSend.Enabled = true;
-            DiscordGuild[] arr = Program.Bot.Client.Guilds.Values.ToArray();
+            DiscordGuild[] arr = Program.Bot.Guilds.Values.ToArray();
             for (int i = 0; i < arr.Length; i++)
                 AddGuild(arr[i]);
         }
@@ -72,7 +72,6 @@ namespace Bot
         public TreeView ChannelTree { get; private set; }
 
         public Task BotThread { get; set; }
-        public Bot Bot { get; set; }
         public CancellationTokenSource TokenSource { get; set; }
         public DiscordGuild SelectedGuild { get; set; }
         public DiscordChannel SelectedChannel { get; set; }
@@ -134,7 +133,7 @@ namespace Bot
                     SelectedChannel = (DiscordChannel) e.Node.Tag;
                     ChannelDefined = true;
                     chatBox.Items.Clear();
-                    (await SelectedChannel.GetMessagesAsync(100)).ToList().ForEach(s => chatBox.Items.Add(s.GetString()));
+                    (await SelectedChannel.GetMessagesAsync()).ToList().ForEach(s => chatBox.Items.Add(s.GetString()));
                     nsfwBox.Checked = SelectedChannel.IsNSFW || SelectedChannel.getEvaluatedNSFW();
                     settingsBoxes.ForEach(s =>
                         s.Checked = SelectedChannel.get((string) s.Tag).TRUE());
@@ -144,7 +143,7 @@ namespace Bot
                 }
                 catch (InvalidCastException e1)
                 {
-                    Program.Bot.Client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax",
+                    Program.Bot.DebugLogger.LogMessage(LogLevel.Error, "DiscHax",
                         "channelTree_AfterSelect: cast failed", DateTime.Now, e1);
                 }
             }
@@ -168,16 +167,17 @@ namespace Bot
                 nodes.ToList().ForEach(s =>
                 {
                     if (s.Tag.GetType() == typeof(DiscordChannel))
-                        s.Checked = ((DiscordChannel)s.Tag).get(ConfigManager.ENABLED).TRUE();
+                        s.Checked = ((DiscordChannel) s.Tag).get(ConfigManager.ENABLED).TRUE();
                     else if (s.Tag.GetType() == typeof(DiscordGuild))
                         s.Checked = ((DiscordGuild) s.Tag).get(ConfigManager.ENABLED).TRUE();
                     else
-                        Program.Bot.Client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax", $"Unexpected Type ({s.Tag.GetType()}) in MainForm.updateChecking()", DateTime.Now);
+                        Program.Bot.DebugLogger.LogMessage(LogLevel.Error, "DiscHax",
+                            $"Unexpected Type ({s.Tag.GetType()}) in MainForm.updateChecking()", DateTime.Now);
                 });
             }
             catch (Exception e)
             {
-                Program.Bot.Client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax", "updateChecking failed",
+                Program.Bot.DebugLogger.LogMessage(LogLevel.Error, "DiscHax", "updateChecking failed",
                     DateTime.Now, e);
             }
             finally
@@ -192,7 +192,7 @@ namespace Bot
             {
                 e.Handled = true;
                 SendMessage(chatSend.Text, SelectedChannel,
-                    t => ClassExtensions.SetProperty(chatSend, x => x.Text, ""));
+                    t => chatSend.SetProperty(x => x.Text, ""));
             }
         }
 
@@ -285,8 +285,8 @@ namespace Bot
             {
                 string[] cfgs =
                     Directory.GetFiles(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"Cfgs"));
-                string[] guilds = Program.Bot.Client.Guilds.Select(s => s.Key.ToString()).ToArray();
-                string[] channels = Program.Bot.Client.Guilds.SelectMany(s => s.Value.Channels).Select(s => s.Key.ToString())
+                string[] guilds = Program.Bot.Guilds.Select(s => s.Key.ToString()).ToArray();
+                string[] channels = Program.Bot.Guilds.SelectMany(s => s.Value.Channels).Select(s => s.Key.ToString())
                     .ToArray();
                 string[] allowedNames = {"common.xml"};
                 cfgs = cfgs.Where(s => Path.GetFileName(s) != "keys.secure").ToArray();
@@ -352,7 +352,10 @@ namespace Bot
             Dispose();
         }
 
-        private void tokenButton_Click(object sender, EventArgs e) =>
-            new TokenForm(TokenManager.DiscordToken, TokenManager.CurrencyconverterapiToken).Show();
+        private void tokenButton_Click(object sender, EventArgs e)
+        {
+            new TokenForm(TokenManager.DiscordToken, TokenManager.CurrencyconverterapiToken,
+                TokenManager.PerspectiveToken).Show();
+        }
     }
 }

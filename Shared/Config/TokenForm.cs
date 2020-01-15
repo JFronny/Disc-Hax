@@ -6,28 +6,32 @@ namespace Shared.Config
 {
     public partial class TokenForm : Form
     {
-        private readonly bool overwriteXML;
+        private readonly bool _overwriteXml;
 
-        public TokenForm(string DiscordToken, string CurrencyconverterapiToken, bool overwriteXML = false)
+        public TokenForm(string discordToken, string currencyconverterapiToken, string perspectiveToken,
+            bool overwriteXml = false)
         {
             InitializeComponent();
-            discordBox.Text = DiscordToken;
-            currConvBox.Text = CurrencyconverterapiToken;
-            this.overwriteXML = overwriteXML;
+            discordBox.Text = discordToken;
+            currConvBox.Text = currencyconverterapiToken;
+            perspectiveBox.Text = perspectiveToken;
+            _overwriteXml = overwriteXml;
         }
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            if (overwriteXML)
+            if (_overwriteXml)
             {
                 TokenManager.SaveXE(new XElement("container",
                     new XElement("discord", discordBox.Text),
-                    new XElement("currencyconverterapi", currConvBox.Text)));
+                    new XElement("currencyconverterapi", currConvBox.Text),
+                    new XElement("perspective", perspectiveBox.Text)));
             }
             else
             {
                 TokenManager.DiscordToken = discordBox.Text;
                 TokenManager.CurrencyconverterapiToken = currConvBox.Text;
+                TokenManager.PerspectiveToken = perspectiveBox.Text;
             }
             DialogResult = DialogResult.OK;
             Close();
