@@ -239,9 +239,13 @@ namespace Bot.Commands
             {
                 await ctx.TriggerTypingAsync();
                 IReadOnlyList<DiscordMessage> msg = await ctx.Channel.GetMessagesAsync();
-                IEnumerable<string> messages = msg.Where(s => s.Author.Id == member.Id).Select(x => x.Content);
-                messages = messages.Concat(msg.SelectMany(s => s.Embeds)
-                    .SelectMany(s => new[] {s.Title, s.Description}.Where(a => !string.IsNullOrWhiteSpace(a))));
+                IEnumerable<string?> messages = msg.Where(s => s.Author.Id == member.Id).Select(x => x.Content);
+                IEnumerable<DiscordEmbed> embeds = msg.Where(s => s.Embeds != null).SelectMany(s => s.Embeds);
+                messages = messages.Concat(embeds
+                    .SelectMany(s => new[] {s.Title, s.Description}
+                        .Concat((s.Fields ?? new DiscordEmbedField[0]).SelectMany(a => new[] {a.Name, a.Value})))
+                );
+                messages = messages.Where(s => !string.IsNullOrWhiteSpace(s));
                 string str = string.Join("\n", messages);
                 await ctx.RespondAsyncFix(
                     $"Toxicity: {(await Program.Perspective.RequestAnalysis(str)).AttributeScores.First().Value.SummaryScore.Value}");
