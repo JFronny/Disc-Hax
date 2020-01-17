@@ -37,11 +37,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CC_Functions.Misc, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\CC-Functions.Misc.1.0.5\lib\CC_Functions.Misc.dll</HintPath>
+      <HintPath>..\packages\CC-Functions.Misc.1.0.6\lib\CC_Functions.Misc.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DSharpPlus, Version=4.0.0.653, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\DSharpPlus.4.0.0-nightly-00653\lib\net45\DSharpPlus.dll</HintPath>
+    <Reference Include="DSharpPlus, Version=4.0.0.655, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\DSharpPlus.4.0.0-nightly-00655\lib\net45\DSharpPlus.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="DSharpPlus.CommandsNext, Version=4.0.0.643, Culture=neutral, PublicKeyToken=null">
