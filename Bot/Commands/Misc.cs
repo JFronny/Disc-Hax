@@ -202,12 +202,10 @@ namespace Bot.Commands
                 //Save
                 g.Flush();
                 g.Dispose();
-                using (MemoryStream str = new MemoryStream())
-                {
-                    bmp.Save(str, ImageFormat.Jpeg);
-                    str.Position = 0;
-                    await ctx.RespondWithFileAsync("Magic8.jpg", str);
-                }
+                using MemoryStream str = new MemoryStream();
+                bmp.Save(str, ImageFormat.Jpeg);
+                str.Position = 0;
+                await ctx.RespondWithFileAsync("Magic8.jpg", str);
             }
         }
 

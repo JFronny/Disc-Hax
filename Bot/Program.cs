@@ -19,7 +19,6 @@ using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
-using DSharpPlus.Net.WebSocket;
 using DSharpPlus.VoiceNext;
 using Octokit;
 using Shared;
@@ -117,8 +116,8 @@ namespace Bot
 #endif
                         UseInternalLogHandler = false
                     };
-                    if (Type.GetType("Mono.Runtime") != null)
-                        cfg.WebSocketClientFactory = WebSocketSharpClient.CreateNew;
+                    //if (Type.GetType("Mono.Runtime") != null)
+                    //    cfg.WebSocketClientFactory = WebSocketSharpClient.CreateNew;
                     Bot = new DiscordClient(cfg);
                     //
                     //
