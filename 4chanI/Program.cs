@@ -21,7 +21,7 @@ namespace Cleverbot
                 .boards;
             Board b = new Board(args != null && args.Length > 0
                 ? args[0]
-                : consoleChoose("Choose a board!", m.Select(s => s.ShortName).ToArray(),
+                : ConsoleChoose("Choose a board!", m.Select(s => s.ShortName).ToArray(),
                     m.Select(s => s.Title).ToArray()));
             Thread.Sleep(1000);
             List<Chan.Net.Thread> th = b.GetThreads().ToList();
@@ -37,22 +37,22 @@ namespace Cleverbot
                     {
                         try
                         {
-                            using (Stream s = c.OpenRead(th[i].Image.Image))
-                            {
-                                Bitmap img = (Bitmap) Image.FromStream(s);
-                                f.BackgroundImage = img;
-                                f.BackgroundImageLayout = ImageLayout.Zoom;
-                                SetFormSize(f, img.Size);
-                            }
+                            using Stream s = c.OpenRead(th[i].Image.Image);
+                            Bitmap img = (Bitmap)Image.FromStream(s);
+                            f.BackgroundImage = img;
+                            f.BackgroundImageLayout = ImageLayout.Zoom;
+                            SetFormSize(f, img.Size);
                         }
                         catch
                         {
                             try
                             {
-                                Label l = new Label();
-                                l.Text = th[i].Message;
-                                l.AutoSize = false;
-                                l.Dock = DockStyle.Fill;
+                                Label l = new Label
+                                {
+                                    Text = th[i].Message,
+                                    AutoSize = false,
+                                    Dock = DockStyle.Fill
+                                };
                                 f.Controls.Add(l);
                                 SetFormSize(f, l.Size);
                             }
@@ -69,7 +69,7 @@ namespace Cleverbot
             }
         }
 
-        private static string consoleChoose(string prompt, string[] choices, string[] choiceDesc = null)
+        private static string ConsoleChoose(string prompt, string[] choices, string[]? choiceDesc = null)
         {
             if (choiceDesc != null && choiceDesc.Length != choices.Length)
                 throw new ArgumentOutOfRangeException(

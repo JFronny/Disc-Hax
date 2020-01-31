@@ -9,7 +9,7 @@ namespace WaifuGen
     internal class Program
     {
         [STAThread]
-        private static void Main(string[] args)
+        private static void Main()
         {
             Random rnd = new Random();
             while (true)
@@ -18,14 +18,12 @@ namespace WaifuGen
                     f.StartPosition = FormStartPosition.CenterScreen;
                     using (WebClient c = new WebClient())
                     {
-                        using (Stream s =
-                            c.OpenRead($"https://www.thiswaifudoesnotexist.net/example-{rnd.Next(6000)}.jpg"))
-                        {
-                            Bitmap img = (Bitmap) Image.FromStream(s);
-                            f.BackgroundImage = img;
-                            f.BackgroundImageLayout = ImageLayout.Zoom;
-                            SetFormSize(f, img.Size);
-                        }
+                        using MemoryStream s =
+                            new MemoryStream(c.DownloadData($"https://www.thiswaifudoesnotexist.net/example-{rnd.Next(6000)}.jpg"));
+                        Bitmap img = (Bitmap)Image.FromStream(s);
+                        f.BackgroundImage = img;
+                        f.BackgroundImageLayout = ImageLayout.Zoom;
+                        SetFormSize(f, img.Size);
                     }
 
                     f.ShowDialog();

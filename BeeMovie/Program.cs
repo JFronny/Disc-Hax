@@ -7,7 +7,7 @@ namespace BeeMovie
     {
         private static readonly Random rnd = new Random();
 
-        private static void Main(string[] args)
+        private static void Main()
         {
             string[] Quotes;
             using (WebClient client = new WebClient())

@@ -50,9 +50,8 @@ namespace Bot
             bool formKey = args.Contains("form") || args.Contains("form-key");
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            string appGuid = ((GuidAttribute) Assembly.GetExecutingAssembly()
-                .GetCustomAttributes(typeof(GuidAttribute), false).GetValue(0)).Value;
-            string mutexId = $"Global\\{{{appGuid}}}";
+            string appName = "DiscHaxBot";
+            string mutexId = $"Global\\{{{appName}}}";
             MutexAccessRule allowEveryoneRule = new MutexAccessRule(
                 new SecurityIdentifier(WellKnownSidType.WorldSid, null), MutexRights.FullControl,
                 AccessControlType.Allow);
