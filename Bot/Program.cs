@@ -57,8 +57,9 @@ namespace Bot
                 AccessControlType.Allow);
             MutexSecurity securitySettings = new MutexSecurity();
             securitySettings.AddAccessRule(allowEveryoneRule);
-            using (Mutex mutex = new Mutex(false, mutexId, out bool _, securitySettings))
+            using (Mutex mutex = new Mutex(false, mutexId, out bool _))
             {
+                mutex.SetAccessControl(securitySettings);
                 bool hasHandle = false;
                 try
                 {
@@ -78,12 +79,14 @@ namespace Bot
                     Console.WriteLine("Initializing");
                     _notifyIcon = new NotifyIcon
                     {
-                        Text = "DiscHax", Icon = Resources.TextTemplate, Visible = true, ContextMenu = new ContextMenu()
+                        Text = "DiscHax",
+                        Icon = Resources.TextTemplate,
+                        Visible = true,
+                        ContextMenuStrip = new ContextMenuStrip()
                     };
                     if (formKey)
                     {
-                        MenuItem formItem = new MenuItem("Show");
-                        formItem.Index = 0;
+                        ToolStripButton formItem = new ToolStripButton("Show");
                         formItem.Click += (sender, e) =>
                         {
                             if (_form != null && !_form.IsDisposed)
@@ -91,16 +94,16 @@ namespace Bot
                             _form = new MainForm();
                             _form.Show();
                         };
-                        _notifyIcon.ContextMenu.MenuItems.Add(formItem);
+                        _notifyIcon.ContextMenuStrip.Items.Add(formItem);
                     }
-                    MenuItem exitItem = new MenuItem("Exit");
+                    ToolStripButton exitItem = new ToolStripButton("Exit");
                     exitItem.Click += (sender, e) =>
                     {
                         Bot.DisconnectAsync();
                         Bot.Dispose();
                         _ctx.ExitThread();
                     };
-                    _notifyIcon.ContextMenu.MenuItems.Add(exitItem);
+                    _notifyIcon.ContextMenuStrip.Items.Add(exitItem);
                     Github = new GitHubClient(new ProductHeaderValue("DiscHax"));
                     Perspective = new Perspective(TokenManager.PerspectiveToken);
                     DiscordConfiguration cfg = new DiscordConfiguration
