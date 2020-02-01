@@ -50,153 +50,140 @@ namespace Bot
             bool formKey = args.Contains("form") || args.Contains("form-key");
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            string appName = "DiscHaxBot";
-            string mutexId = $"Global\\{{{appName}}}";
+            string mutexId = "Global\\{DiscHaxBot}";
             MutexAccessRule allowEveryoneRule = new MutexAccessRule(
                 new SecurityIdentifier(WellKnownSidType.WorldSid, null), MutexRights.FullControl,
                 AccessControlType.Allow);
             MutexSecurity securitySettings = new MutexSecurity();
             securitySettings.AddAccessRule(allowEveryoneRule);
-            using (Mutex mutex = new Mutex(false, mutexId, out bool _))
+            using Mutex mutex = new Mutex(false, mutexId, out bool _, securitySettings);
+            bool hasHandle = false;
+            try
             {
-                mutex.SetAccessControl(securitySettings);
-                bool hasHandle = false;
                 try
                 {
-                    try
-                    {
-                        hasHandle = mutex.WaitOne(5000, false);
-                        if (hasHandle == false)
-                            throw new TimeoutException("Timeout waiting for exclusive access");
-                    }
-                    catch (AbandonedMutexException)
-                    {
+                    hasHandle = mutex.WaitOne(5000, false);
+                    if (hasHandle == false)
+                        throw new TimeoutException("Timeout waiting for exclusive access");
+                }
+                catch (AbandonedMutexException)
+                {
 #if DEBUG
-                        Console.WriteLine("Mutex abandoned");
+                    Console.WriteLine("Mutex abandoned");
 #endif
-                        hasHandle = true;
-                    }
-                    Console.WriteLine("Initializing");
-                    _notifyIcon = new NotifyIcon
+                    hasHandle = true;
+                }
+                Console.WriteLine("Initializing");
+                _notifyIcon = new NotifyIcon
+                {
+                    Text = "DiscHax", Icon = Resources.TextTemplate, Visible = true, ContextMenu = new ContextMenu()
+                };
+                if (formKey)
+                {
+                    MenuItem formItem = new MenuItem("Show");
+                    formItem.Click += (sender, e) =>
                     {
-                        Text = "DiscHax",
-                        Icon = Resources.TextTemplate,
-                        Visible = true,
-                        ContextMenuStrip = new ContextMenuStrip()
+                        if (_form != null && !_form.IsDisposed)
+                            _form.Dispose();
+                        _form = new MainForm();
+                        _form.Show();
                     };
-                    if (formKey)
-                    {
-                        ToolStripButton formItem = new ToolStripButton("Show");
-                        formItem.Click += (sender, e) =>
-                        {
-                            if (_form != null && !_form.IsDisposed)
-                                _form.Dispose();
-                            _form = new MainForm();
-                            _form.Show();
-                        };
-                        _notifyIcon.ContextMenuStrip.Items.Add(formItem);
-                    }
-                    ToolStripButton exitItem = new ToolStripButton("Exit");
-                    exitItem.Click += (sender, e) =>
-                    {
-                        Bot.DisconnectAsync();
-                        Bot.Dispose();
-                        _ctx.ExitThread();
-                    };
-                    _notifyIcon.ContextMenuStrip.Items.Add(exitItem);
-                    Github = new GitHubClient(new ProductHeaderValue("DiscHax"));
-                    Perspective = new Perspective(TokenManager.PerspectiveToken);
-                    DiscordConfiguration cfg = new DiscordConfiguration
-                    {
-                        Token = TokenManager.DiscordToken,
-                        TokenType = TokenType.Bot,
-                        AutoReconnect = true,
+                    _notifyIcon.ContextMenu.MenuItems.Add(formItem);
+                }
+                MenuItem exitItem = new MenuItem("Exit");
+                exitItem.Click += (sender, e) =>
+                {
+                    Bot.DisconnectAsync();
+                    Bot.Dispose();
+                    _ctx.ExitThread();
+                };
+                _notifyIcon.ContextMenu.MenuItems.Add(exitItem);
+                Github = new GitHubClient(new ProductHeaderValue("DiscHax"));
+                Perspective = new Perspective(TokenManager.PerspectiveToken);
+                DiscordConfiguration cfg = new DiscordConfiguration
+                {
+                    Token = TokenManager.DiscordToken,
+                    TokenType = TokenType.Bot,
+                    AutoReconnect = true,
 #if DEBUG
-                        LogLevel = LogLevel.Debug,
+                    LogLevel = LogLevel.Debug,
 #else
                         LogLevel = LogLevel.Info,
 #endif
-                        UseInternalLogHandler = false
-                    };
-                    //if (Type.GetType("Mono.Runtime") != null)
-                    //    cfg.WebSocketClientFactory = WebSocketSharpClient.CreateNew;
-                    Bot = new DiscordClient(cfg);
-                    //
-                    //
-                    Commands = Bot.UseCommandsNext(new CommandsNextConfiguration
-                    {
-                        StringPrefixes = new[] {Common.prefix},
-                        EnableDms = false
-                    });
-                    Commands.CommandExecuted += Commands_CommandExecuted;
-                    Commands.CommandErrored += Commands_CommandErrored;
-                    Bot.UseInteractivity(new InteractivityConfiguration
-                    {
-                        PaginationBehaviour = PaginationBehaviour.Ignore,
-                        Timeout = TimeSpan.FromMinutes(2)
-                    });
-                    Bot.UseVoiceNext(new VoiceNextConfiguration());
-                    Commands.RegisterCommands<ImageBoards>();
-                    Commands.RegisterCommands<Administration>();
-                    Commands.RegisterCommands<LocalStats>();
-                    Commands.RegisterCommands<Minigames>();
-                    Commands.RegisterCommands<Misc>();
-                    Commands.RegisterCommands<Math>();
-                    Commands.RegisterCommands<Money>();
-                    Commands.RegisterCommands<Quotes>();
-                    Commands.RegisterCommands<PublicStats>();
-                    Commands.RegisterConverter(new BoardConv());
-                    Commands.RegisterConverter(new BooruConv());
-                    Commands.RegisterConverter(new CurrencyConv());
-                    Commands.RegisterConverter(new RPSOptionConv());
-                    Commands.SetHelpFormatter<HelpFormatter>();
-                    Bot.DebugLogger.LogMessageReceived += DebugLogger_LogMessageReceived;
-                    //
-                    //
-                    Bot.Ready += Bot_Ready;
-                    Bot.GuildAvailable += AddGuild;
-                    Bot.GuildCreated += AddGuild;
-                    Bot.GuildUnavailable += RemoveGuild;
-                    Bot.GuildDeleted += RemoveGuild;
-                    Bot.ChannelCreated += AddChannel;
-                    Bot.ChannelDeleted += RemoveChannel;
-                    Bot.MessageCreated += AddMessage;
-                    Bot.MessageDeleted += RemoveMessage;
-                    Bot.ClientErrored += Bot_ClientErrored;
-                    _tokenSource = new CancellationTokenSource();
-                    Task.Run(BotThreadCallback);
-                    new Thread(() =>
-                    {
-                        while (true)
-                            try
-                            {
-                                Thread.Sleep(5000);
-                                if (Bot == null)
-                                    return;
-                                foreach (KeyValuePair<ulong, DiscordGuild> guild in Bot.Guilds)
-                                    guild.Value.evalBans();
-                            }
-                            catch (Exception e)
-                            {
-                                Bot.DebugLogger.LogMessage(LogLevel.Error, "DiscHax",
-                                    $"A crash occured in the ban-evaluation Thread: {e}", DateTime.Now, e);
-                            }
-                    }).Start();
-                    if (showForm)
-                    {
-                        _form = new MainForm();
-                        _form.Show();
-                    }
-                    _ctx = new ApplicationContext();
-                    Application.Run(_ctx);
-                    _tokenSource.Cancel();
-                    _notifyIcon.Visible = false;
-                }
-                finally
+                    UseInternalLogHandler = false
+                };
+                Bot = new DiscordClient(cfg);
+                Commands = Bot.UseCommandsNext(new CommandsNextConfiguration
                 {
-                    if (hasHandle)
-                        mutex.ReleaseMutex();
+                    StringPrefixes = new[] {Common.prefix},
+                    EnableDms = false
+                });
+                Commands.CommandExecuted += Commands_CommandExecuted;
+                Commands.CommandErrored += Commands_CommandErrored;
+                Bot.UseInteractivity(new InteractivityConfiguration
+                {
+                    PaginationBehaviour = PaginationBehaviour.Ignore,
+                    Timeout = TimeSpan.FromMinutes(2)
+                });
+                Bot.UseVoiceNext(new VoiceNextConfiguration());
+                Commands.RegisterCommands<ImageBoards>();
+                Commands.RegisterCommands<Administration>();
+                Commands.RegisterCommands<LocalStats>();
+                Commands.RegisterCommands<Minigames>();
+                Commands.RegisterCommands<Misc>();
+                Commands.RegisterCommands<Math>();
+                Commands.RegisterCommands<Money>();
+                Commands.RegisterCommands<Quotes>();
+                Commands.RegisterCommands<PublicStats>();
+                Commands.RegisterConverter(new BoardConv());
+                Commands.RegisterConverter(new BooruConv());
+                Commands.RegisterConverter(new CurrencyConv());
+                Commands.RegisterConverter(new RPSOptionConv());
+                Commands.SetHelpFormatter<HelpFormatter>();
+                Bot.DebugLogger.LogMessageReceived += DebugLogger_LogMessageReceived;
+                Bot.Ready += Bot_Ready;
+                Bot.GuildAvailable += AddGuild;
+                Bot.GuildCreated += AddGuild;
+                Bot.GuildUnavailable += RemoveGuild;
+                Bot.GuildDeleted += RemoveGuild;
+                Bot.ChannelCreated += AddChannel;
+                Bot.ChannelDeleted += RemoveChannel;
+                Bot.MessageCreated += AddMessage;
+                Bot.MessageDeleted += RemoveMessage;
+                Bot.ClientErrored += Bot_ClientErrored;
+                _tokenSource = new CancellationTokenSource();
+                Task.Run(BotThreadCallback);
+                new Thread(() =>
+                {
+                    while (true)
+                        try
+                        {
+                            Thread.Sleep(5000);
+                            if (Bot == null)
+                                return;
+                            foreach (KeyValuePair<ulong, DiscordGuild> guild in Bot.Guilds)
+                                guild.Value.evalBans();
+                        }
+                        catch (Exception e)
+                        {
+                            Bot.DebugLogger.LogMessage(LogLevel.Error, "DiscHax",
+                                $"A crash occured in the ban-evaluation Thread: {e}", DateTime.Now, e);
+                        }
+                }).Start();
+                if (showForm)
+                {
+                    _form = new MainForm();
+                    _form.Show();
                 }
+                _ctx = new ApplicationContext();
+                Application.Run(_ctx);
+                _tokenSource.Cancel();
+                _notifyIcon.Visible = false;
+            }
+            finally
+            {
+                if (hasHandle)
+                    mutex.ReleaseMutex();
             }
         }
 

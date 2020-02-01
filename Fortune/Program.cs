@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using Octokit;
 
 namespace Fortune
@@ -15,7 +14,6 @@ namespace Fortune
         {
             Console.Write("off? (y/n): ");
             bool off = Console.ReadKey().Key == ConsoleKey.Y;
-            typeof(HttpClient).ToString();
             Console.WriteLine();
             GitHubClient cli = new GitHubClient(new ProductHeaderValue("DiscHax"));
             IEnumerable<RepositoryContent> files = cli.Repository.Content.GetAllContents("shlomif", "fortune-mod",

@@ -26,11 +26,11 @@ namespace BooruT
                 Console.WriteLine($"Tags on the image: {string.Join(", ", result.tags)}");
                 using Form f = new Form();
                 f.Text =
-                        $"{result.fileUrl} - {result.rating}";
+                    $"{result.fileUrl} - {result.rating}";
                 f.StartPosition = FormStartPosition.CenterScreen;
                 using WebClient c = new WebClient();
                 using Stream s = c.OpenRead(result.fileUrl);
-                Bitmap img = (Bitmap)Image.FromStream(s);
+                using Bitmap img = (Bitmap) Image.FromStream(s);
                 f.BackgroundImage = img;
                 f.BackgroundImageLayout = ImageLayout.Zoom;
                 SetFormSize(f, img.Size);
@@ -61,7 +61,6 @@ namespace BooruT
             f.Size = s;
             f.SizeChanged += (sender, e) =>
             {
-                Size tmp = f.Size;
                 f.Width = Math.Min(f.Width, screen.Width);
                 f.Height = (int)Math.Round((f.Width - WidthAdd) * ratio) + HeightAdd;
             };

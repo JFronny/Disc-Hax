@@ -38,7 +38,7 @@ namespace Cleverbot
                         try
                         {
                             using Stream s = c.OpenRead(th[i].Image.Image);
-                            Bitmap img = (Bitmap)Image.FromStream(s);
+                            Bitmap img = (Bitmap) Image.FromStream(s);
                             f.BackgroundImage = img;
                             f.BackgroundImageLayout = ImageLayout.Zoom;
                             SetFormSize(f, img.Size);
@@ -47,12 +47,7 @@ namespace Cleverbot
                         {
                             try
                             {
-                                Label l = new Label
-                                {
-                                    Text = th[i].Message,
-                                    AutoSize = false,
-                                    Dock = DockStyle.Fill
-                                };
+                                Label l = new Label {Text = th[i].Message, AutoSize = false, Dock = DockStyle.Fill};
                                 f.Controls.Add(l);
                                 SetFormSize(f, l.Size);
                             }

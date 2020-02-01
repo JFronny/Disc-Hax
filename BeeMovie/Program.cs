@@ -5,7 +5,7 @@ namespace BeeMovie
 {
     internal class Program
     {
-        private static readonly Random rnd = new Random();
+        private static readonly Random Rnd = new Random();
 
         private static void Main()
         {
@@ -24,7 +24,7 @@ namespace BeeMovie
             while (true)
             {
                 Console.Clear();
-                int q = rnd.Next(Quotes.Length - 2);
+                int q = Rnd.Next(Quotes.Length - 2);
                 Console.WriteLine((Quotes[q] + "\n\n" + Quotes[q + 1] + "\n\n" + Quotes[q + 2]).Replace("\n", "\r\n"));
                 Console.ReadKey();
             }

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml.Linq;
@@ -9,7 +10,7 @@ namespace Shared.Config
     public static class TokenManager
     {
         private static readonly string containerFile =
-            Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Cfgs", "keys.secure");
+            Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Cfgs", $"keys.secure.{Environment.OSVersion.Platform.ToString().ToLower()}");
 
         public static string DiscordToken
         {
