@@ -193,11 +193,9 @@ namespace Shared.Config
                     el.Element(BANS).Element("user" + v.Key).Remove();
                     continue;
                 }
-                if (v.Value <= DateTime.Now)
-                {
-                    ID.UnbanMemberAsync(v.Key, "Timed ban timed out");
-                    el.Element(BANS).Element("user" + v.Key).Remove();
-                }
+                if (v.Value > DateTime.Now) continue;
+                ID.UnbanMemberAsync(v.Key, "Timed ban timed out");
+                el.Element(BANS).Element("user" + v.Key).Remove();
             }
             el.Save(XMLPath);
         }

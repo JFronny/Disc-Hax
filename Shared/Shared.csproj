@@ -40,32 +40,32 @@
       <HintPath>..\packages\CC-Functions.Misc.1.0.6\lib\CC_Functions.Misc.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DSharpPlus, Version=4.0.0.657, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\DSharpPlus.4.0.0-nightly-00657\lib\netstandard2.0\DSharpPlus.dll</HintPath>
+    <Reference Include="DSharpPlus, Version=4.0.0.658, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\DSharpPlus.4.0.0-nightly-00658\lib\netstandard2.0\DSharpPlus.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DSharpPlus.CommandsNext, Version=4.0.0.657, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\DSharpPlus.CommandsNext.4.0.0-nightly-00657\lib\netstandard2.0\DSharpPlus.CommandsNext.dll</HintPath>
+    <Reference Include="DSharpPlus.CommandsNext, Version=4.0.0.658, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\DSharpPlus.CommandsNext.4.0.0-nightly-00658\lib\netstandard2.0\DSharpPlus.CommandsNext.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DSharpPlus.Interactivity, Version=4.0.0.657, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\DSharpPlus.Interactivity.4.0.0-nightly-00657\lib\netstandard2.0\DSharpPlus.Interactivity.dll</HintPath>
+    <Reference Include="DSharpPlus.Interactivity, Version=4.0.0.658, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\DSharpPlus.Interactivity.4.0.0-nightly-00658\lib\netstandard2.0\DSharpPlus.Interactivity.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="HtmlAgilityPack, Version=1.11.18.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a">
-      <HintPath>..\packages\HtmlAgilityPack.1.11.18\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    <Reference Include="HtmlAgilityPack, Version=1.11.19.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a">
+      <HintPath>..\packages\HtmlAgilityPack.1.11.19\lib\Net45\HtmlAgilityPack.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.1.1.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=3.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
-      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.3.1.1\lib\net461\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=3.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.3.1.2\lib\net461\Microsoft.Extensions.DependencyInjection.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=3.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
-      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.3.1.1\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=3.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.3.1.2\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
