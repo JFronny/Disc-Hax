@@ -36,18 +36,18 @@ namespace Bot
                     command.Overloads.OrderBy(s => s.Priority).Select(s =>
                     {
                         return $"{command.QualifiedName}{(s.Arguments.Any() ? "\n" : "")}" + string.Join("\n",
-                                   s.Arguments.Select(a =>
-                                   {
-                                       string tmp = $"-   `{a.Name} ";
-                                       string type = CommandsNext.GetUserFriendlyTypeName(a.Type);
-                                       if (a.IsCatchAll)
-                                           tmp += $"[{type}...]";
-                                       else if (a.IsOptional)
-                                           tmp += $"({type})";
-                                       else
-                                           tmp += $"<{type}>";
-                                       return tmp + $"`: {a.Description}";
-                                   }));
+                            s.Arguments.Select(a =>
+                            {
+                                string tmp = $"-   `{a.Name} ";
+                                string type = CommandsNext.GetUserFriendlyTypeName(a.Type);
+                                if (a.IsCatchAll)
+                                    tmp += $"[{type}...]";
+                                else if (a.IsOptional)
+                                    tmp += $"({type})";
+                                else
+                                    tmp += $"<{type}>";
+                                return tmp + $"`: {a.Description}";
+                            }));
                     })
                 ));
             builder.Description = command.Description;
@@ -60,9 +60,9 @@ namespace Bot
                 .Where(s => !s.IsHidden)
                 .Select(s => s is CommandGroup group
                     ? $"{s.Name}: " + string.Join(" ", group.Children
-                          .Where(a => !a.IsHidden)
-                          .Distinct(new CommandComparer())
-                          .Select(a => $"`{a.Name}`"))
+                        .Where(a => !a.IsHidden)
+                        .Distinct(new CommandComparer())
+                        .Select(a => $"`{a.Name}`"))
                     : $"`{s.Name}`")
             );
             Console.WriteLine(text.Length);

@@ -18,7 +18,7 @@ namespace Fortune
             GitHubClient cli = new GitHubClient(new ProductHeaderValue("DiscHax"));
             IEnumerable<RepositoryContent> files = cli.Repository.Content.GetAllContents("shlomif", "fortune-mod",
                 off ? "fortune-mod/datfiles/off/unrotated" : "fortune-mod/datfiles").GetAwaiter().GetResult();
-            IEnumerable<string> disallowednames = new[] { "CMakeLists.txt", null };
+            IEnumerable<string> disallowednames = new[] {"CMakeLists.txt", null};
             IEnumerable<RepositoryContent> filteredFiles =
                 files.Where(s => s.Type == ContentType.File && !disallowednames.Contains(s.Name));
             IEnumerable<string> cookies =
@@ -32,7 +32,7 @@ namespace Fortune
                     return client.DownloadString(s);
                 });
             }
-            string[] quotes = contents.SelectMany(s => s.Split(new[] { "\n%\n" }, StringSplitOptions.None)).ToArray();
+            string[] quotes = contents.SelectMany(s => s.Split(new[] {"\n%\n"}, StringSplitOptions.None)).ToArray();
             while (true)
             {
                 Console.Clear();

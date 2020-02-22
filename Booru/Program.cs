@@ -40,7 +40,7 @@ namespace BooruT
 
         private static void SetFormSize(Form f, Size s)
         {
-            double ratio = (double)s.Height / s.Width;
+            double ratio = (double) s.Height / s.Width;
             Rectangle screen = Screen.PrimaryScreen.WorkingArea;
             if (s.Width > screen.Width)
             {
@@ -62,7 +62,7 @@ namespace BooruT
             f.SizeChanged += (sender, e) =>
             {
                 f.Width = Math.Min(f.Width, screen.Width);
-                f.Height = (int)Math.Round((f.Width - WidthAdd) * ratio) + HeightAdd;
+                f.Height = (int) Math.Round((f.Width - WidthAdd) * ratio) + HeightAdd;
             };
         }
     }

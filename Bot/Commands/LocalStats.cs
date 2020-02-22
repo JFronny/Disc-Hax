@@ -70,8 +70,8 @@ namespace Bot.Commands
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync("Config:\n" + ctx.Channel.getStr() + "\n\nProperties:\n" + string.Join("\n",
-                                           typeof(DiscordChannel).GetProperties()
-                                               .Select(s => $"{s.Name}: {s.GetValue(ctx.Channel)}")));
+                    typeof(DiscordChannel).GetProperties()
+                        .Select(s => $"{s.Name}: {s.GetValue(ctx.Channel)}")));
             }
         }
 
@@ -86,8 +86,8 @@ namespace Bot.Commands
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync("Config:\n" + ctx.Guild.getStr() + "\n\nProperties:\n" + string.Join("\n",
-                                           typeof(DiscordGuild).GetProperties()
-                                               .Select(s => $"{s.Name}: {s.GetValue(ctx.Guild)}")));
+                    typeof(DiscordGuild).GetProperties()
+                        .Select(s => $"{s.Name}: {s.GetValue(ctx.Guild)}")));
             }
         }
     }

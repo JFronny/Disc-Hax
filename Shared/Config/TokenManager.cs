@@ -10,7 +10,8 @@ namespace Shared.Config
     public static class TokenManager
     {
         private static readonly string containerFile =
-            Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Cfgs", $"keys.secure.{Environment.OSVersion.Platform.ToString().ToLower()}");
+            Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Cfgs",
+                $"keys.secure.{Environment.OSVersion.Platform.ToString().ToLower()}");
 
         public static string DiscordToken
         {

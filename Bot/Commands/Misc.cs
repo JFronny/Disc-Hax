@@ -249,5 +249,21 @@ namespace Bot.Commands
                     $"Toxicity: {(await Program.Perspective.RequestAnalysis(str)).AttributeScores.First().Value.SummaryScore.Value}");
             }
         }
+
+        [Command("minecraft")]
+        [Aliases("mc")]
+        [Description("Gets the status of a minecraft server")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Minecraft(CommandContext ctx, [Description("IP of the server")] string IP)
+        {
+            if (ctx.Channel.get(ConfigManager.ENABLED)
+                .AND(ctx.Channel.getMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                string[] parsedIP = IP.Split(':');
+                ushort port = parsedIP.Length == 1 ? (ushort) 25565 : ushort.Parse(parsedIP[1]);
+                await ctx.RespondAsyncFix(StatReader.ReadStat(parsedIP[0], port));
+            }
+        }
     }
 }
