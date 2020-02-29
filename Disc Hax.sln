@@ -36,6 +36,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Magic8", "Magic8\Magic8.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RockPaperScissors", "RockPaperScissors\RockPaperScissors.csproj", "{CD266CB4-A512-44F0-8AB6-5820B0D55AB7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reddit", "Reddit\Reddit.csproj", "{2148E9EB-144A-418A-A8AA-6FC0497FDCB7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,6 +88,10 @@ Global
 		{CD266CB4-A512-44F0-8AB6-5820B0D55AB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD266CB4-A512-44F0-8AB6-5820B0D55AB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CD266CB4-A512-44F0-8AB6-5820B0D55AB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2148E9EB-144A-418A-A8AA-6FC0497FDCB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2148E9EB-144A-418A-A8AA-6FC0497FDCB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2148E9EB-144A-418A-A8AA-6FC0497FDCB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2148E9EB-144A-418A-A8AA-6FC0497FDCB7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,6 +108,7 @@ Global
 		{09AF8E8C-B9D3-40A9-AB01-D9560C0C2887} = {58AA2CDA-66A3-45F2-96EB-90E3EE355663}
 		{7F2A5941-B013-4753-BF30-5D46DA3FB6B9} = {58AA2CDA-66A3-45F2-96EB-90E3EE355663}
 		{CD266CB4-A512-44F0-8AB6-5820B0D55AB7} = {58AA2CDA-66A3-45F2-96EB-90E3EE355663}
+		{2148E9EB-144A-418A-A8AA-6FC0497FDCB7} = {58AA2CDA-66A3-45F2-96EB-90E3EE355663}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CAE17A9D-510E-4412-9865-E484487781F7}
