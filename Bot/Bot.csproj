@@ -46,8 +46,8 @@
     <ApplicationIcon>TextTemplate.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BooruSharp, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\BooruSharp.1.4.7\lib\net45\BooruSharp.dll</HintPath>
+    <Reference Include="BooruSharp, Version=1.4.8.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\BooruSharp.1.4.8\lib\netstandard2.0\BooruSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CC_Functions.Misc, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
@@ -73,8 +73,8 @@
       <HintPath>..\packages\DSharpPlus.VoiceNext.4.0.0-nightly-00658\lib\netstandard2.0\DSharpPlus.VoiceNext.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="HtmlAgilityPack, Version=1.11.19.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a">
-      <HintPath>..\packages\HtmlAgilityPack.1.11.19\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    <Reference Include="HtmlAgilityPack, Version=1.11.21.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a">
+      <HintPath>..\packages\HtmlAgilityPack.1.11.21\lib\Net45\HtmlAgilityPack.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MathParser.org-mXparser, Version=4.4.2.0, Culture=neutral, PublicKeyToken=0fbab7add73ed6e2">
@@ -98,8 +98,8 @@
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Octokit, Version=0.40.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Octokit.0.40.0\lib\net46\Octokit.dll</HintPath>
+    <Reference Include="Octokit, Version=0.42.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Octokit.0.42.0\lib\net46\Octokit.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
