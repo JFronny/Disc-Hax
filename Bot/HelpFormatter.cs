@@ -72,7 +72,7 @@ namespace Bot
 
         public override CommandHelpMessage Build()
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED).TRUE())
+            if (ctx.Channel.Get(ConfigManager.Enabled).TRUE())
             {
                 if (command == null)
                     builder.AddField("Notes",

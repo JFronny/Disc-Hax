@@ -18,8 +18,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task About(CommandContext ctx)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondPaginated(HTMLProcessor.ToPlainText(
@@ -32,8 +32,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task GuildCount(CommandContext ctx)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync($"Currently connected to {Program.Bot.Guilds.Count} Guilds");
@@ -45,8 +45,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Changelog(CommandContext ctx)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsyncFix((await Program.Github.Repository.Commit.GetAll("JFronny", "Disc-Hax"))[0]
@@ -60,8 +60,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Invite(CommandContext ctx)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(
@@ -75,8 +75,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Github(CommandContext ctx)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync("Repo Link: https://github.com/JFronny/Disc-Hax");

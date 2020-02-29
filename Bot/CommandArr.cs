@@ -29,7 +29,7 @@ namespace Bot
                     .Select(s => CommandComparer.GetName(s))
                     .Except(new[] {"method_ping"})
                     .OrderBy(s => s)
-                    .Union(new[] {ConfigManager.NSFW, ConfigManager.ENABLED}).ToArray();
+                    .Union(new[] {ConfigManager.Nsfw, ConfigManager.Enabled}).ToArray();
             return C;
         }
     }

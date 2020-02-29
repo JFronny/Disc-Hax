@@ -21,11 +21,11 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task GetMoney(CommandContext ctx)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync($"You have {ctx.Guild.getMoney(ctx.Member)} coins");
+                await ctx.RespondAsync($"You have {ctx.Guild.GetMoney(ctx.Member)} coins");
             }
         }
 
@@ -34,12 +34,12 @@ namespace Bot.Commands
         public async Task GetMoney(CommandContext ctx, [Description("User whose balance to get")]
             DiscordMember user)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(
-                    $"{user.Username} has {ctx.Guild.getMoney(user)} coins");
+                    $"{user.Username} has {ctx.Guild.GetMoney(user)} coins");
             }
         }
 
@@ -50,14 +50,14 @@ namespace Bot.Commands
         public async Task SetMoney(CommandContext ctx, [Description("User whose balance to set")]
             DiscordMember user, [Description("New value")] decimal money)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                decimal original = ctx.Guild.getMoney(user);
-                ctx.Guild.setMoney(user, money);
+                decimal original = ctx.Guild.GetMoney(user);
+                ctx.Guild.SetMoney(user, money);
                 await ctx.RespondAsync(
-                    $"{user.Username} now has {ctx.Guild.getMoney(user)} coins instead of {original}");
+                    $"{user.Username} now has {ctx.Guild.GetMoney(user)} coins instead of {original}");
             }
         }
 
@@ -67,11 +67,11 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Scoreboard(CommandContext ctx)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                KeyValuePair<ulong, decimal>[] tmp = ctx.Guild.getAllMoney()
+                KeyValuePair<ulong, decimal>[] tmp = ctx.Guild.GetAllMoney()
                     .OrderByDescending(s => s.Value).ToArray();
                 tmp = tmp.Length > 10 ? tmp.Where((s, i) => i < 10).ToArray() : tmp;
                 await ctx.RespondAsync(
@@ -85,17 +85,17 @@ namespace Bot.Commands
         public async Task GiveMoney(CommandContext ctx, [Description("User to give money to")] DiscordMember user,
             [Description("Money to give")] decimal money)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                if (money > ctx.Guild.getMoney(ctx.Member) || money < 0)
+                if (money > ctx.Guild.GetMoney(ctx.Member) || money < 0)
                 {
                     await ctx.RespondAsync("You don't have that much");
                     return;
                 }
-                ctx.Guild.incrementMoney(user, money);
-                ctx.Guild.incrementMoney(ctx.Member, -money);
+                ctx.Guild.IncrementMoney(user, money);
+                ctx.Guild.IncrementMoney(ctx.Member, -money);
                 await ctx.RespondAsync($"Gave {user.Username} {money} coins.");
             }
         }

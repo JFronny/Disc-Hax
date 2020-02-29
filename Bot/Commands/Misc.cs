@@ -57,8 +57,8 @@ namespace Bot.Commands
             TimeSpan duration, [Description("What options should people have.")]
             params DiscordEmoji[] options)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 DiscordMessage msg = await ctx.RespondAsync(embed: new DiscordEmbedBuilder
@@ -81,8 +81,8 @@ namespace Bot.Commands
             [Description("Bytes to generate. One byte equals two characters")]
             int bytes, [Description("Time before exiting")] TimeSpan time)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 InteractivityExtension interactivity = ctx.Client.GetInteractivity();
@@ -105,8 +105,8 @@ namespace Bot.Commands
         public async Task Emotify(CommandContext ctx, [Description("What should be converted")] [RemainingText]
             string text)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsyncFix(text.emotify());
@@ -120,8 +120,8 @@ namespace Bot.Commands
         public async Task Leetify(CommandContext ctx, [Description("What should be leetified")] [RemainingText]
             string text)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsyncFix(text.leetify());
@@ -134,8 +134,8 @@ namespace Bot.Commands
         public async Task PreviewSite(CommandContext ctx, [Description("URL to paginate site from")] [RemainingText]
             Uri URL)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (URL.IsLocal())
@@ -163,8 +163,8 @@ namespace Bot.Commands
         public async Task Magic8(CommandContext ctx, [Description("Question to answer")] [RemainingText]
             string question)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 Rectangle size = new Rectangle(0, 0, 400, 400);
@@ -214,8 +214,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Unshorten(CommandContext ctx, [Description("URL to unshorten")] Uri url)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 HttpWebRequest req = (HttpWebRequest) WebRequest.Create(url);
@@ -232,8 +232,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Toxicity(CommandContext ctx, [Description("Member to calculate")] DiscordMember member)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 IReadOnlyList<DiscordMessage> msg = await ctx.Channel.GetMessagesAsync();
@@ -256,8 +256,8 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Minecraft(CommandContext ctx, [Description("IP of the server")] string IP)
         {
-            if (ctx.Channel.get(ConfigManager.ENABLED)
-                .AND(ctx.Channel.getMethodEnabled()))
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 string[] parsedIP = IP.Split(':');

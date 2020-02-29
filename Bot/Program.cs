@@ -160,7 +160,7 @@ namespace Bot
                             if (Bot == null)
                                 return;
                             foreach (KeyValuePair<ulong, DiscordGuild> guild in Bot.Guilds)
-                                guild.Value.evalBans();
+                                guild.Value.EvalBans();
                         }
                         catch (Exception e)
                         {
@@ -244,7 +244,7 @@ namespace Bot
                 _form.ChannelTree.InvokeAction(new Action<DiscordMessage, DiscordChannel>(_form.AddMessage),
                     e.Message, e.Channel);
             if (!e.Author.IsBot)
-                e.Guild.incrementMoney(e.Guild.Members[e.Author.Id],
+                e.Guild.IncrementMoney(e.Guild.Members[e.Author.Id],
                     Rnd.Next(0, System.Math.Max(e.Message.Content.Length / 25, 20)));
             return Task.CompletedTask;
         }
@@ -266,7 +266,7 @@ namespace Bot
 
         private static async Task Commands_CommandErrored(CommandErrorEventArgs e)
         {
-            if (ConfigManager.get(e.Context.Channel.Id.ToString(), ConfigManager.ENABLED, ConfigManager.CHANNEL).TRUE())
+            if (e.Context.Channel.Get(ConfigManager.Enabled).TRUE())
             {
                 if (e.Exception is UnwantedExecutionException)
                     return;

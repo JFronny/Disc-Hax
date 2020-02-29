@@ -15,7 +15,7 @@ namespace Shared
     public static class ClassExtensions
     {
         public static bool getEvaluatedNSFW(this DiscordChannel Channel) =>
-            Channel.IsNSFW || Channel.get(ConfigManager.NSFW, false).TRUE();
+            Channel.IsNSFW || Channel.Get(ConfigManager.Nsfw, false).TRUE();
 
         public static string emotify(this string self)
         {

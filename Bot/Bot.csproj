@@ -187,6 +187,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandArr.cs" />
+    <Compile Include="Commands\Config.cs" />
     <Compile Include="Commands\ImageBoards.cs" />
     <Compile Include="Commands\Administration.cs" />
     <Compile Include="Commands\LocalStats.cs" />
