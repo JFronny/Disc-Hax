@@ -65,7 +65,8 @@ namespace Shared.Config
                 }
                 if (!string.IsNullOrEmpty(self.Value))
                     return GenericExtensions.ParseBool(self.Value);
-                if (el.Element("upper") != null && !string.IsNullOrEmpty(el.Element("upper").Value) && el.Element("upperType") != null && !string.IsNullOrEmpty(el.Element("upperType").Value))
+                if (el.Element("upper") != null && !string.IsNullOrEmpty(el.Element("upper").Value) &&
+                    el.Element("upperType") != null && !string.IsNullOrEmpty(el.Element("upperType").Value))
                 {
                     id = el.Element("upper").Value;
                     configType = el.Element("upperType").Value;
@@ -158,7 +159,8 @@ namespace Shared.Config
             if (el.Element(Users) == null)
                 el.Add(new XElement(Users));
             if (el.Element(Users).Element("user" + user.Id) == null)
-                el.Element(Users).Add(new XElement("user" + user.Id, decimal.Zero.ToString(CultureInfo.InvariantCulture)));
+                el.Element(Users)
+                    .Add(new XElement("user" + user.Id, decimal.Zero.ToString(CultureInfo.InvariantCulture)));
             el.Save(xmlPath);
             return decimal.Parse(el.Element(Users).Element("user" + user.Id).Value);
         }

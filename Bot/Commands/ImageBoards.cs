@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -13,6 +14,7 @@ using Chan.Net.JsonModel;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using Newtonsoft.Json.Linq;
 using Shared;
 using Shared.Config;
 
@@ -31,13 +33,14 @@ namespace Bot.Commands
             booruDict = Assembly.GetAssembly(typeof(Booru)).GetTypes()
                 .Where(s => s.Namespace == "BooruSharp.Booru" && s.IsClass && !s.IsAbstract &&
                             s.IsSubclassOf(typeof(Booru)))
-                .Select(s => (Booru) Activator.CreateInstance(s, new object[] {null}))
+                .Select(s => (Booru) Activator.CreateInstance(s, new object?[] {null}))
                 .OrderBy(s => s.ToString().Split('.')[2].ToLower()).ToList()
                 .ToDictionary(s => s.ToString().Split('.')[2].ToLower(), s => s);
             Console.WriteLine(" Finished.");
         }
 
         [Command("4chan")]
+        [Aliases("4", "chan")]
         [Description(
             "Sends a random image from the board. If no board is specified, a list of boards will be displayed.")]
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -88,6 +91,7 @@ namespace Bot.Commands
         }
 
         [Command("waifu")]
+        [Aliases("w")]
         [Description("Shows you a random waifu from thiswaifudoesnotexist.net")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Waifu(CommandContext ctx)
@@ -126,6 +130,7 @@ namespace Bot.Commands
         }
 
         [Command("booru")]
+        [Aliases("b")]
         [Description("Shows a random Image from your favourite *booru. See \"booru\" for a full list")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Booru(CommandContext ctx, [Description("Include questionable content?")]
@@ -163,16 +168,14 @@ namespace Bot.Commands
                     triesLeft--;
                 }
                 string val = Program.Rnd.Next(10000, 99999).ToString();
-                using (WebClient wClient = new WebClient())
-                {
-                    await ctx.RespondWithFileAsync($"{val}_img.jpg",
-                        wClient.OpenRead(result.fileUrl), embed: new DiscordEmbedBuilder
-                        {
-                            Description = "Tags: " + string.Join(", ", result.tags),
-                            Title = result.source ?? "Unknown source",
-                            Url = result.fileUrl.ToString()
-                        }.Build());
-                }
+                using WebClient wClient = new WebClient();
+                await ctx.RespondWithFileAsync($"{val}_img.jpg",
+                    wClient.OpenRead(result.fileUrl), embed: new DiscordEmbedBuilder
+                    {
+                        Description = "Tags: " + string.Join(", ", result.tags),
+                        Title = result.source ?? "Unknown source",
+                        Url = result.fileUrl.ToString()
+                    }.Build());
             }
         }
 
@@ -182,5 +185,58 @@ namespace Bot.Commands
             [Description("Tags for image selection")]
             params string[] tags) =>
             await Booru(ctx, ctx.Channel.getEvaluatedNSFW() ? (Booru) new Rule34() : new Safebooru(), tags);
+
+        [Command("reddit")]
+        [Aliases("r")]
+        [Description("Shows a post from reddit")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Reddit(CommandContext ctx,
+            [Description("Shows top posts of the subreddit instead of random ones")]
+            bool topPost = false, [Description("The subreddit to select a post from. Leave empty for a random one")]
+            string subreddit = "random")
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                using WebClient client = new WebClient();
+                string res =
+                    client.DownloadString($"https://www.reddit.com/r/{subreddit}/{(topPost ? "top" : "random")}/.json");
+                JToken jToken = (topPost ? JObject.Parse(res) : JArray.Parse(res)[0])["data"]["children"][0]["data"];
+                while (ctx.Channel.IsNSFW != jToken["over_18"].Value<bool>())
+                {
+                    res = client.DownloadString(
+                        $"https://www.reddit.com/r/{subreddit}/{(topPost ? "top" : "random")}/.json");
+                    jToken = (topPost ? JObject.Parse(res) : JArray.Parse(res)[0])["data"]["children"][0]["data"];
+                }
+                string content =
+                    $"{jToken["author"].Value<string>()} on {jToken["subreddit_name_prefixed"].Value<string>()}";
+                DiscordEmbedBuilder builder = new DiscordEmbedBuilder
+                {
+                    Title = jToken["title"].Value<string>(),
+                    Url = $"https://www.reddit.com{jToken["permalink"].Value<string>()}",
+                    Description = jToken["selftext"].Value<string>()
+                };
+                try
+                {
+                    string address = jToken["url"].Value<string>();
+                    using Stream s = client.OpenRead(address);
+                    await ctx.RespondWithFileAsync(Path.GetFileName(address), s, content, embed: builder.Build());
+                }
+                catch
+                {
+                    try
+                    {
+                        string str = jToken["media"]["reddit_video"]["fallback_url"].Value<string>();
+                        using Stream s = client.OpenRead(str);
+                        await ctx.RespondWithFileAsync(Path.GetFileName(str), s, content, embed: builder.Build());
+                    }
+                    catch
+                    {
+                        await ctx.RespondAsync(content, embed: builder.Build());
+                    }
+                }
+            }
+        }
     }
 }

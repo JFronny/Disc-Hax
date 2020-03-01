@@ -15,7 +15,7 @@ namespace Bot
     {
         private readonly DiscordEmbedBuilder builder;
         private readonly CommandContext ctx;
-        private Command command;
+        private Command? command;
 
         public HelpFormatter(CommandContext ctx) : base(ctx)
         {

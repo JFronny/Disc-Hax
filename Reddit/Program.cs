@@ -3,11 +3,8 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Net;
-using System.Web.UI.WebControls;
 using System.Windows.Forms;
 using Newtonsoft.Json.Linq;
-using Image = System.Drawing.Image;
-using Label = System.Windows.Forms.Label;
 
 namespace Reddit
 {
@@ -23,7 +20,7 @@ namespace Reddit
             bool top = Console.ReadKey().KeyChar == 'y';
             Console.WriteLine("NSFW? (y/n)");
             bool nsfw = Console.ReadKey().KeyChar == 'y';
-            WebClient client = new WebClient();
+            using WebClient client = new WebClient();
             while (true)
             {
                 string res =
@@ -51,14 +48,19 @@ namespace Reddit
                     try
                     {
                         string str = jToken["media"]["reddit_video"]["fallback_url"].Value<string>();
-                        LinkLabel l = new LinkLabel {Text = str, AutoSize = false, Dock = DockStyle.Fill, Links = { new LinkLabel.Link(0, str.Length, str)}};
+                        LinkLabel l = new LinkLabel
+                        {
+                            Text = str, AutoSize = false, Dock = DockStyle.Fill,
+                            Links = {new LinkLabel.Link(0, str.Length, str)}
+                        };
                         l.Click += (sender, e) => { Process.Start(str); };
                         f.Controls.Add(l);
                         SetFormSize(f, l.Size);
                     }
                     catch
                     {
-                        Label l = new Label {Text = jToken["selftext"].Value<string>(), AutoSize = false, Dock = DockStyle.Fill};
+                        Label l = new Label
+                            {Text = jToken["selftext"].Value<string>(), AutoSize = false, Dock = DockStyle.Fill};
                         f.Controls.Add(l);
                         SetFormSize(f, l.Size);
                     }

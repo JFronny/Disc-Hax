@@ -152,7 +152,7 @@ namespace Bot.Commands
         [Description("Gives the member a new nickname")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Nick(CommandContext ctx, [Description("New nickname")] string Nickname,
-            [Description("Member to softban")] DiscordMember member = null)
+            [Description("Member to softban")] DiscordMember? member = null)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
                 .AND(ctx.Channel.GetMethodEnabled()))
@@ -274,7 +274,7 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Purge(CommandContext ctx, [Description("User to delete posts from")]
             DiscordMember member, [Description("Amount of messages to search")]
-            int span = 50, [Description("Reason for deletion")] string reason = null)
+            int span = 50, [Description("Reason for deletion")] string? reason = null)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
                 .AND(ctx.Channel.GetMethodEnabled()))
@@ -292,7 +292,7 @@ namespace Bot.Commands
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Purge(CommandContext ctx, [Description("Regex for messages")] string regex,
             [Description("Amount of messages to search")]
-            int span, [Description("Reason for deletion")] string reason = null)
+            int span, [Description("Reason for deletion")] string? reason = null)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
                 .AND(ctx.Channel.GetMethodEnabled()))

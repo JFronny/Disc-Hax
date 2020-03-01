@@ -253,7 +253,7 @@ namespace Bot
             }
         }
 
-        private void SendMessage(string message, DiscordChannel channel, Action<Task> continuationAction = null)
+        private void SendMessage(string message, DiscordChannel channel, Action<Task>? continuationAction = null)
         {
             if (string.IsNullOrWhiteSpace(message))
                 return;

@@ -63,7 +63,8 @@ namespace Bot.Commands
         [Aliases("c")]
         [Description("Prints out information about the specified channel")]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task Member(CommandContext ctx, [Description("Channel to print, leave empty for current")] DiscordChannel channel = null)
+        public async Task Member(CommandContext ctx, [Description("Channel to print, leave empty for current")]
+            DiscordChannel? channel = null)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
                 .AND(ctx.Channel.GetMethodEnabled()))

@@ -18,11 +18,11 @@ namespace Bot.Commands
     [Description("Random pieces of text from various sources")]
     public class Quotes : BaseCommandModule
     {
-        private static string[] _beequotes;
-        private readonly string[] fortunequotes;
-        private readonly string[] fortunequotes_off;
+        private static readonly string[] _beequotes;
+        private static readonly string[] _fortunequotes;
+        private static readonly string[] _fortunequotesOff;
 
-        public Quotes()
+        static Quotes()
         {
             Console.Write("Downloading BeeMovie quotes...");
             using (WebClient client = new WebClient())
@@ -37,19 +37,19 @@ namespace Bot.Commands
             }
             Console.WriteLine(" Finished.");
             Console.Write("Downloading fortunes");
-            fortunequotes = getFortuneQuotes("fortune-mod/datfiles");
-            fortunequotes_off = getFortuneQuotes("fortune-mod/datfiles/off/unrotated");
+            _fortunequotes = getFortuneQuotes("fortune-mod/datfiles");
+            _fortunequotesOff = getFortuneQuotes("fortune-mod/datfiles/off/unrotated");
             Console.WriteLine(" Finished.");
         }
 
-        private string[] getFortuneQuotes(string path)
+        private static string[] getFortuneQuotes(string path)
         {
             Console.Write(".");
             IEnumerable<RepositoryContent> files =
                 Program.Github.Repository.Content.GetAllContents("shlomif", "fortune-mod", path).GetAwaiter()
                     .GetResult();
             Console.Write(".");
-            IEnumerable<string> disallowednames = new[] {"CMakeLists.txt", null};
+            IEnumerable<string?> disallowednames = new[] {"CMakeLists.txt", null};
             Console.Write(".");
             IEnumerable<RepositoryContent> filteredFiles =
                 files.Where(s => s.Type == ContentType.File && !disallowednames.Contains(s.Name));
@@ -79,7 +79,7 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                string[] quotes = ctx.Channel.getEvaluatedNSFW() ? fortunequotes_off : fortunequotes;
+                string[] quotes = ctx.Channel.getEvaluatedNSFW() ? _fortunequotesOff : _fortunequotes;
                 await ctx.RespondAsyncFix(quotes[Program.Rnd.Next(quotes.Length)], true);
             }
         }
