@@ -14,7 +14,7 @@ namespace Bot.Commands
     public class PublicStats : BaseCommandModule
     {
         [Command("about")]
-        [Description("Prints out the README file from the repository")]
+        [Description("Prints some info about the bot")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task About(CommandContext ctx)
         {
@@ -22,8 +22,8 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondPaginated(HTMLProcessor.ToPlainText(
-                    await (await Program.Github.Repository.Content.GetReadme("JFronny", "Disc-Hax")).GetHtmlContent()));
+                await ctx.RespondAsync(@"Webpage: https://jfronny.github.io/home/bot
+Repo: https://github.com/JFronny/Disc-Hax");
             }
         }
 
@@ -70,7 +70,7 @@ namespace Bot.Commands
         }
 
         [Command("github")]
-        [Aliases("website", "contribute", "issue")]
+        [Aliases("contribute", "issue")]
         [Description("Pastes the github link")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Github(CommandContext ctx)
@@ -80,6 +80,20 @@ namespace Bot.Commands
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync("Repo Link: https://github.com/JFronny/Disc-Hax");
+            }
+        }
+
+        [Command("website")]
+        [Aliases("info")]
+        [Description("Pastes the github link")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Website(CommandContext ctx)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                await ctx.RespondAsync("Webpage: https://jfronny.github.io/home/bot");
             }
         }
     }
