@@ -238,5 +238,22 @@ namespace Bot.Commands
                 }
             }
         }
+
+        [Command("inspirobot")]
+        [Aliases("i")]
+        [Description("Shows a random Image from your favourite *booru. See \"booru\" for a full list")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Inspirobot(CommandContext ctx, [Description("Set to true for christmas quotes")] bool xmas = false)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                using WebClient client = new WebClient();
+                string page = client.DownloadString(
+                    $"http://inspirobot.me/api?generate=true{(xmas ? "&season=xmas" : "")}");
+                await ctx.RespondWithFileAsync(Path.GetFileName(page), client.OpenRead(page));
+            }
+        }
     }
 }
