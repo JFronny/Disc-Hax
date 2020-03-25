@@ -36,8 +36,8 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
-        <Reference Include="Octokit, Version=0.42.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>..\packages\Octokit.0.42.0\lib\net46\Octokit.dll</HintPath>
+        <Reference Include="Octokit, Version=0.45.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>..\packages\Octokit.0.45.0\lib\net46\Octokit.dll</HintPath>
           <Private>True</Private>
         </Reference>
         <Reference Include="System" />
@@ -52,9 +52,6 @@
     <ItemGroup>
         <Compile Include="Program.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
-    </ItemGroup>
-    <ItemGroup>
-      <None Include="packages.config" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

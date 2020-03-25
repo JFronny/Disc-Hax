@@ -96,12 +96,10 @@ namespace Bot.Commands
                 }
                 g.DrawLines(line, points.ToArray());
                 g.Flush();
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    bmp.Save(memoryStream, ImageFormat.Jpeg);
-                    memoryStream.Position = 0;
-                    await ctx.RespondWithFileAsync("EquationResult.jpg", memoryStream);
-                }
+                using MemoryStream memoryStream = new MemoryStream();
+                bmp.Save(memoryStream, ImageFormat.Jpeg);
+                memoryStream.Position = 0;
+                await ctx.RespondWithFileAsync("EquationResult.jpg", memoryStream);
             }
         }
 

@@ -25,15 +25,15 @@ namespace Bot.Commands
     [Description("Commands to get random images from image-boards around the interwebz")]
     public class ImageBoards : BaseCommandModule
     {
-        public static Dictionary<string, Booru> booruDict;
+        public static Dictionary<string, ABooru> booruDict;
 
         public ImageBoards()
         {
             Console.Write("Instantiating Boorus...");
-            booruDict = Assembly.GetAssembly(typeof(Booru)).GetTypes()
+            booruDict = Assembly.GetAssembly(typeof(ABooru)).GetTypes()
                 .Where(s => s.Namespace == "BooruSharp.Booru" && s.IsClass && !s.IsAbstract &&
-                            s.IsSubclassOf(typeof(Booru)))
-                .Select(s => (Booru) Activator.CreateInstance(s, new object?[] {null}))
+                            s.IsSubclassOf(typeof(ABooru)))
+                .Select(s => (ABooru) Activator.CreateInstance(s, new object?[] {null}))
                 .OrderBy(s => s.ToString().Split('.')[2].ToLower()).ToList()
                 .ToDictionary(s => s.ToString().Split('.')[2].ToLower(), s => s);
             Console.WriteLine(" Finished.");
@@ -68,19 +68,17 @@ namespace Bot.Commands
                 {
                     Thread[] threads = board.GetThreads().ToArray();
                     Thread t = threads[Program.Rnd.Next(threads.Length)];
-                    using (WebClient wClient = new WebClient())
-                    {
-                        await ctx.RespondWithFileAsync($"{t.PostNumber}.jpg",
-                            wClient.OpenRead(t.Image.Image),
-                            $"https://boards.4channel.org/{t.Board.BoardId}/thread/{t.PostNumber}",
-                            embed: new DiscordEmbedBuilder
-                            {
-                                Author = new DiscordEmbedBuilder.EmbedAuthor {Name = t.Name},
-                                Timestamp = t.TimeCreated,
-                                Title = string.IsNullOrWhiteSpace(t.Subject) ? "Untitled" : t.Subject,
-                                Description = t.Message
-                            }.Build());
-                    }
+                    using WebClient wClient = new WebClient();
+                    await ctx.RespondWithFileAsync($"{t.PostNumber}.jpg",
+                        wClient.OpenRead(t.Image.Image),
+                        $"https://boards.4channel.org/{t.Board.BoardId}/thread/{t.PostNumber}",
+                        embed: new DiscordEmbedBuilder
+                        {
+                            Author = new DiscordEmbedBuilder.EmbedAuthor {Name = t.Name},
+                            Timestamp = t.TimeCreated,
+                            Title = string.IsNullOrWhiteSpace(t.Subject) ? "Untitled" : t.Subject,
+                            Description = t.Message
+                        }.Build());
                 }
                 else
                 {
@@ -114,12 +112,10 @@ namespace Bot.Commands
                 if (ctx.Channel.getEvaluatedNSFW() || forceExecution)
                 {
                     int img = Program.Rnd.Next(6000);
-                    using (WebClient wClient = new WebClient())
-                    {
-                        await ctx.RespondWithFileAsync($"{img}.jpg",
-                            wClient.OpenRead($"https://www.thiswaifudoesnotexist.net/example-{img}.jpg"),
-                            "There.");
-                    }
+                    using WebClient wClient = new WebClient();
+                    await ctx.RespondWithFileAsync($"{img}.jpg",
+                        wClient.OpenRead($"https://www.thiswaifudoesnotexist.net/example-{img}.jpg"),
+                        "There.");
                 }
                 else
                 {
@@ -149,7 +145,7 @@ namespace Bot.Commands
         [Command("booru")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Booru(CommandContext ctx, [Description("Booru to select image from")]
-            Booru booru,
+            ABooru booru,
             [Description("Tags for image selection")]
             params string[] tags)
         {
@@ -157,14 +153,14 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                SearchResult result = await booru.GetRandomImage(tags);
+                SearchResult result = await booru.GetRandomImageAsync(tags);
                 int triesLeft = 10;
                 while (result.rating != (ctx.Channel.getEvaluatedNSFW() ? Rating.Explicit : Rating.Safe) &&
                        !booru.IsSafe())
                 {
                     if (triesLeft == 0)
                         throw new Exception("Failed to find image in a reasonable amount of tries");
-                    result = await booru.GetRandomImage(tags);
+                    result = await booru.GetRandomImageAsync(tags);
                     triesLeft--;
                 }
                 string val = Program.Rnd.Next(10000, 99999).ToString();
@@ -184,7 +180,7 @@ namespace Bot.Commands
         public async Task Booru(CommandContext ctx,
             [Description("Tags for image selection")]
             params string[] tags) =>
-            await Booru(ctx, ctx.Channel.getEvaluatedNSFW() ? (Booru) new Rule34() : new Safebooru(), tags);
+            await Booru(ctx, ctx.Channel.getEvaluatedNSFW() ? (ABooru) new Rule34() : new Safebooru(), tags);
 
         [Command("reddit")]
         [Aliases("r")]
@@ -203,7 +199,7 @@ namespace Bot.Commands
                 string res =
                     client.DownloadString($"https://www.reddit.com/r/{subreddit}/{(topPost ? "top" : "random")}/.json");
                 JToken jToken = (topPost ? JObject.Parse(res) : JArray.Parse(res)[0])["data"]["children"][0]["data"];
-                while (ctx.Channel.IsNSFW != jToken["over_18"].Value<bool>())
+                while (ctx.Channel.getEvaluatedNSFW() != jToken["over_18"].Value<bool>())
                 {
                     res = client.DownloadString(
                         $"https://www.reddit.com/r/{subreddit}/{(topPost ? "top" : "random")}/.json");
@@ -243,7 +239,8 @@ namespace Bot.Commands
         [Aliases("i")]
         [Description("Shows a random Image from your favourite *booru. See \"booru\" for a full list")]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task Inspirobot(CommandContext ctx, [Description("Set to true for christmas quotes")] bool xmas = false)
+        public async Task Inspirobot(CommandContext ctx, [Description("Set to true for christmas quotes")]
+            bool xmas = false)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
                 .AND(ctx.Channel.GetMethodEnabled()))

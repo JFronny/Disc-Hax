@@ -13,11 +13,11 @@ namespace BooruT
         private static void Main(string[] args)
         {
             Console.Write("Allow NSFW? (Y/N):");
-            Booru booru = Console.ReadKey().Key == ConsoleKey.Y ? (Booru) new Rule34() : new Gelbooru();
+            ABooru booru = Console.ReadKey().Key == ConsoleKey.Y ? (ABooru) new Rule34() : new Gelbooru();
             Console.Write(Environment.NewLine);
             while (true)
             {
-                SearchResult result = booru.GetRandomImage(args).GetAwaiter().GetResult();
+                SearchResult result = booru.GetRandomImageAsync(args).GetAwaiter().GetResult();
                 Console.Clear();
                 Console.WriteLine($"Image preview URL: {result.previewUrl}");
                 Console.WriteLine($"Image URL: {result.fileUrl}");

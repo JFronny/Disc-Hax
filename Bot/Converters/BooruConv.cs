@@ -7,9 +7,9 @@ using DSharpPlus.Entities;
 
 namespace Bot.Converters
 {
-    public class BooruConv : IArgumentConverter<Booru>
+    public class BooruConv : IArgumentConverter<ABooru>
     {
-        public async Task<Optional<Booru>> ConvertAsync(string value, CommandContext ctx) =>
+        public async Task<Optional<ABooru>> ConvertAsync(string value, CommandContext ctx) =>
             ImageBoards.booruDict[value.ToLower()];
     }
 }

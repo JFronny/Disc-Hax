@@ -24,7 +24,7 @@ namespace Bot.Commands
     [Description("Random commands that didn't fit into other categories")]
     public class Misc : BaseCommandModule
     {
-        private static readonly string[] answerList =
+        private static readonly string[] AnswerList =
         {
             "IT IS\nCERTAIN",
             "IT IS\nDECIDEDLY\nSO",
@@ -86,9 +86,9 @@ namespace Bot.Commands
             {
                 await ctx.TriggerTypingAsync();
                 InteractivityExtension interactivity = ctx.Client.GetInteractivity();
-                byte[] codebytes = new byte[bytes];
-                Program.Rnd.NextBytes(codebytes);
-                string code = BitConverter.ToString(codebytes).ToLower().Replace("-", "");
+                byte[] codeBytes = new byte[bytes];
+                Program.Rnd.NextBytes(codeBytes);
+                string code = BitConverter.ToString(codeBytes).ToLower().Replace("-", "");
                 await ctx.RespondAsync($"The first one to type the following code gets a reward: {code.emotify()}");
                 InteractivityResult<DiscordMessage> msg =
                     await interactivity.WaitForMessageAsync(xm => xm.Content.Contains(code), time);
@@ -132,21 +132,19 @@ namespace Bot.Commands
         [Description("Paginates a website for preview")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task PreviewSite(CommandContext ctx, [Description("URL to paginate site from")] [RemainingText]
-            Uri URL)
+            Uri url)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                if (URL.IsLocal())
+                if (url.IsLocal())
                     throw new WebException("Error: NameResolutionFailure");
                 string html;
                 try
                 {
-                    using (WebClient client = new WebClient())
-                    {
-                        html = client.DownloadString(URL);
-                    }
+                    using WebClient client = new WebClient();
+                    html = client.DownloadString(url);
                 }
                 catch
                 {
@@ -193,7 +191,7 @@ namespace Bot.Commands
                 Font font = SystemFonts.DefaultFont;
                 font = new Font(font.FontFamily, font.Size * (180f / g.MeasureString("QWERTBTESTSTR", font).Width));
                 //Text
-                g.DrawString(answerList[Program.Rnd.Next(answerList.Length)], font, Brushes.White, size,
+                g.DrawString(AnswerList[Program.Rnd.Next(AnswerList.Length)], font, Brushes.White, size,
                     new StringFormat
                     {
                         LineAlignment = StringAlignment.Center,
@@ -218,11 +216,7 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                HttpWebRequest req = (HttpWebRequest) WebRequest.Create(url);
-                req.AllowAutoRedirect = true;
-                req.MaximumAutomaticRedirections = 100;
-                WebResponse resp = req.GetResponse();
-                await ctx.RespondAsyncFix($"Response is: {resp.ResponseUri}");
+                await ctx.RespondAsyncFix($"Response is: {url.Unshorten().AbsoluteUri}");
             }
         }
 

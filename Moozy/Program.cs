@@ -31,8 +31,8 @@ namespace Moozy
         {
             string json = "";
             using (FileStream fs = File.OpenRead("config.json"))
-            using (StreamReader sr = new StreamReader(fs, new UTF8Encoding(false)))
             {
+                using StreamReader sr = new StreamReader(fs, new UTF8Encoding(false));
                 json = await sr.ReadToEndAsync();
             }
 

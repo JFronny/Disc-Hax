@@ -13,21 +13,21 @@ namespace WaifuGen
         {
             Random rnd = new Random();
             while (true)
-                using (Form f = new Form())
+            {
+                using Form f = new Form();
+                f.StartPosition = FormStartPosition.CenterScreen;
+                using (WebClient c = new WebClient())
                 {
-                    f.StartPosition = FormStartPosition.CenterScreen;
-                    using (WebClient c = new WebClient())
-                    {
-                        using Stream s =
-                            c.OpenRead($"https://www.thiswaifudoesnotexist.net/example-{rnd.Next(6000)}.jpg");
-                        Bitmap img = (Bitmap) Image.FromStream(s);
-                        f.BackgroundImage = img;
-                        f.BackgroundImageLayout = ImageLayout.Zoom;
-                        SetFormSize(f, img.Size);
-                    }
-
-                    f.ShowDialog();
+                    using Stream s =
+                        c.OpenRead($"https://www.thiswaifudoesnotexist.net/example-{rnd.Next(6000)}.jpg");
+                    Bitmap img = (Bitmap) Image.FromStream(s);
+                    f.BackgroundImage = img;
+                    f.BackgroundImageLayout = ImageLayout.Zoom;
+                    SetFormSize(f, img.Size);
                 }
+
+                f.ShowDialog();
+            }
         }
 
         private static void SetFormSize(Form f, Size s)
