@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Net;
-using System.Windows.Forms;
+using Eto.Drawing;
+using Eto.Forms;
 using Newtonsoft.Json.Linq;
 
 namespace Reddit
 {
-    internal class Program
+    internal static class Program
     {
         public static void Main(string[] args)
         {
@@ -20,27 +20,42 @@ namespace Reddit
             bool top = Console.ReadKey().KeyChar == 'y';
             Console.WriteLine("NSFW? (y/n)");
             bool nsfw = Console.ReadKey().KeyChar == 'y';
-            using WebClient client = new WebClient();
-            while (true)
+            using Application app = new Application();
+            using WebClient c = new WebClient();
+            using Form f = new Form();
+            using ImageView view = new ImageView();
+            using Label l = new Label();
+            f.MouseDown += (sender, e) => Update(f, view, l, c, subreddit, top, nsfw);
+            view.MouseDown += (sender, e) => Update(f, view, l, c, subreddit, top, nsfw);
+            l.MouseDown += (sender, e) => Update(f, view, l, c, subreddit, top, nsfw);
+            f.Closed += (sender, e) => Environment.Exit(0);
+            Update(f, view, l, c, subreddit, top, nsfw);
+            app.Run(f);
+        }
+
+        private static void Update(Form f, ImageView view, Label l, WebClient c, string subreddit, bool top, bool nsfw)
+        {
+            try
             {
-                string res =
-                    client.DownloadString($"https://www.reddit.com/r/{subreddit}/{(top ? "top" : "random")}/.json");
-                JToken jToken = (top ? JObject.Parse(res) : JArray.Parse(res)[0])["data"]["children"][0]["data"];
-                Console.WriteLine($"https://www.reddit.com{jToken["permalink"].Value<string>()}");
-                if (jToken["over_18"].Value<bool>() && !nsfw)
-                    continue;
-                using Form f = new Form
+                bool found = false;
+                JToken jToken = null;
+                while (!found)
                 {
-                    Text =
-                        $"{jToken["author"].Value<string>()}: {jToken["title"].Value<string>()} - Score: {jToken["score"].Value<int>()}",
-                    StartPosition = FormStartPosition.CenterScreen
-                };
+                    string res =
+                        c.DownloadString($"https://www.reddit.com/r/{subreddit}/{(top ? "top" : "random")}/.json");
+                    jToken = (top ? JObject.Parse(res) : JArray.Parse(res)[0])["data"]["children"][0]["data"];
+                    Console.WriteLine($"https://www.reddit.com{jToken["permalink"].Value<string>()}");
+                    if (!jToken["over_18"].Value<bool>() || nsfw)
+                        found = true;
+                }
+                f.Title =
+                    $"{jToken["author"].Value<string>()}: {jToken["title"].Value<string>()} - Score: {jToken["score"].Value<int>()}";
                 try
                 {
-                    using Stream s = client.OpenRead(jToken["url"].Value<string>());
-                    Bitmap img = (Bitmap) Image.FromStream(s);
-                    f.BackgroundImage = img;
-                    f.BackgroundImageLayout = ImageLayout.Zoom;
+                    using Stream s = c.OpenRead(jToken["url"].Value<string>());
+                    Bitmap img = new Bitmap(s);
+                    view.Image = img;
+                    f.Content = view;
                     SetFormSize(f, img.Size);
                 }
                 catch
@@ -48,31 +63,41 @@ namespace Reddit
                     try
                     {
                         string str = jToken["media"]["reddit_video"]["fallback_url"].Value<string>();
-                        LinkLabel l = new LinkLabel
+                        l.TextColor = SystemColors.LinkText;
+                        l.Text = str;
+                        l.MouseDown += (sender, e) =>
                         {
-                            Text = str, AutoSize = false, Dock = DockStyle.Fill,
-                            Links = {new LinkLabel.Link(0, str.Length, str)}
+                            try
+                            {
+                                Process.Start(str);
+                            }
+                            catch
+                            {
+                            }
                         };
-                        l.Click += (sender, e) => { Process.Start(str); };
-                        f.Controls.Add(l);
+                        f.Content = l;
                         SetFormSize(f, l.Size);
                     }
                     catch
                     {
-                        Label l = new Label
-                            {Text = jToken["selftext"].Value<string>(), AutoSize = false, Dock = DockStyle.Fill};
-                        f.Controls.Add(l);
+                        l.TextColor = SystemColors.ControlText;
+                        l.Text = jToken["selftext"].Value<string>();
+                        l.MouseDown += (sender, e) => { };
+                        f.Content = l;
                         SetFormSize(f, l.Size);
                     }
                 }
-                f.ShowDialog();
+            }
+            catch
+            {
+                Update(f, view, l, c, subreddit, top, nsfw);
             }
         }
 
-        private static void SetFormSize(Form f, Size s)
+        private static void SetFormSize(Form f, SizeF s)
         {
             double ratio = (double) s.Height / s.Width;
-            Rectangle screen = Screen.PrimaryScreen.WorkingArea;
+            RectangleF screen = Screen.PrimaryScreen.WorkingArea;
             if (s.Width > screen.Width)
             {
                 s.Height = (s.Width / screen.Width) * s.Height;
@@ -85,15 +110,11 @@ namespace Reddit
                 s.Height = screen.Height;
             }
 
-            int WidthAdd = 16;
-            int HeightAdd = 39;
-            s.Width += WidthAdd;
-            s.Height += HeightAdd;
-            f.Size = s;
+            f.Size = new Size((int) Math.Round(s.Width), (int) Math.Round(s.Height));
             f.SizeChanged += (sender, e) =>
             {
-                f.Width = Math.Min(f.Width, screen.Width);
-                f.Height = (int) Math.Round((f.Width - WidthAdd) * ratio) + HeightAdd;
+                f.Width = (int) Math.Round(Math.Min(f.Width, screen.Width));
+                f.Height = (int) Math.Round(f.Width * ratio);
             };
         }
     }

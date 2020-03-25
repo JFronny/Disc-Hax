@@ -1,47 +1,52 @@
 ﻿using System;
-using System.Drawing;
 using System.IO;
 using System.Net;
-using System.Windows.Forms;
+using System.Threading.Tasks;
 using BooruSharp.Booru;
 using BooruSharp.Search.Post;
+using Eto.Drawing;
+using Eto.Forms;
 
-namespace BooruT
+namespace Booru
 {
-    internal class Program
+    internal static class Program
     {
-        private static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
             Console.Write("Allow NSFW? (Y/N):");
-            ABooru booru = Console.ReadKey().Key == ConsoleKey.Y ? (ABooru) new Rule34() : new Gelbooru();
+            ABooru booru = Console.ReadKey().Key == ConsoleKey.Y ? (ABooru) new Rule34() : new Safebooru();
             Console.Write(Environment.NewLine);
-            while (true)
-            {
-                SearchResult result = booru.GetRandomImageAsync(args).GetAwaiter().GetResult();
-                Console.Clear();
-                Console.WriteLine($"Image preview URL: {result.previewUrl}");
-                Console.WriteLine($"Image URL: {result.fileUrl}");
-                Console.WriteLine($"Image Source: {result.score}");
-                Console.WriteLine($"Image rating: {result.rating}");
-                Console.WriteLine($"Tags on the image: {string.Join(", ", result.tags)}");
-                using Form f = new Form();
-                f.Text =
-                    $"{result.fileUrl} - {result.rating}";
-                f.StartPosition = FormStartPosition.CenterScreen;
-                using WebClient c = new WebClient();
-                using Stream s = c.OpenRead(result.fileUrl);
-                using Bitmap img = (Bitmap) Image.FromStream(s);
-                f.BackgroundImage = img;
-                f.BackgroundImageLayout = ImageLayout.Zoom;
-                SetFormSize(f, img.Size);
-                f.ShowDialog();
-            }
+            using WebClient c = new WebClient();
+            using Application app = new Application();
+            using ImageView view = new ImageView();
+            using Form f = new Form {Content = view};
+            f.Closed += (sender, e) => Environment.Exit(0);
+            f.MouseDown += async (sender, e) => await Modify(f, view, c, booru, args);
+            view.MouseDown += async (sender, e) => await Modify(f, view, c, booru, args);
+            Modify(f, view, c, booru, args);
+            app.Run(f);
         }
 
-        private static void SetFormSize(Form f, Size s)
+        private static async Task Modify(Form f, ImageView view, WebClient c, ABooru booru, string[] args)
+        {
+            SearchResult result = await booru.GetRandomImageAsync(args);
+            Console.Clear();
+            Console.WriteLine($"Image preview URL: {result.previewUrl}");
+            Console.WriteLine($"Image URL: {result.fileUrl}");
+            Console.WriteLine($"Image Source: {result.score}");
+            Console.WriteLine($"Image rating: {result.rating}");
+            Console.WriteLine($"Tags on the image: {string.Join(", ", result.tags)}");
+            f.Title =
+                $"{result.fileUrl} - {result.rating}";
+            await using Stream s = c.OpenRead(result.fileUrl);
+            view.Image = new Bitmap(s);
+            SetFormSize(f, view.Image.Size);
+        }
+
+        private static void SetFormSize(Form f, SizeF s)
         {
             double ratio = (double) s.Height / s.Width;
-            Rectangle screen = Screen.PrimaryScreen.WorkingArea;
+            RectangleF screen = Screen.PrimaryScreen.WorkingArea;
             if (s.Width > screen.Width)
             {
                 s.Height = (s.Width / screen.Width) * s.Height;
@@ -54,15 +59,11 @@ namespace BooruT
                 s.Height = screen.Height;
             }
 
-            int WidthAdd = 16;
-            int HeightAdd = 39;
-            s.Width += WidthAdd;
-            s.Height += HeightAdd;
-            f.Size = s;
+            f.Size = new Size((int) Math.Round(s.Width), (int) Math.Round(s.Height));
             f.SizeChanged += (sender, e) =>
             {
-                f.Width = Math.Min(f.Width, screen.Width);
-                f.Height = (int) Math.Round((f.Width - WidthAdd) * ratio) + HeightAdd;
+                f.Width = (int) Math.Round(Math.Min(f.Width, screen.Width));
+                f.Height = (int) Math.Round(f.Width * ratio);
             };
         }
     }

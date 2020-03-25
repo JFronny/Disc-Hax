@@ -1,20 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Windows.Forms;
 using Chan.Net;
 using Chan.Net.JsonModel;
-using Thread = System.Threading.Thread;
+using Eto.Drawing;
+using Eto.Forms;
 
-namespace Cleverbot
+namespace chanI
 {
-    internal class Program
+    internal static class Program
     {
+        private static int _index;
+        private static List<Thread> _th;
+
         private static void Main(string[] args)
         {
+            Application app = new Application();
             Console.WriteLine("Fetching data from 4chan...");
             List<BoardInfo> m = JsonDeserializer.Deserialize<BoardListModel>(Internet
                     .DownloadString(@"https://a.4cdn.org/boards.json").ConfigureAwait(false).GetAwaiter().GetResult())
@@ -23,44 +26,58 @@ namespace Cleverbot
                 ? args[0]
                 : ConsoleChoose("Choose a board!", m.Select(s => s.ShortName).ToArray(),
                     m.Select(s => s.Title).ToArray()));
-            Thread.Sleep(1000);
-            List<Chan.Net.Thread> th = b.GetThreads().ToList();
-            for (int i = 0; i < th.Count; i++)
+            System.Threading.Thread.Sleep(1000);
+            _th = b.GetThreads().ToList();
+            using Form f = new Form();
+            using WebClient c = new WebClient();
+            using Label l = new Label();
+            using ImageView view = new ImageView();
+            f.MouseDown += (sender, e) => LoadNextImage(c, f, l, view);
+            l.MouseDown += (sender, e) => LoadNextImage(c, f, l, view);
+            view.MouseDown += (sender, e) => LoadNextImage(c, f, l, view);
+            LoadNextImage(c, f, l, view);
+            app.Run(f);
+            System.Threading.Thread.Sleep(1000);
+        }
+
+        private static void LoadNextImage(WebClient c, Form f, Label l, ImageView view)
+        {
+            if (_index >= _th.Count)
             {
-                Console.WriteLine($"https://boards.4channel.org/{th[i].Board.BoardId}/thread/{th[i].PostNumber}");
-                using (Form f = new Form())
+                f.Close();
+            }
+            else
+            {
+                l.Text = "Loading content...";
+                f.Content = l;
+                Console.WriteLine(
+                    $"https://boards.4channel.org/{_th[_index].Board.BoardId}/thread/{_th[_index].PostNumber}");
+
+                f.Title =
+                    $"{_th[_index].Name}: {(string.IsNullOrWhiteSpace(_th[_index].Subject) ? "Untitled" : _th[_index].Subject)} - {_index + 1}/{_th.Count}";
+                try
                 {
-                    f.Text =
-                        $"{th[i].Name}: {(string.IsNullOrWhiteSpace(th[i].Subject) ? "Untitled" : th[i].Subject)} - {i + 1}/{th.Count}";
-                    f.StartPosition = FormStartPosition.CenterScreen;
-                    using (WebClient c = new WebClient())
-                    {
-                        try
-                        {
-                            using Stream s = c.OpenRead(th[i].Image.Image);
-                            Bitmap img = (Bitmap) Image.FromStream(s);
-                            f.BackgroundImage = img;
-                            f.BackgroundImageLayout = ImageLayout.Zoom;
-                            SetFormSize(f, img.Size);
-                        }
-                        catch
-                        {
-                            try
-                            {
-                                Label l = new Label {Text = th[i].Message, AutoSize = false, Dock = DockStyle.Fill};
-                                f.Controls.Add(l);
-                                SetFormSize(f, l.Size);
-                            }
-                            catch
-                            {
-                            }
-                        }
-                    }
-
-                    f.ShowDialog();
+                    using Stream s = c.OpenRead(_th[_index].Image.Image);
+                    Bitmap img = new Bitmap(s);
+                    view.Image = img;
+                    f.Content = view;
+                    SetFormSize(f, img.Size);
                 }
+                catch
+                {
+                    try
+                    {
+                        l.Size = new Size(200, 100);
+                        l.Text = _th[_index].Message;
 
-                Thread.Sleep(1000);
+                        SetFormSize(f, l.Size);
+                    }
+                    catch
+                    {
+                        LoadNextImage(c, f, l, view);
+                    }
+                }
+                _index++;
             }
         }
 
@@ -87,10 +104,10 @@ namespace Cleverbot
             return choice;
         }
 
-        private static void SetFormSize(Form f, Size s)
+        private static void SetFormSize(Form f, SizeF s)
         {
             double ratio = (double) s.Height / s.Width;
-            Rectangle screen = Screen.PrimaryScreen.WorkingArea;
+            RectangleF screen = Screen.PrimaryScreen.WorkingArea;
             if (s.Width > screen.Width)
             {
                 s.Height = (s.Width / screen.Width) * s.Height;
@@ -103,16 +120,11 @@ namespace Cleverbot
                 s.Height = screen.Height;
             }
 
-            int WidthAdd = 16;
-            int HeightAdd = 39;
-            s.Width += WidthAdd;
-            s.Height += HeightAdd;
-            f.Size = s;
+            f.Size = new Size((int) Math.Round(s.Width), (int) Math.Round(s.Height));
             f.SizeChanged += (sender, e) =>
             {
-                Size tmp = f.Size;
-                f.Width = Math.Min(f.Width, screen.Width);
-                f.Height = (int) Math.Round((f.Width - WidthAdd) * ratio) + HeightAdd;
+                f.Width = (int) Math.Round(Math.Min(f.Width, screen.Width));
+                f.Height = (int) Math.Round(f.Width * ratio);
             };
         }
     }

@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Drawing;
-using System.Windows.Forms;
+using Eto.Drawing;
+using Eto.Forms;
 
 namespace Magic8
 {
-    internal class Program
+    internal static class Program
     {
-        private static readonly string[] answerList =
+        private static readonly string[] AnswerList =
         {
             "IT IS\nCERTAIN",
             "IT IS\nDECIDEDLY\nSO",
@@ -30,53 +30,50 @@ namespace Magic8
             "OUTLOOK\nNOT SO\nGOOD"
         };
 
-        public static void Main(string[] args)
+        private static readonly Random Rnd = new Random();
+
+        private static Bitmap Generate(IDisposable prev)
         {
-            while (true)
-            {
-                Rectangle size = new Rectangle(0, 0, 400, 400);
-                Bitmap bmp = new Bitmap(size.Width, size.Height);
-                Graphics g = Graphics.FromImage(bmp);
-                Random rnd = new Random();
-                //Background
-                g.Clear(Color.White);
-                //Main Circle
-                g.FillEllipse(Brushes.Black, size);
-                //Center circle
-                size.Width /= 2;
-                size.Height /= 2;
-                size.X = size.Width / 2;
-                size.Y = size.Height / 2;
-                g.DrawEllipse(new Pen(Color.FromArgb(100, 80, 80, 80), 6), size);
-                //Triangle
-                PointF center = new PointF(size.X + (size.Width / 2), size.Y + (size.Height / 2));
-                float radius = size.Width / 2;
-                g.FillPolygon(Brushes.Blue, new[]
-                {
-                    new PointF(center.X - (0.866f * radius), center.Y - (0.5f * radius)),
-                    new PointF(center.X + (0.866f * radius), center.Y - (0.5f * radius)),
-                    new PointF(center.X, center.Y + radius)
-                });
-                //Get text scale
-                Font font = SystemFonts.DefaultFont;
-                font = new Font(font.FontFamily, font.Size * (180f / g.MeasureString("QWERTBTESTSTR", font).Width));
-                //Text
-                g.DrawString(answerList[rnd.Next(answerList.Length)], font, Brushes.White, size,
-                    new StringFormat
-                    {
-                        LineAlignment = StringAlignment.Center,
-                        Alignment = StringAlignment.Center
-                    });
-                //Save
-                g.Flush();
-                g.Dispose();
-                Form f = new Form();
-                f.BackgroundImage = bmp;
-                f.BackgroundImageLayout = ImageLayout.Center;
-                f.Size = new Size(400, 410);
-                f.ShowDialog();
-                bmp.Dispose();
-            }
+            prev?.Dispose();
+            Rectangle size = new Rectangle(0, 0, 400, 400);
+            Bitmap bmp = new Bitmap(size.Size, PixelFormat.Format32bppRgb);
+            Graphics g = new Graphics(bmp);
+            //Background
+            g.Clear(Colors.White);
+            //Main Circle
+            g.FillEllipse(Brushes.Black, size);
+            //Center circle
+            size.Width /= 2;
+            size.Height /= 2;
+            size.X = size.Width / 2;
+            size.Y = size.Height / 2;
+            g.DrawEllipse(new Pen(Color.FromArgb(100, 80, 80, 80), 6), size);
+            //Triangle
+            PointF center = new PointF(size.X + (size.Width / 2), size.Y + (size.Height / 2));
+            float radius = size.Width / 2f;
+            g.FillPolygon(Brushes.Blue, new PointF(center.X - (0.866f * radius), center.Y - (0.5f * radius)),
+                new PointF(center.X + (0.866f * radius), center.Y - (0.5f * radius)),
+                new PointF(center.X, center.Y + radius));
+            Font font = SystemFonts.Default();
+            font = new Font(font.Family, font.Size * (180f / g.MeasureString(font, "QWERTBTESTSTR").Width));
+            string answer = AnswerList[Rnd.Next(AnswerList.Length)];
+            size.Top = (int) Math.Round(size.Center.Y - (g.MeasureString(font, answer).Height / 2));
+            g.DrawText(font, Brushes.White, size, answer, FormattedTextWrapMode.Word, FormattedTextAlignment.Center);
+            g.Flush();
+            g.Dispose();
+            return bmp;
+        }
+
+        public static void Main()
+        {
+            using Application app = new Application();
+            using ImageView view = new ImageView();
+            using Form f = new Form {Size = new Size(400, 410), Content = view};
+            view.Image = Generate(null);
+            f.MouseDown += (sender, e) => view.Image = Generate(view.Image);
+            view.MouseDown += (sender, e) => view.Image = Generate(view.Image);
+            f.Closed += (sender, e) => Environment.Exit(0);
+            app.Run(f);
         }
     }
 }

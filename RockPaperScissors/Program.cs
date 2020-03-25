@@ -5,7 +5,7 @@ namespace RockPaperScissors
 {
     internal class Program
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
             Random rnd = new Random();
             while (true)
