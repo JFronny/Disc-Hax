@@ -39,6 +39,12 @@ namespace Bot
             try
             {
                 Console.WriteLine("Initializing");
+#if NO_TIMED_BAN
+                Console.WriteLine("Build config:");
+#endif
+#if NO_TIMED_BAN
+                Console.WriteLine("- NO_TIMED_BAN");
+#endif
                 Github = new GitHubClient(new ProductHeaderValue("DiscHax"));
                 Perspective = new Perspective(TokenManager.PerspectiveToken);
                 DiscordConfiguration cfg = new DiscordConfiguration
