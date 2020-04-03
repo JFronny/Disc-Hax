@@ -31,7 +31,7 @@ namespace Bot.Commands
             if (ctx.Channel.Get(ConfigManager.Enabled).TRUE())
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync(target.GetStr());
+                await ctx.RespondAsync(target.GetStr(CommandArr.getC()));
             }
         }
 

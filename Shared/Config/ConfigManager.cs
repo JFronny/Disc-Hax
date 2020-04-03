@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Windows.Forms;
 using System.Xml.Linq;
 using CC_Functions.Misc;
 using DSharpPlus.Entities;
@@ -26,7 +26,7 @@ namespace Shared.Config
 
         public static XElement GetXml(string id, string elName, out string xmlPath)
         {
-            xmlPath = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Cfgs");
+            xmlPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Cfgs");
             if (!Directory.Exists(xmlPath))
                 Directory.CreateDirectory(xmlPath);
             xmlPath = Path.Combine(xmlPath, $"{id}.xml");
@@ -76,7 +76,7 @@ namespace Shared.Config
             }
         }
 
-        public static string GetStr(this SnowflakeObject id)
+        public static string GetStr(this SnowflakeObject id, string[] allowed)
         {
             string configType = id switch
             {
@@ -84,10 +84,7 @@ namespace Shared.Config
                 DiscordGuild _ => Guild,
                 _ => throw new ArgumentException("Invalid Snowflake! (Supports Guilds and Channels)")
             };
-            return string.Join("\r\n",
-                GetXml(id.Id.ToString(), configType, out _).Elements()
-                    .Where(s => !string.IsNullOrWhiteSpace(s.Value) && s.Value.Length <= 5)
-                    .Select(s => $"{s.Name}: {s.Value}"));
+            return string.Join("\r\n", allowed.Select(element => $"{element}: {Get(id, element)}"));
         }
 
         public static void Set(this SnowflakeObject id, string element, bool? val, bool disableFormChecks = false)
@@ -111,11 +108,20 @@ namespace Shared.Config
             IList<(string, string)> upper = null)
         {
             XElement xml = GetXml(id, configType, out string xmlPath);
+            bool changed = false;
             string el = element.ToLower();
             if (!xml.Elements(el).Any())
+            {
                 xml.Add(new XElement(el, val.ToString()));
-            else
+                changed = true;
+            }
+            else if (xml.Element(el).Value != val.ToString())
+            {
                 xml.Element(el).Value = val.ToString();
+                changed = true;
+            }
+
+            if (!changed) return;
             if (upper != null)
             {
                 XElement tmpXml = xml;
@@ -184,7 +190,8 @@ namespace Shared.Config
             return id.Members.Where(s => !s.Value.IsBot && id.Members.ContainsKey(s.Key))
                 .ToDictionary(s => s.Key, s => GetMoney(id, s.Value));
         }
-
+        
+#if !NO_TIMED_BAN
         public static void AddTimedBan(this DiscordGuild id, DiscordMember user, TimeSpan span)
         {
             XElement el = GetXml(id.Id.ToString(), Guild, out string xmlPath);
@@ -251,5 +258,6 @@ namespace Shared.Config
                 el.Element(Bans).Element("user" + user).Remove();
             el.Save(xmlPath);
         }
+#endif
     }
 }

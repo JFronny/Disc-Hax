@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using System.Text;
-using System.Windows.Forms;
 using System.Xml.Linq;
 using CC_Functions.Misc;
 
@@ -10,7 +10,7 @@ namespace Shared.Config
     public static class TokenManager
     {
         private static readonly string containerFile =
-            Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Cfgs",
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Cfgs",
                 $"keys.secure.{Environment.OSVersion.Platform.ToString().ToLower()}");
 
         public static string DiscordToken
@@ -51,7 +51,7 @@ namespace Shared.Config
             if (!Directory.Exists(Path.GetDirectoryName(containerFile)))
                 Directory.CreateDirectory(Path.GetDirectoryName(containerFile));
             if (!File.Exists(containerFile))
-                new TokenForm("", "", "", true).ShowDialog();
+                TokenForm.Show("", "", "", true);
             byte[] bytes = HID.DecryptLocal(File.ReadAllBytes(containerFile));
             XElement retEl = XElement.Parse(Encoding.UTF8.GetString(bytes));
             if (retEl.Element("discord") == null)

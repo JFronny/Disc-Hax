@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -9,6 +7,7 @@ using System.Threading.Tasks;
 using CC_Functions.Misc;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using Eto.Drawing;
 using org.mariuszgromada.math.mxparser;
 using Shared;
 using Shared.Config;
@@ -75,10 +74,10 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                Bitmap bmp = new Bitmap(200, 200);
-                Graphics g = Graphics.FromImage(bmp);
-                g.Clear(Color.White);
-                Pen grid = Pens.LightGray;
+                Bitmap bmp = new Bitmap(200, 200, PixelFormat.Format24bppRgb);
+                Graphics g = new Graphics(bmp);
+                g.Clear(Colors.White);
+                Pen grid = Pens.LightGrey;
                 Pen gridZero = Pens.Gray;
                 Pen line = Pens.Red;
                 for (int i = -100; i < 100; i += 10)
@@ -127,7 +126,7 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondPaginated(string.Join(", ",
+                await ctx.RespondPaginatedIfTooLong(string.Join(", ",
                     CurrencyConverter.Currencies.Values.Select(s => $"{s.currencyName}/{s.currencySymbol} ({s.id})")
                         .OrderBy(s => s)));
             }

@@ -1,12 +1,12 @@
 ﻿using System.IO;
-using System.Windows.Forms;
+using System.Reflection;
 using System.Xml.Linq;
 
 namespace Shared.Config
 {
     public static class Common
     {
-        private static readonly string path = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Cfgs",
+        private static readonly string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Cfgs",
             "common.xml");
 
         private static XElement common;

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -14,8 +12,12 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.EventHandling;
+using Eto.Drawing;
 using Shared;
 using Shared.Config;
+using Color = Eto.Drawing.Color;
+using PointF = Eto.Drawing.PointF;
+using Rectangle = Eto.Drawing.Rectangle;
 
 namespace Bot.Commands
 {
@@ -151,7 +153,7 @@ namespace Bot.Commands
                     await ctx.RespondAsync("Failed to download site");
                     return;
                 }
-                await ctx.RespondPaginated(HTMLProcessor.ToPlainText(html));
+                await ctx.RespondPaginatedIfTooLong(HTMLProcessor.ToPlainText(html));
             }
         }
 
@@ -166,10 +168,10 @@ namespace Bot.Commands
             {
                 await ctx.TriggerTypingAsync();
                 Rectangle size = new Rectangle(0, 0, 400, 400);
-                Bitmap bmp = new Bitmap(size.Width, size.Height);
-                Graphics g = Graphics.FromImage(bmp);
+                Bitmap bmp = new Bitmap(size.Size, PixelFormat.Format32bppRgb);
+                Graphics g = new Graphics(bmp);
                 //Background
-                g.Clear(Color.White);
+                g.Clear(Colors.White);
                 //Main Circle
                 g.FillEllipse(Brushes.Black, size);
                 //Center circle
@@ -180,27 +182,18 @@ namespace Bot.Commands
                 g.DrawEllipse(new Pen(Color.FromArgb(100, 80, 80, 80), 6), size);
                 //Triangle
                 PointF center = new PointF(size.X + (size.Width / 2), size.Y + (size.Height / 2));
-                float radius = size.Width / 2;
-                g.FillPolygon(Brushes.Blue, new[]
-                {
-                    new PointF(center.X - (0.866f * radius), center.Y - (0.5f * radius)),
+                float radius = size.Width / 2f;
+                g.FillPolygon(Brushes.Blue, new PointF(center.X - (0.866f * radius), center.Y - (0.5f * radius)),
                     new PointF(center.X + (0.866f * radius), center.Y - (0.5f * radius)),
-                    new PointF(center.X, center.Y + radius)
-                });
-                //Get text scale
-                Font font = SystemFonts.DefaultFont;
-                font = new Font(font.FontFamily, font.Size * (180f / g.MeasureString("QWERTBTESTSTR", font).Width));
-                //Text
-                g.DrawString(AnswerList[Program.Rnd.Next(AnswerList.Length)], font, Brushes.White, size,
-                    new StringFormat
-                    {
-                        LineAlignment = StringAlignment.Center,
-                        Alignment = StringAlignment.Center
-                    });
-                //Save
+                    new PointF(center.X, center.Y + radius));
+                Font font = SystemFonts.Default();
+                font = new Font(font.Family, font.Size * (180f / g.MeasureString(font, "QWERTBTESTSTR").Width));
+                string answer = AnswerList[Program.Rnd.Next(AnswerList.Length)];
+                size.Top = (int) System.Math.Round(size.Center.Y - (g.MeasureString(font, answer).Height / 2));
+                g.DrawText(font, Brushes.White, size, answer, FormattedTextWrapMode.Word, FormattedTextAlignment.Center);
                 g.Flush();
                 g.Dispose();
-                using MemoryStream str = new MemoryStream();
+                await using MemoryStream str = new MemoryStream();
                 bmp.Save(str, ImageFormat.Jpeg);
                 str.Position = 0;
                 await ctx.RespondWithFileAsync("Magic8.jpg", str);

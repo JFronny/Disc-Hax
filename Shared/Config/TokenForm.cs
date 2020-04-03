@@ -1,26 +1,42 @@
-﻿using System;
-using System.Windows.Forms;
 using System.Xml.Linq;
+using Eto.Drawing;
+using Eto.Forms;
 
 namespace Shared.Config
 {
-    public partial class TokenForm : Form
+    public static class TokenForm
     {
-        private readonly bool _overwriteXml;
-
-        public TokenForm(string discordToken, string currencyconverterapiToken, string perspectiveToken,
+        public static void Show(string discordToken, string currConvToken, string perspectiveToken,
             bool overwriteXml = false)
         {
-            InitializeComponent();
-            discordBox.Text = discordToken;
-            currConvBox.Text = currencyconverterapiToken;
-            perspectiveBox.Text = perspectiveToken;
-            _overwriteXml = overwriteXml;
-        }
-
-        private void okButton_Click(object sender, EventArgs e)
-        {
-            if (_overwriteXml)
+            PasswordBox discordBox = new PasswordBox {PasswordChar = '●', Text = discordToken};
+            PasswordBox currConvBox = new PasswordBox {PasswordChar = '●', Text = currConvToken};
+            PasswordBox perspectiveBox = new PasswordBox {PasswordChar = '●', Text = perspectiveToken};
+            Dialog dlg = new Dialog
+            {
+                Content = new TableLayout
+                {
+                    Spacing = new Size(5, 5),
+                    Padding = new Padding(10, 10, 10, 10),
+                    Rows =
+                    {
+                        new TableRow(
+                            new Label { Text = "Discord:" },
+                            discordBox
+                        ),
+                        new TableRow(
+                            new Label { Text = "CurrConv:" },
+                            currConvBox
+                        ),
+                        new TableRow(
+                            new Label { Text = "Perspective:" },
+                            perspectiveBox
+                        )
+                    }
+                }
+            };
+            dlg.ShowModal();
+            if (overwriteXml)
             {
                 TokenManager.SaveXE(new XElement("container",
                     new XElement("discord", discordBox.Text),
@@ -33,8 +49,6 @@ namespace Shared.Config
                 TokenManager.CurrencyconverterapiToken = currConvBox.Text;
                 TokenManager.PerspectiveToken = perspectiveBox.Text;
             }
-            DialogResult = DialogResult.OK;
-            Close();
         }
     }
 }

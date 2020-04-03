@@ -5,6 +5,7 @@ using CC_Functions.Misc;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using Shared;
 using Shared.Config;
 
 namespace Bot.Commands
@@ -24,8 +25,19 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync(string.Join("\n",
-                    typeof(DiscordUser).GetProperties().Select(s => $"{s.Name}: {s.GetValue(user)}")));
+                await ctx.RespondPaginatedIfTooLong(string.Join("\n",
+                    typeof(DiscordUser).GetProperties()
+                        .Select(s =>
+                        {
+                            try
+                            {
+                                return $"{s.Name}: {s.GetValue(user)}";
+                            }
+                            catch
+                            {
+                                return $"Could not read {s.Name}";
+                            }
+                        })));
             }
         }
 
@@ -39,8 +51,19 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync(string.Join("\n",
-                    typeof(DiscordMember).GetProperties().Select(s => $"{s.Name}: {s.GetValue(member)}")));
+                await ctx.RespondPaginatedIfTooLong(string.Join("\n",
+                    typeof(DiscordMember).GetProperties()
+                        .Select(s =>
+                        {
+                            try
+                            {
+                                return $"{s.Name}: {s.GetValue(member)}";
+                            }
+                            catch
+                            {
+                                return $"Could not read {s.Name}";
+                            }
+                        })));
             }
         }
 
@@ -54,8 +77,19 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync(string.Join("\n",
-                    typeof(DiscordRole).GetProperties().Select(s => $"{s.Name}: {s.GetValue(role)}")));
+                await ctx.RespondPaginatedIfTooLong(string.Join("\n",
+                    typeof(DiscordRole).GetProperties()
+                        .Select(s =>
+                        {
+                            try
+                            {
+                                return $"{s.Name}: {s.GetValue(role)}";
+                            }
+                            catch
+                            {
+                                return $"Could not read {s.Name}";
+                            }
+                        })));
             }
         }
 
@@ -72,9 +106,19 @@ namespace Bot.Commands
                 await ctx.TriggerTypingAsync();
                 if (channel == null)
                     channel = ctx.Channel;
-                await ctx.RespondAsync("Config:\n" + channel.GetStr() + "\n\nProperties:\n" + string.Join("\n",
+                await ctx.RespondPaginatedIfTooLong("Config:\n" + channel.GetStr(CommandArr.getC()) + "\n\nProperties:\n" + string.Join("\n",
                     typeof(DiscordChannel).GetProperties()
-                        .Select(s => $"{s.Name}: {s.GetValue(channel)}")));
+                        .Select(s =>
+                        {
+                            try
+                            {
+                                return $"{s.Name}: {s.GetValue(channel)}";
+                            }
+                            catch
+                            {
+                                return $"Could not read {s.Name}";
+                            }
+                        })));
             }
         }
 
@@ -88,9 +132,19 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync("Config:\n" + ctx.Guild.GetStr() + "\n\nProperties:\n" + string.Join("\n",
+                await ctx.RespondPaginatedIfTooLong("Config:\n" + ctx.Guild.GetStr(CommandArr.getC()) + "\n\nProperties:\n" + string.Join("\n",
                     typeof(DiscordGuild).GetProperties()
-                        .Select(s => $"{s.Name}: {s.GetValue(ctx.Guild)}")));
+                        .Select(s =>
+                        {
+                            try
+                            {
+                                return $"{s.Name}: {s.GetValue(ctx.Guild)}";
+                            }
+                            catch
+                            {
+                                return $"Could not read {s.Name}";
+                            }
+                        })));
             }
         }
     }

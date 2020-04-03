@@ -87,14 +87,6 @@ namespace Shared
             }).ToArray());
         }
 
-        public static Task RespondPaginated(this CommandContext ctx, string message)
-        {
-            InteractivityExtension interactivity = ctx.Client.GetInteractivity();
-            Page[] pages = interactivity.GeneratePagesInEmbed(message);
-            return interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages,
-                deletion: PaginationDeletion.DeleteMessage);
-        }
-
         public static Task<DiscordMessage> RespondAsyncFix(this CommandContext ctx, string content = null,
             bool isTTS = false, DiscordEmbed embed = null) =>
             ctx.RespondAsync(content.Replace("*", "\\*").Replace("_", "\\_"), isTTS, embed);
@@ -108,5 +100,18 @@ namespace Shared
 
         public static string GetString(this DiscordMessage msg) =>
             $"<{(msg.Author.IsCurrent ? "SELF>" : msg.Author.IsBot ? $"BOT>[{msg.Author.Username}]" : $"USER>[{msg.Author.Username}]")}{msg.Content}";
+
+        public static Task RespondPaginatedIfTooLong(this CommandContext ctx, string content)
+        {
+            if (content.Length <= 2000)
+                return ctx.RespondAsync(content);
+            else
+            {
+                InteractivityExtension interactivity = ctx.Client.GetInteractivity();
+                Page[] pages = interactivity.GeneratePagesInEmbed(content);
+                return interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages,
+                    deletion: PaginationDeletion.DeleteMessage);
+            }
+        }
     }
 }

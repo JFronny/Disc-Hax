@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -12,9 +11,10 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using Eto.Drawing;
 using Shared;
 using Shared.Config;
-using ImageFormat = System.Drawing.Imaging.ImageFormat;
+using ImageFormat = Eto.Drawing.ImageFormat;
 
 namespace Bot.Commands
 {
@@ -55,6 +55,7 @@ namespace Bot.Commands
             }
         }
 
+#if !NO_TIMED_BAN
         [Command("ban")]
         [RequireUserPermissions(Permissions.BanMembers)]
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -72,6 +73,7 @@ namespace Bot.Commands
                 await ctx.RespondAsync($"Banned {member.DisplayName}.");
             }
         }
+#endif
 
         [Command("unban")]
         [Aliases("u", "ub", "uban", "deban", "rmban")]
@@ -87,7 +89,9 @@ namespace Bot.Commands
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.Guild.UnbanMemberAsync(user, reason);
+#if !NO_TIMED_BAN
                 ctx.Guild.UnbanUserIfBanned(user.Id);
+#endif
                 await ctx.RespondAsync($"Unbanned {user.Username}.");
             }
         }
@@ -103,10 +107,16 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
+#if NO_TIMED_BAN
+                IEnumerable<string> bans = (await ctx.Guild.GetBansAsync())
+                    .Select(s =>
+                        $"User: {s.User.Username}\nReason: {s.Reason}");
+#else
                 IEnumerable<string> bans = (await ctx.Guild.GetBansAsync())
                     .Select(s =>
                         $"User: {s.User.Username}\nReason: {s.Reason}\nTimed: {(ctx.Guild.IsUserTimeBanned(s.User.Id) ? $"Yes, {ctx.Guild.GetBanTimeLeft(s.User.Id):g} left" : "No")}");
-                await ctx.RespondPaginated($"Banned Users:\n{string.Join("\n\n", bans)}");
+#endif
+                await ctx.RespondPaginatedIfTooLong($"Banned Users:\n{string.Join("\n\n", bans)}");
             }
         }
 
@@ -242,7 +252,7 @@ namespace Bot.Commands
         {
             await ctx.TriggerTypingAsync();
             WebClient wc = new WebClient();
-            Image bmp = Image.FromStream(wc.OpenRead(user.AvatarUrl));
+            Bitmap bmp = new Bitmap(wc.OpenRead(user.AvatarUrl));
             MemoryStream ms = new MemoryStream();
             bmp.Save(ms, ImageFormat.Jpeg);
             ms.Position = 0;
