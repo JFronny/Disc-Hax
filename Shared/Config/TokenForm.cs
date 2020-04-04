@@ -9,10 +9,10 @@ namespace Shared.Config
         public static void Show(string discordToken, string currConvToken, string perspectiveToken,
             bool overwriteXml = false)
         {
-            PasswordBox discordBox = new PasswordBox {PasswordChar = '●', Text = discordToken};
-            PasswordBox currConvBox = new PasswordBox {PasswordChar = '●', Text = currConvToken};
-            PasswordBox perspectiveBox = new PasswordBox {PasswordChar = '●', Text = perspectiveToken};
-            Dialog dlg = new Dialog
+            using PasswordBox discordBox = new PasswordBox {PasswordChar = '●', Text = discordToken};
+            using PasswordBox currConvBox = new PasswordBox {PasswordChar = '●', Text = currConvToken};
+            using PasswordBox perspectiveBox = new PasswordBox {PasswordChar = '●', Text = perspectiveToken};
+            using Dialog dlg = new Dialog
             {
                 Content = new TableLayout
                 {
