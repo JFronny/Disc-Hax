@@ -1,18 +1,90 @@
 # Disc-Hax
-The BEST discord bot!
+A powerful multi-purpose discord bot!
 [![CodeFactor](https://www.codefactor.io/repository/github/jfronny/disc-hax/badge)](https://www.codefactor.io/repository/github/jfronny/disc-hax)
 [![Discord](https://img.shields.io/discord/466965965658128384?label=Discord)](https://discord.gg/UjhHBqt)
 
-Current features:
-- !booru - Shows a random Image from danbooru or rule34.xxx
-- !beemovie - Sends a quote from the bee movie script as TTS
-- !waifu - Shows you a random waifu from thiswaifudoesnotexist.net
-- !4chan - Sends a random image from the board
-- !ping - Responds with \"Pong\" if the bot is active
-- !config - Prints or changes the DiscHax-instance config
-- !poll - Run a poll with reactions (partially copy/pasted)
-- !quicktype - Waits for a response containing a generated code
-- !emotify - Converts your text to emoticons
-
-
-NOTE: Please follow [this guide](https://dsharpplus.emzi0767.com/articles/vnext_setup.html) to setup the bot properly
+Features:
+- ~60 powerful commands (state: Apr 9 2020)
+  - admin
+    - ping
+    - ban
+    - unban
+    - bans
+    - softban
+    - kick
+    - nick
+    - mute
+    - deaf
+    - cooldown
+    - avatar
+    - purge
+    - config
+  - board
+    - 4chan
+    - waifu
+    - booru
+    - nonbooru
+    - reddit
+    - inspirobot
+    - sauce
+    - xkcd
+  - game
+    - rps
+    - slots
+  - help
+  - info
+    - user
+    - member
+    - role
+    - channel
+    - guild
+  - lang
+    - urban
+    - translate
+    - corrupt
+  - math
+    - calc
+    - solve
+    - graph
+    - currency
+  - misc
+    - poll
+    - quicktype
+    - emotify
+    - leetify
+    - preview
+    - magic8
+    - unshorten
+    - toxicity
+    - minecraft
+    - quote
+  - money
+    - balance
+    - scoreboard
+    - give
+  - quote
+    - fortune
+    - beemovie
+  - stat
+    - about
+    - guildcount
+    - changelog
+    - invite
+    - github
+    - website
+    - uptime
+- Powerful configuration
+  - Custom XML-based layered database
+  - Toggle every single command
+  - Custom prefixes
+  - Locally encrypted API Keys
+- Easy to develop
+  - Experiments for many features
+  - Decently structured solution
+  - Lots of testing
+  - Few external dependencies (you don't need PHP, SQL, Node.JS)
+  - No payed API keys (eg Google Translate)
+  - Modern library
+  - Every group, command and parameter is documented in [help]
+- Fast
+  - My instance runs just fine on a RasPi with minimal specs

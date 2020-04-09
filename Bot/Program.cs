@@ -16,6 +16,7 @@ using Octokit;
 using Shared;
 using Shared.Config;
 using Application = Eto.Forms.Application;
+using Language = Bot.Commands.Language;
 using Math = Bot.Commands.Math;
 
 namespace Bot
@@ -85,15 +86,17 @@ namespace Bot
                     PaginationBehaviour = PaginationBehaviour.Ignore,
                     Timeout = TimeSpan.FromMinutes(2)
                 });
-                Commands.RegisterCommands<ImageBoards>();
                 Commands.RegisterCommands<Administration>();
+                Commands.RegisterCommands<ImageBoards>();
+                Commands.RegisterCommands<Japan>();
+                Commands.RegisterCommands<Language>();
                 Commands.RegisterCommands<LocalStats>();
+                Commands.RegisterCommands<Math>();
                 Commands.RegisterCommands<Minigames>();
                 Commands.RegisterCommands<Misc>();
-                Commands.RegisterCommands<Math>();
                 Commands.RegisterCommands<Money>();
-                Commands.RegisterCommands<Quotes>();
                 Commands.RegisterCommands<PublicStats>();
+                Commands.RegisterCommands<Quotes>();
                 Commands.RegisterConverter(new BoardConv());
                 Commands.RegisterConverter(new BooruConv());
                 Commands.RegisterConverter(new CurrencyConv());

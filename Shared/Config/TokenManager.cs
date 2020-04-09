@@ -46,12 +46,23 @@ namespace Shared.Config
             }
         }
 
+        public static string YandexToken
+        {
+            get => LoadXe().Element("yandex")?.Value;
+            set
+            {
+                XElement el = LoadXe();
+                el.Element("yandex").Value = value;
+                SaveXe(el);
+            }
+        }
+
         private static XElement LoadXe()
         {
             if (!Directory.Exists(Path.GetDirectoryName(ContainerFile)))
                 Directory.CreateDirectory(Path.GetDirectoryName(ContainerFile));
             if (!File.Exists(ContainerFile))
-                TokenForm.Show("", "", "", true);
+                TokenForm.Show("", "", "", "", true);
             byte[] bytes = HID.DecryptLocal(File.ReadAllBytes(ContainerFile));
             XElement retEl = XElement.Parse(Encoding.UTF8.GetString(bytes));
             if (retEl.Element("discord") == null)
@@ -60,6 +71,8 @@ namespace Shared.Config
                 retEl.Add(new XElement("currencyconverterapi", ""));
             if (retEl.Element("perspective") == null)
                 retEl.Add(new XElement("perspective", ""));
+            if (retEl.Element("yandex") == null)
+                retEl.Add(new XElement("yandex", ""));
             return retEl;
         }
 

@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
+using Gtk;
 using HtmlAgilityPack;
 
 namespace Shared
 {
-    public static class HtmlProcessor
+    public static class TextProcessor
     {
         private static readonly HashSet<string> InlineTags = new HashSet<string>
         {
@@ -21,7 +23,7 @@ namespace Shared
             "script", "style"
         };
 
-        public static string ToPlainText(string htmlDoc)
+        public static string HtmlToPlainText(string htmlDoc)
         {
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(htmlDoc);
@@ -29,6 +31,20 @@ namespace Shared
             ToPlainTextState state = ToPlainTextState.StartLine;
             Plain(builder, ref state, new[] {doc.DocumentNode});
             return builder.ToString();
+        }
+
+        public static string Normalize(string self, bool spaces, bool lower)
+        {
+            string regex = "[^a-z0-9";
+            if (lower)
+                self = self.ToLower();
+            else
+                regex += "A-Z";
+            if (spaces)
+                regex += " -";
+            regex += "]";
+            Regex rgx = new Regex(regex);
+            return rgx.Replace(self, "");
         }
 
         private static void Plain(StringBuilder builder, ref ToPlainTextState state, IEnumerable<HtmlNode> nodes)

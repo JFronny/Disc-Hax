@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -13,6 +14,7 @@ using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.EventHandling;
 using Eto.Drawing;
+using Newtonsoft.Json.Linq;
 using Shared;
 using Shared.Config;
 
@@ -150,7 +152,7 @@ namespace Bot.Commands
                     await ctx.RespondAsync("Failed to download site");
                     return;
                 }
-                await ctx.RespondPaginatedIfTooLong(HtmlProcessor.ToPlainText(html));
+                await ctx.RespondPaginatedIfTooLong(TextProcessor.HtmlToPlainText(html));
             }
         }
 

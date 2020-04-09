@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -57,7 +58,7 @@ namespace Bot.Commands
                 List<string> newTags;
                 do
                 {
-                    string html = hc.GetStringAsync("https://www5.javmost.com/allcategory/" + page).Result;
+                    string html = hc.GetStringAsync($"https://www5.javmost.com/allcategory/{page}").Result;
                     newTags = Regex
                         .Matches(html, "<a href=\"https:\\/\\/www5\\.javmost\\.com\\/category\\/([^\\/]+)\\/\">")
                         .Select(m => m.Groups[1].Value.Trim().ToLower())
@@ -270,8 +271,8 @@ namespace Bot.Commands
                             break;
                         }
                         case DoujinEnumConv.DoujinEnum.EHentai:
-                            url = "https://e-hentai.org/?f_cats=959&f_search=" +
-                                  Uri.EscapeDataString(string.Join(" ", tags));
+                            url =
+                                $"https://e-hentai.org/?f_cats=959&f_search={Uri.EscapeDataString(string.Join(" ", tags))}";
                             int randomDoujinshi;
                             string imageUrl;
                             List<string> allTags = new List<string>();
@@ -286,7 +287,7 @@ namespace Bot.Commands
                                     break;
                                 }
                                 randomDoujinshi = Program.Rnd.Next(0, int.Parse(m.Groups[1].Value.Replace(",", "")));
-                                html = await hc.GetStringAsync(url + "&page=" + randomDoujinshi / 25);
+                                html = await hc.GetStringAsync($"{url}&page={randomDoujinshi / 25}");
                                 finalUrl =
                                     Regex.Matches(html, "<a href=\"(https:\\/\\/e-hentai\\.org\\/g\\/[^\"]+)\"")[
                                         randomDoujinshi % 25].Groups[1].Value;
@@ -323,7 +324,7 @@ namespace Bot.Commands
                                 tag = "all";
                             int perPage;
                             int total;
-                            url = "https://www5.javmost.com/category/" + tag;
+                            url = $"https://www5.javmost.com/category/{tag}";
                             using (HttpClient hc = new HttpClient())
                             {
                                 html = await hc.GetStringAsync(url);
@@ -344,7 +345,7 @@ namespace Bot.Commands
                                 if (pageNumber > 0)
                                 {
                                     using HttpClient hc = new HttpClient();
-                                    html = await hc.GetStringAsync(url + "/page/" + (pageNumber + 1));
+                                    html = await hc.GetStringAsync($"{url}/page/{(pageNumber + 1)}");
                                 }
                                 int index = pageIndex + 1;
                                 string[] arr = html.Split(new[] {"<!-- begin card -->"}, StringSplitOptions.None);
@@ -358,7 +359,7 @@ namespace Bot.Commands
                                     "<a href=\"(https:\\/\\/www5\\.javmost\\.com\\/([^\\/]+)\\/)\"");
                                 previewUrl = Regex.Match(videoHtml, "data-src=\"([^\"]+)\"").Groups[1].Value;
                                 if (previewUrl.StartsWith("//"))
-                                    previewUrl = "https:" + previewUrl;
+                                    previewUrl = $"https:{previewUrl}";
                                 videoTags = Regex
                                     .Matches(videoHtml,
                                         "<a href=\"https:\\/\\/www5\\.javmost\\.com\\/category\\/([^\\/]+)\\/\"")
@@ -448,7 +449,7 @@ namespace Bot.Commands
 
         [Command("inspirobot")]
         [Aliases("i")]
-        [Description("Shows a random Image from your favourite *booru. See \"booru\" for a full list")]
+        [Description("Gets a random image from inspirobot")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Inspirobot(CommandContext ctx, [Description("Set to true for christmas quotes")]
             bool xmas = false)
@@ -461,6 +462,101 @@ namespace Bot.Commands
                 string page = client.DownloadString(
                     $"http://inspirobot.me/api?generate=true{(xmas ? "&season=xmas" : "")}");
                 await ctx.RespondWithFileAsync(Path.GetFileName(page), client.OpenRead(page));
+            }
+        }
+
+        [Command("sauce")]
+        [Aliases("s", "source")]
+        [Description("Gets the source for an image (provided as an attachment or url)")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Sauce(CommandContext ctx)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                if (ctx.Channel.GetEvaluatedNsfw())
+                {
+                    if (ctx.Message.Attachments.Count > 0)
+                        await Sauce(ctx, ctx.Message.Attachments[0].Url);
+                    else
+                        await ctx.RespondAsync("You must provide a link or attachment!");
+                }
+                else
+                    await ctx.RespondAsync("NSFW Channels only!");
+            }
+        }
+
+        [Command("sauce")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Sauce(CommandContext ctx, [Description("The images url")] string url)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                if (ctx.Channel.GetEvaluatedNsfw())
+                {
+                    string html;
+                    using (HttpClient hc = new HttpClient())
+                        html = await hc.GetStringAsync(
+                            $"https://saucenao.com/search.php?db=999&url={Uri.EscapeDataString(url)}");
+                    if (!html.Contains("<div id=\"middle\">"))
+                    {
+                        await ctx.RespondAsync("Not found");
+                        return;
+                    }
+                    string fullHtml = html;
+                    html = html.Split(new[] {"<td class=\"resulttablecontent\">"}, StringSplitOptions.None)[1];
+                    /*return new FeatureRequest<Response.BooruSource, Error.SourceBooru>(new Response.BooruSource
+                    {
+                        compatibility = float.Parse(Regex.Match(html, "<div class=\"resultsimilarityinfo\">([0-9]{2,3}\\.[0-9]{1,2})%<\\/div>").Groups[1].Value, CultureInfo.InvariantCulture),
+                        content = Utilities.RemoveHTML(html.Split(new[] { "<div class=\"resultcontentcolumn\">" }, StringSplitOptions.None)[1].Split(new[] { "</div>" }, StringSplitOptions.None)[0]),
+                        url = Regex.Match(fullHtml, "<img title=\"Index #[^\"]+\"( raw-rating=\"[^\"]+\") src=\"(https:\\/\\/img[0-9]+.saucenao.com\\/[^\"]+)\"").Groups[2].Value
+                    }, Error.SourceBooru.None);*/
+                    float certitude =
+                        float.Parse(
+                            Regex.Match(html, "<div class=\"resultsimilarityinfo\">([0-9]{2,3}\\.[0-9]{1,2})%<\\/div>")
+                                .Groups[1].Value, CultureInfo.InvariantCulture);
+                    await ctx.RespondAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Description = TextProcessor.HtmlToPlainText(html.Split(new[] { "<div class=\"resultcontentcolumn\">" }, StringSplitOptions.None)[1].Split(new[] { "</div>" }, StringSplitOptions.None)[0]),
+                        ImageUrl = Regex.Match(fullHtml, "<img title=\"Index #[^\"]+\"( raw-rating=\"[^\"]+\") src=\"(https:\\/\\/img[0-9]+.saucenao.com\\/[^\"]+)\"").Groups[2].Value,
+                        Color = certitude > 80 ? DiscordColor.Green :
+                            certitude > 50 ? DiscordColor.Orange : DiscordColor.Red,
+                        Footer = new DiscordEmbedBuilder.EmbedFooter
+                        {
+                            Text = $"Certitude: {certitude}%"
+                        }
+                    }.Build());
+                }
+                else
+                    await ctx.RespondAsync("NSFW Channels only!");
+            }
+        }
+
+        [Command("xkcd")]
+        [Aliases("x")]
+        [Description("Gets a random image from xkcd")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Xkcd(CommandContext ctx)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                using WebClient client = new WebClient();
+                int c = Program.Rnd.Next(1, JObject.Parse(client.DownloadString("https://xkcd.com/info.0.json")).Value<int>("num") + 1);
+                JObject comic = JObject.Parse(client.DownloadString($"https://xkcd.com/{c}/info.0.json"));
+                string val = Program.Rnd.Next(10000, 99999).ToString();
+                await ctx.RespondWithFileAsync($"{val}_img.jpg",
+                    client.OpenRead(comic.Value<string>("img")), embed: new DiscordEmbedBuilder
+                    {
+                        Description = $"Transcript: {comic.Value<string>("alt")}",
+                        Title = comic.Value<string>("safe_title"),
+                        Url = $"https://xkcd.com/{c}/",
+                        Timestamp = new DateTime(int.Parse(comic.Value<string>("year")), int.Parse(comic.Value<string>("month")), int.Parse(comic.Value<string>("day")))
+                    }.Build());
             }
         }
     }
