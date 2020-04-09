@@ -2,15 +2,15 @@ namespace Shared
 {
     public struct Currency
     {
-        public readonly string currencyName;
-        public readonly string currencySymbol;
-        public readonly string id;
+        public readonly string CurrencyName;
+        public readonly string CurrencySymbol;
+        public readonly string Id;
 
         public Currency(string currencyName, string currencySymbol, string id)
         {
-            this.currencyName = currencyName;
-            this.currencySymbol = currencySymbol;
-            this.id = id;
+            this.CurrencyName = currencyName;
+            this.CurrencySymbol = currencySymbol;
+            this.Id = id;
         }
     }
 }

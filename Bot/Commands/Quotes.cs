@@ -18,31 +18,38 @@ namespace Bot.Commands
     [Description("Random pieces of text from various sources")]
     public class Quotes : BaseCommandModule
     {
-        private static readonly string[] _beequotes;
-        private static readonly string[] _fortunequotes;
-        private static readonly string[] _fortunequotesOff;
+        private static readonly string[] Beequotes;
+        private static readonly string[] Fortunequotes;
+        private static readonly string[] FortunequotesOff;
 
         static Quotes()
         {
             Console.Write("Downloading BeeMovie quotes...");
             using (WebClient client = new WebClient())
             {
-                _beequotes = client
+                Beequotes = client
                     .DownloadString(
                         "http://www.script-o-rama.com/movie_scripts/a1/bee-movie-script-transcript-seinfeld.html")
                     .Split(new[] {"<pre>"}, StringSplitOptions.None)[1]
                     .Split(new[] {"</pre>"}, StringSplitOptions.None)[0]
                     .Split(new[] {"\n\n  \n"}, StringSplitOptions.None);
-                _beequotes[0] = _beequotes[0].Replace("  \n  \n", "");
+                Beequotes[0] = Beequotes[0].Replace("  \n  \n", "");
             }
             Console.WriteLine(" Finished.");
             Console.Write("Downloading fortunes");
-            _fortunequotes = getFortuneQuotes("fortune-mod/datfiles");
-            _fortunequotesOff = getFortuneQuotes("fortune-mod/datfiles/off/unrotated");
+            try
+            {
+                Fortunequotes = GetFortuneQuotes("fortune-mod/datfiles");
+                FortunequotesOff = GetFortuneQuotes("fortune-mod/datfiles/off/unrotated");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Cought {e.GetType().Name} while downloading. Fortunes might not be available. Restart in ~ an hour to fix");
+            }
             Console.WriteLine(" Finished.");
         }
 
-        private static string[] getFortuneQuotes(string path)
+        private static string[] GetFortuneQuotes(string path)
         {
             Console.Write(".");
             IEnumerable<RepositoryContent> files =
@@ -79,7 +86,7 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                string[] quotes = ctx.Channel.getEvaluatedNSFW() ? _fortunequotesOff : _fortunequotes;
+                string[] quotes = ctx.Channel.GetEvaluatedNsfw() ? FortunequotesOff : Fortunequotes;
                 await ctx.RespondAsyncFix(quotes[Program.Rnd.Next(quotes.Length)], true);
             }
         }
@@ -93,9 +100,9 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                int q = Program.Rnd.Next(_beequotes.Length - 2);
+                int q = Program.Rnd.Next(Beequotes.Length - 2);
                 await ctx.RespondAsyncFix(
-                    (_beequotes[q] + "\n\n" + _beequotes[q + 1] + "\n\n" + _beequotes[q + 2]).Replace("\n", "\r\n"),
+                    (Beequotes[q] + "\n\n" + Beequotes[q + 1] + "\n\n" + Beequotes[q + 2]).Replace("\n", "\r\n"),
                     true);
             }
         }

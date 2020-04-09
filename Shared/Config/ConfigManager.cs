@@ -42,7 +42,9 @@ namespace Shared.Config
             }
         }
 
-        public static bool? Get(this SnowflakeObject id, string element, bool? defaultVal = true)
+        public static bool? Get(this SnowflakeObject id, string element, bool? defaultVal = true) => GenericExtensions.ParseBool(id.Get(element, defaultVal.GetString()));
+
+        public static string? Get(this SnowflakeObject id, string element, string? defaultVal)
         {
             return id switch
             {
@@ -52,7 +54,7 @@ namespace Shared.Config
             };
         }
 
-        private static bool? Get(string id, string element, string configType, bool? defaultVal = true)
+        private static string? Get(string id, string element, string configType, string? defaultVal)
         {
             while (true)
             {
@@ -64,7 +66,7 @@ namespace Shared.Config
                     continue;
                 }
                 if (!string.IsNullOrEmpty(self.Value))
-                    return GenericExtensions.ParseBool(self.Value);
+                    return self.Value;
                 if (el.Element("upper") != null && !string.IsNullOrEmpty(el.Element("upper").Value) &&
                     el.Element("upperType") != null && !string.IsNullOrEmpty(el.Element("upperType").Value))
                 {
@@ -84,10 +86,10 @@ namespace Shared.Config
                 DiscordGuild _ => Guild,
                 _ => throw new ArgumentException("Invalid Snowflake! (Supports Guilds and Channels)")
             };
-            return string.Join("\r\n", allowed.Select(element => $"{element}: {Get(id, element)}"));
+            return string.Join("\r\n", allowed.Select(element => $"{element}: {Get(id, element, true)}"));
         }
 
-        public static void Set(this SnowflakeObject id, string element, bool? val, bool disableFormChecks = false)
+        public static void Set(this SnowflakeObject id, string element, string? val, bool disableFormChecks = false)
         {
             switch (id)
             {
@@ -104,7 +106,7 @@ namespace Shared.Config
             }
         }
 
-        private static void Set(string id, string element, bool? val, bool disableFormChecks, string configType,
+        private static void Set(string id, string element, string? val, bool disableFormChecks, string configType,
             IList<(string, string)> upper = null)
         {
             XElement xml = GetXml(id, configType, out string xmlPath);
@@ -112,12 +114,12 @@ namespace Shared.Config
             string el = element.ToLower();
             if (!xml.Elements(el).Any())
             {
-                xml.Add(new XElement(el, val.ToString()));
+                xml.Add(val is null ? new XElement(el) : new XElement(el, val));
                 changed = true;
             }
-            else if (xml.Element(el).Value != val.ToString())
+            else if (xml.Element(el).Value != val && !(val is null))
             {
-                xml.Element(el).Value = val.ToString();
+                xml.Element(el).Value = val;
                 changed = true;
             }
 
@@ -152,8 +154,8 @@ namespace Shared.Config
         private static bool? GetMethodEnabled(string id, string configType, bool? defaultval, string callerName)
         {
             string tmp1 = CommandComparer.GetName(callerName);
-            bool? tmp = Get(id, tmp1, configType,
-                defaultval);
+            bool? tmp = GenericExtensions.ParseBool(Get(id, tmp1, configType,
+                defaultval.GetString()));
             Console.WriteLine($"CommandComparer.GetName({callerName})={tmp1}");
             Console.WriteLine($"cfg({callerName})={tmp}");
             return tmp;
@@ -164,11 +166,11 @@ namespace Shared.Config
             XElement el = GetXml(id.Id.ToString(), Guild, out string xmlPath);
             if (el.Element(Users) == null)
                 el.Add(new XElement(Users));
-            if (el.Element(Users).Element("user" + user.Id) == null)
+            if (el.Element(Users).Element($"user{user.Id}") == null)
                 el.Element(Users)
-                    .Add(new XElement("user" + user.Id, decimal.Zero.ToString(CultureInfo.InvariantCulture)));
+                    .Add(new XElement($"user{user.Id}", decimal.Zero.ToString(CultureInfo.InvariantCulture)));
             el.Save(xmlPath);
-            return decimal.Parse(el.Element(Users).Element("user" + user.Id).Value);
+            return decimal.Parse(el.Element(Users).Element($"user{user.Id}").Value);
         }
 
         public static void SetMoney(this DiscordGuild id, DiscordMember user, decimal money)
@@ -176,9 +178,9 @@ namespace Shared.Config
             XElement el = GetXml(id.Id.ToString(), Guild, out string xmlPath);
             if (el.Element(Users) == null)
                 el.Add(new XElement(Users));
-            if (el.Element(Users).Element("user" + user.Id) == null)
-                el.Element(Users).Add(new XElement("user" + user.Id));
-            el.Element(Users).Element("user" + user.Id).Value = money.ToString(CultureInfo.InvariantCulture);
+            if (el.Element(Users).Element($"user{user.Id}") == null)
+                el.Element(Users).Add(new XElement($"user{user.Id}"));
+            el.Element(Users).Element($"user{user.Id}").Value = money.ToString(CultureInfo.InvariantCulture);
             el.Save(xmlPath);
         }
 
@@ -197,10 +199,10 @@ namespace Shared.Config
             XElement el = GetXml(id.Id.ToString(), Guild, out string xmlPath);
             if (el.Element(Bans) == null)
                 el.Add(new XElement(Bans));
-            if (el.Element(Bans).Element("user" + user.Id) == null)
-                el.Element(Bans).Add(new XElement("user" + user.Id, TimeSpan.Zero.ToString()));
+            if (el.Element(Bans).Element($"user{user.Id}") == null)
+                el.Element(Bans).Add(new XElement($"user{user.Id}", TimeSpan.Zero.ToString()));
             XElement element = el.Element(Bans);
-            element = element.Element("user" + user.Id);
+            element = element.Element($"user{user.Id}");
             element.Value = (DateTime.Now + span).ToString(CultureInfo.InvariantCulture);
             el.Save(xmlPath);
         }
@@ -217,12 +219,12 @@ namespace Shared.Config
             {
                 if (id.GetBansAsync().GetAwaiter().GetResult().Count(s => s.User.Id == v.Key) == 0)
                 {
-                    el.Element(Bans).Element("user" + v.Key).Remove();
+                    el.Element(Bans).Element($"user{v.Key}").Remove();
                     continue;
                 }
                 if (v.Value > DateTime.Now) continue;
                 id.UnbanMemberAsync(v.Key, "Timed ban timed out");
-                el.Element(Bans).Element("user" + v.Key).Remove();
+                el.Element(Bans).Element($"user{v.Key}").Remove();
             }
             el.Save(xmlPath);
         }
@@ -232,7 +234,7 @@ namespace Shared.Config
             XElement el = GetXml(id.Id.ToString(), Guild, out string xmlPath);
             if (el.Element(Bans) == null)
                 el.Add(new XElement(Bans));
-            bool output = el.Element(Bans).Element("user" + user) != null;
+            bool output = el.Element(Bans).Element($"user{user}") != null;
             el.Save(xmlPath);
             return output;
         }
@@ -243,8 +245,8 @@ namespace Shared.Config
             if (el.Element(Bans) == null)
                 el.Add(new XElement(Bans));
             TimeSpan output = TimeSpan.Zero;
-            if (el.Element(Bans).Element("user" + user) != null)
-                output = DateTime.Parse(el.Element(Bans).Element("user" + user).Value) - DateTime.Now;
+            if (el.Element(Bans).Element($"user{user}") != null)
+                output = DateTime.Parse(el.Element(Bans).Element($"user{user}").Value) - DateTime.Now;
             el.Save(xmlPath);
             return output;
         }
@@ -254,8 +256,8 @@ namespace Shared.Config
             XElement el = GetXml(id.Id.ToString(), Guild, out string xmlPath);
             if (el.Element(Bans) == null)
                 el.Add(new XElement(Bans));
-            if (el.Element(Bans).Element("user" + user) != null)
-                el.Element(Bans).Element("user" + user).Remove();
+            if (el.Element(Bans).Element($"user{user}") != null)
+                el.Element(Bans).Element($"user{user}").Remove();
             el.Save(xmlPath);
         }
 #endif

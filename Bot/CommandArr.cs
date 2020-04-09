@@ -10,27 +10,27 @@ namespace Bot
 {
     public static class CommandArr
     {
-        private static Type[]? M;
-        private static string[]? C;
+        private static Type[]? _m;
+        private static string[]? _c;
 
-        public static Type[] getM()
+        public static Type[] GetM()
         {
-            if (M == null)
-                M = Assembly.GetExecutingAssembly().GetTypes()
+            if (_m == null)
+                _m = Assembly.GetExecutingAssembly().GetTypes()
                     .Where(s => typeof(BaseCommandModule).IsAssignableFrom(s)).ToArray();
-            return M;
+            return _m;
         }
 
-        public static string[] getC()
+        public static string[] GetC()
         {
-            if (C == null)
-                C = getM().SelectMany(s => s.GetMethods())
+            if (_c == null)
+                _c = GetM().SelectMany(s => s.GetMethods())
                     .Where(s => s.GetCustomAttributes(typeof(CommandAttribute), false).Length > 0)
                     .Select(s => CommandComparer.GetName(s))
                     .Except(new[] {"method_ping"})
                     .OrderBy(s => s)
                     .Union(new[] {ConfigManager.Nsfw, ConfigManager.Enabled}).ToArray();
-            return C;
+            return _c;
         }
     }
 }

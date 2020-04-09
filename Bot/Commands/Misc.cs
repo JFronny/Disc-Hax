@@ -91,7 +91,7 @@ namespace Bot.Commands
                 byte[] codeBytes = new byte[bytes];
                 Program.Rnd.NextBytes(codeBytes);
                 string code = BitConverter.ToString(codeBytes).ToLower().Replace("-", "");
-                await ctx.RespondAsync($"The first one to type the following code gets a reward: {code.emotify()}");
+                await ctx.RespondAsync($"The first one to type the following code gets a reward: {code.Emotify()}");
                 InteractivityResult<DiscordMessage> msg =
                     await interactivity.WaitForMessageAsync(xm => xm.Content.Contains(code), time);
                 if (msg.TimedOut)
@@ -111,7 +111,7 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsyncFix(text.emotify());
+                await ctx.RespondAsyncFix(text.Emotify());
             }
         }
 
@@ -126,7 +126,7 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsyncFix(text.leetify());
+                await ctx.RespondAsyncFix(text.Leetify());
             }
         }
 
@@ -153,7 +153,7 @@ namespace Bot.Commands
                     await ctx.RespondAsync("Failed to download site");
                     return;
                 }
-                await ctx.RespondPaginatedIfTooLong(HTMLProcessor.ToPlainText(html));
+                await ctx.RespondPaginatedIfTooLong(HtmlProcessor.ToPlainText(html));
             }
         }
 
@@ -241,15 +241,43 @@ namespace Bot.Commands
         [Aliases("mc")]
         [Description("Gets the status of a minecraft server")]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task Minecraft(CommandContext ctx, [Description("IP of the server")] string IP)
+        public async Task Minecraft(CommandContext ctx, [Description("IP of the server")] string ip)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                string[] parsedIP = IP.Split(':');
-                ushort port = parsedIP.Length == 1 ? (ushort) 25565 : ushort.Parse(parsedIP[1]);
-                await ctx.RespondAsyncFix(StatReader.ReadStat(parsedIP[0], port));
+                string[] parsedIp = ip.Split(':');
+                ushort port = parsedIp.Length == 1 ? (ushort) 25565 : ushort.Parse(parsedIp[1]);
+                await ctx.RespondAsyncFix(StatReader.ReadStat(parsedIp[0], port));
+            }
+        }
+
+        [Command("quote")]
+        [Aliases("q")]
+        [Description("Quote a message")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Quote(CommandContext ctx)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                DiscordMessage msg = (await ctx.Channel.GetMessagesAsync()).Skip(1).First(s => !s.Author.IsBot);
+                await msg.Quote(ctx);
+            }
+        }
+        
+        [Command("quote")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Quote(CommandContext ctx, [Description("The messages ID")] ulong id)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                DiscordMessage msg = await ctx.Channel.GetMessageAsync(id);
+                await msg.Quote(ctx);
             }
         }
     }

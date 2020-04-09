@@ -38,7 +38,7 @@ namespace Shared.Config
             dlg.ShowModal();
             if (overwriteXml)
             {
-                TokenManager.SaveXE(new XElement("container",
+                TokenManager.SaveXe(new XElement("container",
                     new XElement("discord", discordBox.Text),
                     new XElement("currencyconverterapi", currConvBox.Text),
                     new XElement("perspective", perspectiveBox.Text)));

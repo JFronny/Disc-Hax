@@ -7,21 +7,21 @@ using DSharpPlus.Entities;
 
 namespace Bot.Converters
 {
-    public class RPSOptionConv : IArgumentConverter<RPSOptionConv.RPSOption>
+    public class RpsOptionConv : IArgumentConverter<RpsOptionConv.RpsOption>
     {
-        public enum RPSOption
+        public enum RpsOption
         {
             Rock,
             Paper,
             Scissor
         }
 
-        public static Array soptions = Enum.GetValues(typeof(RPSOption));
+        public static Array Soptions = Enum.GetValues(typeof(RpsOption));
 
-        public async Task<Optional<RPSOption>> ConvertAsync(string value, CommandContext ctx)
+        public async Task<Optional<RpsOption>> ConvertAsync(string value, CommandContext ctx)
         {
             string tmp1 = value.ToLower();
-            return soptions.OfType<RPSOption>().First(
+            return Soptions.OfType<RpsOption>().First(
                 s =>
                 {
                     string tmp2 = s.ToString().ToLower();

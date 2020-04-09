@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CC_Functions.Misc;
@@ -22,8 +23,9 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync(@"Webpage: https://jfronny.github.io/home/bot
-Repo: https://github.com/JFronny/Disc-Hax");
+                await ctx.RespondAsync($@"Webpage: https://jfronny.github.io/home/bot
+Repo: https://github.com/JFronny/Disc-Hax
+Uptime: {(DateTime.Now - Program.Start).GetReadable()}");
             }
         }
 
@@ -94,6 +96,20 @@ Repo: https://github.com/JFronny/Disc-Hax");
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync("Webpage: https://jfronny.github.io/home/bot");
+            }
+        }
+
+        [Command("uptime")]
+        [Aliases("u")]
+        [Description("Prints the bots uptime")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Uptime(CommandContext ctx)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                await ctx.RespondAsync($"Up for {(DateTime.Now - Program.Start).GetReadable()}");
             }
         }
     }

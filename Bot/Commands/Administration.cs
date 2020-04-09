@@ -30,10 +30,10 @@ namespace Bot.Commands
         public async Task Ping(CommandContext ctx) =>
             await Ping(ctx.Channel, (c1, c2, c3) => ctx.RespondAsync(c1, c2, c3));
 
-        public static async Task Ping(DiscordChannel Channel,
+        public static async Task Ping(DiscordChannel channel,
             Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (Channel.Get(ConfigManager.Enabled).TRUE())
+            if (channel.Get(ConfigManager.Enabled).TRUE())
                 await postMessage($"Pong! ({Program.Bot.Ping}ms)", false, null);
         }
 
@@ -161,7 +161,7 @@ namespace Bot.Commands
         [Aliases("n")]
         [Description("Gives the member a new nickname")]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task Nick(CommandContext ctx, [Description("New nickname")] string Nickname,
+        public async Task Nick(CommandContext ctx, [Description("New nickname")] string nickname,
             [Description("Member to softban")] DiscordMember? member = null)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
@@ -174,8 +174,8 @@ namespace Bot.Commands
                 if ((member.Id == ctx.Member.Id && userPer.HasPermission(Permissions.ChangeNickname)) ||
                     userPer.HasPermission(Permissions.ManageNicknames))
                 {
-                    await member.ModifyAsync(s => s.Nickname = Nickname);
-                    await ctx.RespondAsync($"Set the nickname of {member.Username} to {Nickname}.");
+                    await member.ModifyAsync(s => s.Nickname = nickname);
+                    await ctx.RespondAsync($"Set the nickname of {member.Username} to {nickname}.");
                 }
                 else
                 {
@@ -275,7 +275,7 @@ namespace Bot.Commands
                 return;
             }
             await ctx.CommandsNext.ExecuteCommandAsync(ctx.CommandsNext.CreateFakeContext(m, ctx.Channel, command,
-                Common.prefix, ctx.CommandsNext.FindCommand(command, out string _)));
+                Common.Prefix, ctx.CommandsNext.FindCommand(command, out string _)));
         }
 
         [Command("purge")]

@@ -9,10 +9,10 @@ namespace BeeMovie
 
         private static void Main()
         {
-            string[] Quotes;
+            string[] quotes;
             using (WebClient client = new WebClient())
             {
-                Quotes = client
+                quotes = client
                     .DownloadString(
                         "http://www.script-o-rama.com/movie_scripts/a1/bee-movie-script-transcript-seinfeld.html")
                     .Split(new[] {"<pre>"}, StringSplitOptions.None)[1]
@@ -20,12 +20,12 @@ namespace BeeMovie
                     .Split(new[] {"\n\n  \n"}, StringSplitOptions.None);
             }
 
-            Quotes[0] = Quotes[0].Replace("  \n  \n", "");
+            quotes[0] = quotes[0].Replace("  \n  \n", "");
             while (true)
             {
                 Console.Clear();
-                int q = Rnd.Next(Quotes.Length - 2);
-                Console.WriteLine((Quotes[q] + "\n\n" + Quotes[q + 1] + "\n\n" + Quotes[q + 2]).Replace("\n", "\r\n"));
+                int q = Rnd.Next(quotes.Length - 2);
+                Console.WriteLine((quotes[q] + "\n\n" + quotes[q + 1] + "\n\n" + quotes[q + 2]).Replace("\n", "\r\n"));
                 Console.ReadKey();
             }
         }

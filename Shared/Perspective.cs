@@ -29,7 +29,7 @@ namespace Shared
             StringContent content = new StringContent(JsonConvert.SerializeObject(requestPayload), Encoding.UTF8,
                 "application/json");
             HttpResponseMessage response = await _httpclient.PostAsync(
-                "https://" + $"commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key={_token}", content);
+                $"https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key={_token}", content);
             return JsonConvert.DeserializeObject<PerspectiveAnalysisResponse>(
                 await response.Content.ReadAsStringAsync());
         }

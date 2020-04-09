@@ -25,12 +25,12 @@ namespace Bot.Commands
     [Description("Commands to get random images from image-boards around the interwebz")]
     public class ImageBoards : BaseCommandModule
     {
-        public static Dictionary<string, ABooru> booruDict;
+        public static Dictionary<string, ABooru> BooruDict;
 
         public ImageBoards()
         {
             Console.Write("Instantiating Boorus...");
-            booruDict = Assembly.GetAssembly(typeof(ABooru)).GetTypes()
+            BooruDict = Assembly.GetAssembly(typeof(ABooru)).GetTypes()
                 .Where(s => s.Namespace == "BooruSharp.Booru" && s.IsClass && !s.IsAbstract &&
                             s.IsSubclassOf(typeof(ABooru)))
                 .Select(s => (ABooru) Activator.CreateInstance(s, new object?[] {null}))
@@ -64,7 +64,7 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                if (ctx.Channel.getEvaluatedNSFW())
+                if (ctx.Channel.GetEvaluatedNsfw())
                 {
                     Thread[] threads = board.GetThreads().ToArray();
                     Thread t = threads[Program.Rnd.Next(threads.Length)];
@@ -109,7 +109,7 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                if (ctx.Channel.getEvaluatedNSFW() || forceExecution)
+                if (ctx.Channel.GetEvaluatedNsfw() || forceExecution)
                 {
                     int img = Program.Rnd.Next(6000);
                     using WebClient wClient = new WebClient();
@@ -137,8 +137,8 @@ namespace Bot.Commands
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(qcont
-                    ? string.Join("; ", booruDict.Keys)
-                    : string.Join("; ", booruDict.Keys.Where(s => booruDict[s].IsSafe())));
+                    ? string.Join("; ", BooruDict.Keys)
+                    : string.Join("; ", BooruDict.Keys.Where(s => BooruDict[s].IsSafe())));
             }
         }
 
@@ -155,7 +155,7 @@ namespace Bot.Commands
                 await ctx.TriggerTypingAsync();
                 SearchResult result = await booru.GetRandomImageAsync(tags);
                 int triesLeft = 10;
-                while (result.rating != (ctx.Channel.getEvaluatedNSFW() ? Rating.Explicit : Rating.Safe) &&
+                while (result.rating != (ctx.Channel.GetEvaluatedNsfw() ? Rating.Explicit : Rating.Safe) &&
                        !booru.IsSafe())
                 {
                     if (triesLeft == 0)
@@ -168,7 +168,7 @@ namespace Bot.Commands
                 await ctx.RespondWithFileAsync($"{val}_img.jpg",
                     wClient.OpenRead(result.fileUrl), embed: new DiscordEmbedBuilder
                     {
-                        Description = "Tags: " + string.Join(", ", result.tags),
+                        Description = $"Tags: {string.Join(", ", result.tags)}",
                         Title = result.source ?? "Unknown source",
                         Url = result.fileUrl.ToString()
                     }.Build());
@@ -180,7 +180,7 @@ namespace Bot.Commands
         public async Task Booru(CommandContext ctx,
             [Description("Tags for image selection")]
             params string[] tags) =>
-            await Booru(ctx, ctx.Channel.getEvaluatedNSFW() ? (ABooru) new Rule34() : new Safebooru(), tags);
+            await Booru(ctx, ctx.Channel.GetEvaluatedNsfw() ? (ABooru) new Rule34() : new Safebooru(), tags);
 
         [Command("reddit")]
         [Aliases("r")]
@@ -199,7 +199,7 @@ namespace Bot.Commands
                 string res =
                     client.DownloadString($"https://www.reddit.com/r/{subreddit}/{(topPost ? "top" : "random")}/.json");
                 JToken jToken = (topPost ? JObject.Parse(res) : JArray.Parse(res)[0])["data"]["children"][0]["data"];
-                while (ctx.Channel.getEvaluatedNSFW() != jToken["over_18"].Value<bool>())
+                while (ctx.Channel.GetEvaluatedNsfw() != jToken["over_18"].Value<bool>())
                 {
                     res = client.DownloadString(
                         $"https://www.reddit.com/r/{subreddit}/{(topPost ? "top" : "random")}/.json");

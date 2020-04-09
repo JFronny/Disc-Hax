@@ -17,7 +17,6 @@ using Shared.Config;
 using Application = Eto.Forms.Application;
 using DateTime = System.DateTime;
 using Math = Bot.Commands.Math;
-using Mutex = System.Threading.Mutex;
 using Task = System.Threading.Tasks.Task;
 using Thread = System.Threading.Thread;
 
@@ -30,6 +29,7 @@ namespace Bot
         private static CancellationTokenSource _tokenSource;
         public static GitHubClient Github;
         public static Perspective Perspective;
+        public static DateTime Start = DateTime.Now;
         private static CommandsNextExtension Commands { get; set; }
 
         [STAThread]
@@ -62,8 +62,23 @@ namespace Bot
                 Bot = new DiscordClient(cfg);
                 Commands = Bot.UseCommandsNext(new CommandsNextConfiguration
                 {
-                    StringPrefixes = new[] {Common.prefix},
-                    EnableDms = false
+                    StringPrefixes = new[] {Common.Prefix},
+                    EnableDms = false,
+                    PrefixResolver = async msg =>
+                    {
+                        string prefix = msg.Channel.Get("Prefix", Common.Prefix);
+                        string content = msg.Content;
+                        if (content.StartsWith(prefix))
+                        {
+                            if (content.StartsWith($"{prefix} "))
+                                return prefix.Length + 1;
+                            return prefix.Length;
+                        }
+                        if (!content.StartsWith(Bot.CurrentUser.Mention)) return -1;
+                        if (content.StartsWith($"{Bot.CurrentUser.Mention} "))
+                            return Bot.CurrentUser.Mention.Length + 1;
+                        return Bot.CurrentUser.Mention.Length;
+                    }
                 });
                 Commands.CommandExecuted += Commands_CommandExecuted;
                 Commands.CommandErrored += Commands_CommandErrored;
@@ -84,7 +99,7 @@ namespace Bot
                 Commands.RegisterConverter(new BoardConv());
                 Commands.RegisterConverter(new BooruConv());
                 Commands.RegisterConverter(new CurrencyConv());
-                Commands.RegisterConverter(new RPSOptionConv());
+                Commands.RegisterConverter(new RpsOptionConv());
                 Commands.SetHelpFormatter<HelpFormatter>();
                 Bot.DebugLogger.LogMessageReceived += DebugLogger_LogMessageReceived;
                 Bot.Ready += Bot_Ready;
@@ -146,6 +161,7 @@ namespace Bot
             Bot.DebugLogger.LogMessage(LogLevel.Info, "DiscHax",
                 $"Your invite Link: https://discordapp.com/oauth2/authorize?client_id={e.Client.CurrentApplication.Id}&scope=bot&permissions=8",
                 DateTime.Now);
+            Bot.UpdateStatusAsync(new DiscordActivity("help", ActivityType.ListeningTo));
             return Task.CompletedTask;
         }
 
@@ -154,6 +170,7 @@ namespace Bot
             if (!e.Author.IsBot)
                 e.Guild.IncrementMoney(e.Guild.Members[e.Author.Id],
                     Rnd.Next(0, System.Math.Max(e.Message.Content.Length / 25, 20)));
+            Bot.UpdateStatusAsync(new DiscordActivity("help", ActivityType.ListeningTo));
             return Task.CompletedTask;
         }
 

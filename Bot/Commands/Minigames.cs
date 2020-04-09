@@ -20,19 +20,19 @@ namespace Bot.Commands
         [Command("rps")]
         [Description("Play Rock-Paper-Scissors")]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task RPS(CommandContext ctx, [Description("Input (=Rock/Paper/Scissor)")]
-            RPSOptionConv.RPSOption Option)
+        public async Task Rps(CommandContext ctx, [Description("Input (=Rock/Paper/Scissor)")]
+            RpsOptionConv.RpsOption option)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 string output;
-                RPSOptionConv.RPSOption rpsOption =
-                    (RPSOptionConv.RPSOption) RPSOptionConv.soptions.GetValue(
-                        Program.Rnd.Next(RPSOptionConv.soptions.Length));
-                output = $"You chose: {Option}, I chose {rpsOption}. This means ";
-                int diff = (int) rpsOption - (int) Option;
+                RpsOptionConv.RpsOption rpsOption =
+                    (RpsOptionConv.RpsOption) RpsOptionConv.Soptions.GetValue(
+                        Program.Rnd.Next(RpsOptionConv.Soptions.Length));
+                output = $"You chose: {option}, I chose {rpsOption}. This means ";
+                int diff = (int) rpsOption - (int) option;
                 diff = diff switch {-2 => 1, 2 => -1, _ => diff};
                 output += diff switch
                 {
@@ -48,8 +48,8 @@ namespace Bot.Commands
 
         [Command("rps")]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task RPS(CommandContext ctx, [Description("Input (=Rock/Paper/Scissor)")]
-            RPSOptionConv.RPSOption Option, [Description("Amount of coinst to bet")]
+        public async Task Rps(CommandContext ctx, [Description("Input (=Rock/Paper/Scissor)")]
+            RpsOptionConv.RpsOption option, [Description("Amount of coinst to bet")]
             decimal bet)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
@@ -62,11 +62,11 @@ namespace Bot.Commands
                     return;
                 }
                 string output;
-                RPSOptionConv.RPSOption rpsOption =
-                    (RPSOptionConv.RPSOption) RPSOptionConv.soptions.GetValue(
-                        Program.Rnd.Next(RPSOptionConv.soptions.Length));
-                output = $"You chose: {Option}, I chose {rpsOption}. This means ";
-                int diff = (int) rpsOption - (int) Option;
+                RpsOptionConv.RpsOption rpsOption =
+                    (RpsOptionConv.RpsOption) RpsOptionConv.Soptions.GetValue(
+                        Program.Rnd.Next(RpsOptionConv.Soptions.Length));
+                output = $"You chose: {option}, I chose {rpsOption}. This means ";
+                int diff = (int) rpsOption - (int) option;
                 diff = diff switch {-2 => 1, 2 => -1, _ => diff};
                 output += diff switch
                 {
@@ -132,22 +132,22 @@ namespace Bot.Commands
                     for (int i = 0; i < 4; i++)
                     {
                         await msg.ModifyAsync(
-                            $"| {getSlot(Program.Rnd.Next(5))} | :grey_question: | :grey_question: |");
+                            $"| {GetSlot(Program.Rnd.Next(5))} | :grey_question: | :grey_question: |");
                         await Task.Delay(1000);
                     }
                     for (int i = 0; i < 4; i++)
                     {
                         await msg.ModifyAsync(
-                            $"| {getSlot(pool[0])} | {getSlot(Program.Rnd.Next(5))} | :grey_question: |");
+                            $"| {GetSlot(pool[0])} | {GetSlot(Program.Rnd.Next(5))} | :grey_question: |");
                         await Task.Delay(1000);
                     }
                     for (int i = 0; i < 4; i++)
                     {
                         await msg.ModifyAsync(
-                            $"| {getSlot(pool[0])} | {getSlot(pool[1])} | {getSlot(Program.Rnd.Next(5))} |");
+                            $"| {GetSlot(pool[0])} | {GetSlot(pool[1])} | {GetSlot(Program.Rnd.Next(5))} |");
                         await Task.Delay(1000);
                     }
-                    await msg.ModifyAsync($"| {getSlot(pool[0])} | {getSlot(pool[1])} | {getSlot(pool[2])} |");
+                    await msg.ModifyAsync($"| {GetSlot(pool[0])} | {GetSlot(pool[1])} | {GetSlot(pool[2])} |");
                 }
                 pool = pool.OrderBy(s => s).ToArray();
                 decimal winnings = 0;
@@ -174,12 +174,12 @@ namespace Bot.Commands
                 }
                 winnings -= bet;
                 await msg.ModifyAsync(
-                    $"| {getSlot(pool[0])} | {getSlot(pool[1])} | {getSlot(pool[2])} |\nYou {(winnings > 0 ? "won" : "lost")} {Abs((double) winnings)} coins.");
+                    $"| {GetSlot(pool[0])} | {GetSlot(pool[1])} | {GetSlot(pool[2])} |\nYou {(winnings > 0 ? "won" : "lost")} {Abs((double) winnings)} coins.");
                 ctx.Guild.IncrementMoney(ctx.Member, winnings);
             }
         }
 
-        private string getSlot(int val) => val switch
+        private string GetSlot(int val) => val switch
         {
             0 => ":first_place:",
             1 => ":gem:",

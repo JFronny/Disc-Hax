@@ -10,11 +10,11 @@ namespace RockPaperScissors
             Random rnd = new Random();
             while (true)
             {
-                Array soptions = Enum.GetValues(typeof(RPSOption));
-                RPSOption rpsOption = (RPSOption) soptions.GetValue(rnd.Next(soptions.Length));
+                Array soptions = Enum.GetValues(typeof(RpsOption));
+                RpsOption rpsOption = (RpsOption) soptions.GetValue(rnd.Next(soptions.Length));
                 Console.Write("Choose: ");
                 string input = Console.ReadLine().ToLower();
-                RPSOption uoption = soptions.OfType<RPSOption>().First(
+                RpsOption uoption = soptions.OfType<RpsOption>().First(
                     s =>
                     {
                         string tmp = s.ToString().ToLower();
@@ -35,7 +35,7 @@ namespace RockPaperScissors
             }
         }
 
-        private enum RPSOption
+        private enum RpsOption
         {
             Rock,
             Paper,

@@ -114,7 +114,7 @@ namespace Bot.Commands
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(
-                    $"{amount} {inCurrency.currencyName} equals {CurrencyConverter.Convert(amount, inCurrency, outCurrency)} {outCurrency.currencyName}");
+                    $"{amount} {inCurrency.CurrencyName} equals {CurrencyConverter.Convert(amount, inCurrency, outCurrency)} {outCurrency.CurrencyName}");
             }
         }
 
@@ -127,7 +127,7 @@ namespace Bot.Commands
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondPaginatedIfTooLong(string.Join(", ",
-                    CurrencyConverter.Currencies.Values.Select(s => $"{s.currencyName}/{s.currencySymbol} ({s.id})")
+                    CurrencyConverter.Currencies.Values.Select(s => $"{s.CurrencyName}/{s.CurrencySymbol} ({s.Id})")
                         .OrderBy(s => s)));
             }
         }

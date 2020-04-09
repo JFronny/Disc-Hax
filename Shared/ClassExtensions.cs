@@ -14,10 +14,10 @@ namespace Shared
 {
     public static class ClassExtensions
     {
-        public static bool getEvaluatedNSFW(this DiscordChannel Channel) =>
-            Channel.IsNSFW || Channel.Get(ConfigManager.Nsfw, false).TRUE();
+        public static bool GetEvaluatedNsfw(this DiscordChannel channel) =>
+            channel.IsNSFW || channel.Get(ConfigManager.Nsfw, false).TRUE();
 
-        public static string emotify(this string self)
+        public static string Emotify(this string self)
         {
             return string.Join("", self.ToLower().ToCharArray().Select(s =>
             {
@@ -50,7 +50,7 @@ namespace Shared
             }).ToArray());
         }
 
-        public static string leetify(this string self)
+        public static string Leetify(this string self)
         {
             return string.Join("", self.ToLower().ToCharArray().Select(s =>
             {
@@ -88,8 +88,8 @@ namespace Shared
         }
 
         public static Task<DiscordMessage> RespondAsyncFix(this CommandContext ctx, string content = null,
-            bool isTTS = false, DiscordEmbed embed = null) =>
-            ctx.RespondAsync(content.Replace("*", "\\*").Replace("_", "\\_"), isTTS, embed);
+            bool isTts = false, DiscordEmbed embed = null) =>
+            ctx.RespondAsync(content.Replace("*", "\\*").Replace("_", "\\_"), isTts, embed);
 
         public static bool IsLocal(this Uri self)
         {

@@ -106,19 +106,8 @@ namespace Bot.Commands
                 await ctx.TriggerTypingAsync();
                 if (channel == null)
                     channel = ctx.Channel;
-                await ctx.RespondPaginatedIfTooLong("Config:\n" + channel.GetStr(CommandArr.getC()) + "\n\nProperties:\n" + string.Join("\n",
-                    typeof(DiscordChannel).GetProperties()
-                        .Select(s =>
-                        {
-                            try
-                            {
-                                return $"{s.Name}: {s.GetValue(channel)}";
-                            }
-                            catch
-                            {
-                                return $"Could not read {s.Name}";
-                            }
-                        })));
+                await ctx.RespondPaginatedIfTooLong(
+                    $"Config:\n{channel.GetStr(CommandArr.GetC())}\n\nProperties:\n{string.Join("\n", typeof(DiscordChannel).GetProperties().Select(s => { try { return $"{s.Name}: {s.GetValue(channel)}"; } catch { return $"Could not read {s.Name}"; } }))}");
             }
         }
 
@@ -132,19 +121,8 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondPaginatedIfTooLong("Config:\n" + ctx.Guild.GetStr(CommandArr.getC()) + "\n\nProperties:\n" + string.Join("\n",
-                    typeof(DiscordGuild).GetProperties()
-                        .Select(s =>
-                        {
-                            try
-                            {
-                                return $"{s.Name}: {s.GetValue(ctx.Guild)}";
-                            }
-                            catch
-                            {
-                                return $"Could not read {s.Name}";
-                            }
-                        })));
+                await ctx.RespondPaginatedIfTooLong(
+                    $"Config:\n{ctx.Guild.GetStr(CommandArr.GetC())}\n\nProperties:\n{string.Join("\n", typeof(DiscordGuild).GetProperties().Select(s => { try { return $"{s.Name}: {s.GetValue(ctx.Guild)}"; } catch { return $"Could not read {s.Name}"; } }))}");
             }
         }
     }

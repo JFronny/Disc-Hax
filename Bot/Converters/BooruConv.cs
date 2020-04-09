@@ -10,6 +10,6 @@ namespace Bot.Converters
     public class BooruConv : IArgumentConverter<ABooru>
     {
         public async Task<Optional<ABooru>> ConvertAsync(string value, CommandContext ctx) =>
-            ImageBoards.booruDict[value.ToLower()];
+            ImageBoards.BooruDict[value.ToLower()];
     }
 }

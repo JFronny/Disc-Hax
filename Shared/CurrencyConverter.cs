@@ -35,9 +35,9 @@ namespace Shared
         {
             WebClient client = new WebClient();
             string str = client.DownloadString(
-                $"https://free.currconv.com/api/v7/convert?q={inCurrency.id}_{outCurrency.id}&apiKey={TokenManager.CurrencyconverterapiToken}");
+                $"https://free.currconv.com/api/v7/convert?q={inCurrency.Id}_{outCurrency.Id}&apiKey={TokenManager.CurrencyconverterapiToken}");
             client.Dispose();
-            JToken o = JObject.Parse(str)["results"][$"{inCurrency.id}_{outCurrency.id}"];
+            JToken o = JObject.Parse(str)["results"][$"{inCurrency.Id}_{outCurrency.Id}"];
             return o.Value<float>("val");
         }
 

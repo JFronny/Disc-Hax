@@ -6,61 +6,61 @@ namespace Shared.Config
 {
     public static class Common
     {
-        private static readonly string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Cfgs",
+        private static readonly string Path = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Cfgs",
             "common.xml");
 
-        private static XElement common;
+        private static XElement _common;
 
-        public static string prefix
+        public static string Prefix
         {
             get
             {
-                getXE();
-                if (common.Element("prefix") == null)
+                GetXe();
+                if (_common.Element("prefix") == null)
                 {
-                    common.Add(new XElement("prefix"), "!");
-                    saveXE();
+                    _common.Add(new XElement("prefix"), "!");
+                    SaveXe();
                 }
 
-                return common.Element("prefix").Value;
+                return _common.Element("prefix").Value;
             }
         }
 
-        public static bool guildsBox
+        public static bool GuildsBox
         {
             get
             {
-                getXE();
-                if (common.Element("guildsBox") == null ||
-                    !bool.TryParse(common.Element("guildsBox").Value, out bool t))
+                GetXe();
+                if (_common.Element("guildsBox") == null ||
+                    !bool.TryParse(_common.Element("guildsBox").Value, out bool t))
                 {
-                    common.Add(new XElement("guildsBox", bool.FalseString));
-                    saveXE();
+                    _common.Add(new XElement("guildsBox", bool.FalseString));
+                    SaveXe();
                 }
 
-                return bool.Parse(common.Element("guildsBox").Value);
+                return bool.Parse(_common.Element("guildsBox").Value);
             }
             set
             {
-                getXE();
-                if (common.Element("guildsBox") == null)
-                    common.Add(new XElement("guildsBox", value.ToString()));
+                GetXe();
+                if (_common.Element("guildsBox") == null)
+                    _common.Add(new XElement("guildsBox", value.ToString()));
                 else
-                    common.Element("guildsBox").Value = value.ToString();
-                saveXE();
+                    _common.Element("guildsBox").Value = value.ToString();
+                SaveXe();
             }
         }
 
-        private static void getXE()
+        private static void GetXe()
         {
-            if (!Directory.Exists(Path.GetDirectoryName(path)))
-                Directory.CreateDirectory(Path.GetDirectoryName(path));
-            if (!File.Exists(path))
+            if (!Directory.Exists(System.IO.Path.GetDirectoryName(Path)))
+                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Path));
+            if (!File.Exists(Path))
                 new XElement("common", new XElement("prefix", "!"), new XElement("guildsBox", false.ToString()),
-                    new XElement("stash")).Save(path);
-            common = XElement.Load(path);
+                    new XElement("stash")).Save(Path);
+            _common = XElement.Load(Path);
         }
 
-        private static void saveXE() => common.Save(path);
+        private static void SaveXe() => _common.Save(Path);
     }
 }

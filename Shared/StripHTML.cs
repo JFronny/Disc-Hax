@@ -4,7 +4,7 @@ using HtmlAgilityPack;
 
 namespace Shared
 {
-    public static class HTMLProcessor
+    public static class HtmlProcessor
     {
         private static readonly HashSet<string> InlineTags = new HashSet<string>
         {
@@ -21,10 +21,10 @@ namespace Shared
             "script", "style"
         };
 
-        public static string ToPlainText(string HtmlDoc)
+        public static string ToPlainText(string htmlDoc)
         {
             HtmlDocument doc = new HtmlDocument();
-            doc.LoadHtml(HtmlDoc);
+            doc.LoadHtml(htmlDoc);
             StringBuilder builder = new StringBuilder();
             ToPlainTextState state = ToPlainTextState.StartLine;
             Plain(builder, ref state, new[] {doc.DocumentNode});

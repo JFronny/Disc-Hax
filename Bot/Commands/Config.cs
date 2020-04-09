@@ -31,7 +31,7 @@ namespace Bot.Commands
             if (ctx.Channel.Get(ConfigManager.Enabled).TRUE())
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync(target.GetStr(CommandArr.getC()));
+                await ctx.RespondAsync(target.GetStr(CommandArr.GetC()));
             }
         }
 
@@ -53,9 +53,14 @@ namespace Bot.Commands
             if (ctx.Channel.Get(ConfigManager.Enabled).TRUE())
             {
                 await ctx.TriggerTypingAsync();
-                if (!CommandArr.getC().Contains(element))
-                    throw new ArgumentException($"Element ({element}) not in CommandArr");
-                await ctx.RespondAsync($"{element}: {target.Get(element)}");
+                if (element.ToLower() == "prefix")
+                    await ctx.RespondAsync($"{element}: {target.Get(element, target is DiscordGuild ? Common.Prefix : ((DiscordChannel)target).Guild.Get("Prefix", Common.Prefix))}");
+                else
+                {
+                    if (!CommandArr.GetC().Contains(element))
+                        throw new ArgumentException($"Element ({element}) not in CommandArr");
+                    await ctx.RespondAsync($"{element}: {target.Get(element)}");
+                }
             }
         }
 
@@ -63,24 +68,29 @@ namespace Bot.Commands
         [RequireUserPermissions(Permissions.Administrator)]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public Task ConfigCmd(CommandContext ctx, [Description("Config element to change")]
-            string element, [Description("New value")] bool value) => ConfigCmd(ctx, ctx.Guild, element, value);
+            string element, [Description("New value")] string value) => ConfigCmd(ctx, ctx.Guild, element, value);
 
         [Command("config")]
         [RequireUserPermissions(Permissions.Administrator)]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public Task ConfigCmd(CommandContext ctx, [Description("The channel to configure")]
             DiscordChannel channel, [Description("Config element to change")]
-            string element, [Description("New value")] bool value) =>
+            string element, [Description("New value")] string value) =>
             ConfigCmd(ctx, (SnowflakeObject) channel, element, value);
 
-        private async Task ConfigCmd(CommandContext ctx, SnowflakeObject target, string element, bool value)
+        private async Task ConfigCmd(CommandContext ctx, SnowflakeObject target, string element, string value)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled).TRUE())
             {
                 await ctx.TriggerTypingAsync();
-                if (!CommandArr.getC().Contains(element))
-                    throw new ArgumentException($"Element ({element}) not in CommandArr");
-                target.Set(element, value);
+                if (element.ToLower() == "prefix")
+                    target.Set("Prefix", value);
+                else
+                {
+                    if (!CommandArr.GetC().Contains(element))
+                        throw new ArgumentException($"Element ({element}) not in CommandArr");
+                    target.Set(element, ctx.Client.GetCommandsNext().ConvertArgument<bool>(value, ctx).ToString());
+                }
                 await ctx.RespondAsync($"Set {element} to {value}");
             }
         }
