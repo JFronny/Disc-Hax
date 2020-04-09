@@ -43,9 +43,7 @@ namespace chanI
         private static void LoadNextImage(WebClient c, Form f, Label l, ImageView view)
         {
             if (_index >= _th.Count)
-            {
                 f.Close();
-            }
             else
             {
                 l.Text = "Loading content...";
@@ -110,13 +108,13 @@ namespace chanI
             RectangleF screen = Screen.PrimaryScreen.WorkingArea;
             if (s.Width > screen.Width)
             {
-                s.Height = (s.Width / screen.Width) * s.Height;
+                s.Height = s.Width / screen.Width * s.Height;
                 s.Width = screen.Width;
             }
 
             if (s.Height > screen.Height)
             {
-                s.Width = (s.Height / screen.Height) * s.Width;
+                s.Width = s.Height / screen.Height * s.Width;
                 s.Height = screen.Height;
             }
 

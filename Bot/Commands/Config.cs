@@ -54,7 +54,8 @@ namespace Bot.Commands
             {
                 await ctx.TriggerTypingAsync();
                 if (element.ToLower() == "prefix")
-                    await ctx.RespondAsync($"{element}: {target.Get(element, target is DiscordGuild ? Common.Prefix : ((DiscordChannel)target).Guild.Get("Prefix", Common.Prefix))}");
+                    await ctx.RespondAsync(
+                        $"{element}: {target.Get(element, target is DiscordGuild ? Common.Prefix : ((DiscordChannel) target).Guild.Get("Prefix", Common.Prefix))}");
                 else
                 {
                     if (!CommandArr.GetC().Contains(element))

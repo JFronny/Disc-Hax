@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Bot.Commands;
 using Bot.Converters;
 using CC_Functions.Misc;
@@ -15,10 +16,7 @@ using Octokit;
 using Shared;
 using Shared.Config;
 using Application = Eto.Forms.Application;
-using DateTime = System.DateTime;
 using Math = Bot.Commands.Math;
-using Task = System.Threading.Tasks.Task;
-using Thread = System.Threading.Thread;
 
 namespace Bot
 {
@@ -62,7 +60,7 @@ namespace Bot
                 Bot = new DiscordClient(cfg);
                 Commands = Bot.UseCommandsNext(new CommandsNextConfiguration
                 {
-                    StringPrefixes = new[] {Common.Prefix},
+                    StringPrefixes = new string[0],
                     EnableDms = false,
                     PrefixResolver = async msg =>
                     {
@@ -99,6 +97,7 @@ namespace Bot
                 Commands.RegisterConverter(new BoardConv());
                 Commands.RegisterConverter(new BooruConv());
                 Commands.RegisterConverter(new CurrencyConv());
+                Commands.RegisterConverter(new DoujinEnumConv());
                 Commands.RegisterConverter(new RpsOptionConv());
                 Commands.SetHelpFormatter<HelpFormatter>();
                 Bot.DebugLogger.LogMessageReceived += DebugLogger_LogMessageReceived;
@@ -108,7 +107,6 @@ namespace Bot
                 _tokenSource = new CancellationTokenSource();
                 Task.Run(BotThreadCallback);
                 while (true)
-                {
                     try
                     {
                         Thread.Sleep(5000);
@@ -129,7 +127,6 @@ namespace Bot
                             $"A crash occured in the ban-evaluation Thread: {e}", DateTime.Now, e);
 #endif
                     }
-                }
             }
             finally
             {

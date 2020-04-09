@@ -21,15 +21,15 @@ namespace Shared.Config
                     Rows =
                     {
                         new TableRow(
-                            new Label { Text = "Discord:" },
+                            new Label {Text = "Discord:"},
                             discordBox
                         ),
                         new TableRow(
-                            new Label { Text = "CurrConv:" },
+                            new Label {Text = "CurrConv:"},
                             currConvBox
                         ),
                         new TableRow(
-                            new Label { Text = "Perspective:" },
+                            new Label {Text = "Perspective:"},
                             perspectiveBox
                         )
                     }
@@ -37,12 +37,10 @@ namespace Shared.Config
             };
             dlg.ShowModal();
             if (overwriteXml)
-            {
                 TokenManager.SaveXe(new XElement("container",
                     new XElement("discord", discordBox.Text),
                     new XElement("currencyconverterapi", currConvBox.Text),
                     new XElement("perspective", perspectiveBox.Text)));
-            }
             else
             {
                 TokenManager.DiscordToken = discordBox.Text;

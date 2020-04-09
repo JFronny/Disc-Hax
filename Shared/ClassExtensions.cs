@@ -105,13 +105,10 @@ namespace Shared
         {
             if (content.Length <= 2000)
                 return ctx.RespondAsync(content);
-            else
-            {
-                InteractivityExtension interactivity = ctx.Client.GetInteractivity();
-                Page[] pages = interactivity.GeneratePagesInEmbed(content);
-                return interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages,
-                    deletion: PaginationDeletion.DeleteMessage);
-            }
+            InteractivityExtension interactivity = ctx.Client.GetInteractivity();
+            Page[] pages = interactivity.GeneratePagesInEmbed(content);
+            return interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages,
+                deletion: PaginationDeletion.DeleteMessage);
         }
     }
 }

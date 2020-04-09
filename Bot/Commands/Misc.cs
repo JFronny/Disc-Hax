@@ -15,9 +15,6 @@ using DSharpPlus.Interactivity.EventHandling;
 using Eto.Drawing;
 using Shared;
 using Shared.Config;
-using Color = Eto.Drawing.Color;
-using PointF = Eto.Drawing.PointF;
-using Rectangle = Eto.Drawing.Rectangle;
 
 namespace Bot.Commands
 {
@@ -181,16 +178,17 @@ namespace Bot.Commands
                 size.Y = size.Height / 2;
                 g.DrawEllipse(new Pen(Color.FromArgb(100, 80, 80, 80), 6), size);
                 //Triangle
-                PointF center = new PointF(size.X + (size.Width / 2), size.Y + (size.Height / 2));
+                PointF center = new PointF(size.X + size.Width / 2, size.Y + size.Height / 2);
                 float radius = size.Width / 2f;
-                g.FillPolygon(Brushes.Blue, new PointF(center.X - (0.866f * radius), center.Y - (0.5f * radius)),
-                    new PointF(center.X + (0.866f * radius), center.Y - (0.5f * radius)),
+                g.FillPolygon(Brushes.Blue, new PointF(center.X - 0.866f * radius, center.Y - 0.5f * radius),
+                    new PointF(center.X + 0.866f * radius, center.Y - 0.5f * radius),
                     new PointF(center.X, center.Y + radius));
                 Font font = SystemFonts.Default();
                 font = new Font(font.Family, font.Size * (180f / g.MeasureString(font, "QWERTBTESTSTR").Width));
                 string answer = AnswerList[Program.Rnd.Next(AnswerList.Length)];
-                size.Top = (int) System.Math.Round(size.Center.Y - (g.MeasureString(font, answer).Height / 2));
-                g.DrawText(font, Brushes.White, size, answer, FormattedTextWrapMode.Word, FormattedTextAlignment.Center);
+                size.Top = (int) System.Math.Round(size.Center.Y - g.MeasureString(font, answer).Height / 2);
+                g.DrawText(font, Brushes.White, size, answer, FormattedTextWrapMode.Word,
+                    FormattedTextAlignment.Center);
                 g.Flush();
                 g.Dispose();
                 await using MemoryStream str = new MemoryStream();
@@ -267,7 +265,7 @@ namespace Bot.Commands
                 await msg.Quote(ctx);
             }
         }
-        
+
         [Command("quote")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Quote(CommandContext ctx, [Description("The messages ID")] ulong id)

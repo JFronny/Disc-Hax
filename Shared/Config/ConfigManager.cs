@@ -42,7 +42,8 @@ namespace Shared.Config
             }
         }
 
-        public static bool? Get(this SnowflakeObject id, string element, bool? defaultVal = true) => GenericExtensions.ParseBool(id.Get(element, defaultVal.GetString()));
+        public static bool? Get(this SnowflakeObject id, string element, bool? defaultVal = true) =>
+            GenericExtensions.ParseBool(id.Get(element, defaultVal.GetString()));
 
         public static string? Get(this SnowflakeObject id, string element, string? defaultVal)
         {
@@ -86,7 +87,7 @@ namespace Shared.Config
                 DiscordGuild _ => Guild,
                 _ => throw new ArgumentException("Invalid Snowflake! (Supports Guilds and Channels)")
             };
-            return string.Join("\r\n", allowed.Select(element => $"{element}: {Get(id, element, true)}"));
+            return string.Join("\r\n", allowed.Select(element => $"{element}: {Get(id, element)}"));
         }
 
         public static void Set(this SnowflakeObject id, string element, string? val, bool disableFormChecks = false)
@@ -192,7 +193,7 @@ namespace Shared.Config
             return id.Members.Where(s => !s.Value.IsBot && id.Members.ContainsKey(s.Key))
                 .ToDictionary(s => s.Key, s => GetMoney(id, s.Value));
         }
-        
+
 #if !NO_TIMED_BAN
         public static void AddTimedBan(this DiscordGuild id, DiscordMember user, TimeSpan span)
         {

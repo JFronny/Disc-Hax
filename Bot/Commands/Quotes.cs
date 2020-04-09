@@ -44,7 +44,8 @@ namespace Bot.Commands
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Cought {e.GetType().Name} while downloading. Fortunes might not be available. Restart in ~ an hour to fix");
+                Console.WriteLine(
+                    $"Cought {e.GetType().Name} while downloading. Fortunes might not be available. Restart in ~ an hour to fix");
             }
             Console.WriteLine(" Finished.");
         }

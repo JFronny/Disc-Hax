@@ -11,14 +11,12 @@ namespace BeeMovie
         {
             string[] quotes;
             using (WebClient client = new WebClient())
-            {
                 quotes = client
                     .DownloadString(
                         "http://www.script-o-rama.com/movie_scripts/a1/bee-movie-script-transcript-seinfeld.html")
                     .Split(new[] {"<pre>"}, StringSplitOptions.None)[1]
                     .Split(new[] {"</pre>"}, StringSplitOptions.None)[0]
                     .Split(new[] {"\n\n  \n"}, StringSplitOptions.None);
-            }
 
             quotes[0] = quotes[0].Replace("  \n  \n", "");
             while (true)

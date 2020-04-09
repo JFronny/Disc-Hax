@@ -75,9 +75,7 @@ namespace Shared
                     {
                     }
                     else if (InlineTags.Contains(tag))
-                    {
                         Plain(builder, ref state, node.ChildNodes);
-                    }
                     else
                     {
                         if (state != ToPlainTextState.StartLine)

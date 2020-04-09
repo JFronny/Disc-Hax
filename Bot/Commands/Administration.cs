@@ -171,16 +171,14 @@ namespace Bot.Commands
                 if (member == null)
                     member = ctx.Member;
                 Permissions userPer = ctx.Member.PermissionsIn(ctx.Channel);
-                if ((member.Id == ctx.Member.Id && userPer.HasPermission(Permissions.ChangeNickname)) ||
+                if (member.Id == ctx.Member.Id && userPer.HasPermission(Permissions.ChangeNickname) ||
                     userPer.HasPermission(Permissions.ManageNicknames))
                 {
                     await member.ModifyAsync(s => s.Nickname = nickname);
                     await ctx.RespondAsync($"Set the nickname of {member.Username} to {nickname}.");
                 }
                 else
-                {
                     throw new Exception("I cannot allow you to do that.");
-                }
             }
         }
 

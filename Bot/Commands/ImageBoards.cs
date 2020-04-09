@@ -1,13 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 using BooruSharp.Booru;
 using BooruSharp.Search.Post;
+using Bot.Converters;
 using CC_Functions.Misc;
 using Chan.Net;
 using Chan.Net.JsonModel;
@@ -15,8 +20,12 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using Newtonsoft.Json.Linq;
+using NHentaiSharp.Core;
+using NHentaiSharp.Exception;
+using NHentaiSharp.Search;
 using Shared;
 using Shared.Config;
+using SearchResult = BooruSharp.Search.Post.SearchResult;
 
 namespace Bot.Commands
 {
@@ -26,6 +35,7 @@ namespace Bot.Commands
     public class ImageBoards : BaseCommandModule
     {
         public static Dictionary<string, ABooru> BooruDict;
+        private static readonly List<string> JavMostCategories = new List<string>();
 
         public ImageBoards()
         {
@@ -36,6 +46,34 @@ namespace Bot.Commands
                 .Select(s => (ABooru) Activator.CreateInstance(s, new object?[] {null}))
                 .OrderBy(s => s.ToString().Split('.')[2].ToLower()).ToList()
                 .ToDictionary(s => s.ToString().Split('.')[2].ToLower(), s => s);
+            Console.WriteLine(" Finished.");
+            Console.Write("Instantiating JavMostCategories...");
+            JavMostCategories.Add("censor");
+            JavMostCategories.Add("uncensor");
+            int page = 1;
+            try
+            {
+                using HttpClient hc = new HttpClient {Timeout = TimeSpan.FromSeconds(5.0)};
+                List<string> newTags;
+                do
+                {
+                    string html = hc.GetStringAsync("https://www5.javmost.com/allcategory/" + page).Result;
+                    newTags = Regex
+                        .Matches(html, "<a href=\"https:\\/\\/www5\\.javmost\\.com\\/category\\/([^\\/]+)\\/\">")
+                        .Select(m => m.Groups[1].Value.Trim().ToLower())
+                        .Where(content => !JavMostCategories.Contains(content)).ToList();
+                    JavMostCategories.AddRange(newTags);
+                    page++;
+                } while (newTags.Count > 0);
+            }
+            catch (HttpRequestException)
+            {
+                if (!Debugger.IsAttached)
+                    throw;
+            }
+            catch (TaskCanceledException)
+            {
+            }
             Console.WriteLine(" Finished.");
         }
 
@@ -81,10 +119,8 @@ namespace Bot.Commands
                         }.Build());
                 }
                 else
-                {
                     await ctx.RespondAsync(
                         "Due to the way 4chan users behave, this command is only allowed in NSFW channels");
-                }
             }
         }
 
@@ -118,10 +154,8 @@ namespace Bot.Commands
                         "There.");
                 }
                 else
-                {
                     await ctx.RespondAsync(
                         "The generated waifus might not be something you want to be looking at at work. You can override this.");
-                }
             }
         }
 
@@ -182,6 +216,183 @@ namespace Bot.Commands
             params string[] tags) =>
             await Booru(ctx, ctx.Channel.GetEvaluatedNsfw() ? (ABooru) new Rule34() : new Safebooru(), tags);
 
+        [Command("nonbooru")]
+        [Aliases("d")]
+        [Description("Shows a random non-booru from your favourite source. See \"doujinshi ls\" for a full list")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task NonBooru(CommandContext ctx, [Description("Source to select image from (ls for a list)")]
+            DoujinEnumConv.DoujinEnum source,
+            [Description("Tags for image selection")]
+            params string[] tags)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                if (ctx.Channel.GetEvaluatedNsfw())
+                {
+                    using WebClient wClient = new WebClient();
+                    string val = Program.Rnd.Next(10000, 99999).ToString();
+                    string html;
+                    string url;
+                    switch (source)
+                    {
+                        case DoujinEnumConv.DoujinEnum.Nhentai:
+                        {
+                            NHentaiSharp.Search.SearchResult result;
+                            try
+                            {
+                                result = await (tags.Length == 0
+                                    ? SearchClient.SearchAsync()
+                                    : SearchClient.SearchWithTagsAsync(tags));
+                            }
+                            catch (InvalidArgumentException)
+                            {
+                                await ctx.RespondAsync("Not found");
+                                break;
+                            }
+                            int page = Program.Rnd.Next(0, result.numPages) + 1;
+                            result = await (tags.Length == 0
+                                ? SearchClient.SearchAsync(page)
+                                : SearchClient.SearchWithTagsAsync(tags, page));
+                            GalleryElement doujinshi = result.elements[Program.Rnd.Next(0, result.elements.Length)];
+                            await ctx.RespondWithFileAsync($"{val}_img.jpg",
+                                wClient.OpenRead(doujinshi.cover.imageUrl.Unshorten()), embed: new DiscordEmbedBuilder
+                                {
+                                    Description = $"Tags: {string.Join(", ", doujinshi.tags.Select(s => s.name))}",
+                                    Title = $"{doujinshi.japaneseTitle} ({doujinshi.prettyTitle})",
+                                    Url = doujinshi.url.ToString(),
+                                    Footer = new DiscordEmbedBuilder.EmbedFooter
+                                    {
+                                        Text = "Click on the title to access the doujin page."
+                                    }
+                                }.Build());
+                            break;
+                        }
+                        case DoujinEnumConv.DoujinEnum.EHentai:
+                            url = "https://e-hentai.org/?f_cats=959&f_search=" +
+                                  Uri.EscapeDataString(string.Join(" ", tags));
+                            int randomDoujinshi;
+                            string imageUrl;
+                            List<string> allTags = new List<string>();
+                            string finalUrl;
+                            using (HttpClient hc = new HttpClient())
+                            {
+                                html = await hc.GetStringAsync(url);
+                                Match m = Regex.Match(html, "Showing ([0-9,]+) result");
+                                if (!m.Success)
+                                {
+                                    await ctx.RespondAsync("Not found");
+                                    break;
+                                }
+                                randomDoujinshi = Program.Rnd.Next(0, int.Parse(m.Groups[1].Value.Replace(",", "")));
+                                html = await hc.GetStringAsync(url + "&page=" + randomDoujinshi / 25);
+                                finalUrl =
+                                    Regex.Matches(html, "<a href=\"(https:\\/\\/e-hentai\\.org\\/g\\/[^\"]+)\"")[
+                                        randomDoujinshi % 25].Groups[1].Value;
+                                html = await hc.GetStringAsync(finalUrl);
+                                string htmlTags = html.Split(new[] {"taglist"}, StringSplitOptions.None)[1]
+                                    .Split(new[] {"Showing"}, StringSplitOptions.None)[0];
+                                foreach (Match match in Regex.Matches(htmlTags, ">([^<]+)<\\/a><\\/div>"))
+                                    allTags.Add(match.Groups[1].Value);
+                                string htmlCover = await hc.GetStringAsync(Regex
+                                    .Match(html, "<a href=\"([^\"]+)\"><img alt=\"0*1\"").Groups[1].Value);
+                                imageUrl = Regex.Match(htmlCover, "<img id=\"img\" src=\"([^\"]+)\"").Groups[1].Value;
+                            }
+                            await ctx.RespondWithFileAsync($"{val}_img.jpg",
+                                wClient.OpenRead(imageUrl), embed: new DiscordEmbedBuilder
+                                {
+                                    Description = $"Tags: {string.Join(", ", allTags.ToArray())}",
+                                    Title = HttpUtility.HtmlDecode(Regex
+                                        .Match(html, "<title>(.+) - E-Hentai Galleries<\\/title>").Groups[1].Value),
+                                    Url = finalUrl,
+                                    Footer = new DiscordEmbedBuilder.EmbedFooter
+                                    {
+                                        Text = "Click on the title to access the doujin page."
+                                    }
+                                }.Build());
+                            break;
+                        case DoujinEnumConv.DoujinEnum.JavMost:
+                            string tag = tags.Length > 0 ? string.Join(" ", tags).ToLower() : "";
+                            if (tags.Length > 0 && !JavMostCategories.Contains(tag))
+                            {
+                                await ctx.RespondAsync("Not found");
+                                break;
+                            }
+                            if (tag == "")
+                                tag = "all";
+                            int perPage;
+                            int total;
+                            url = "https://www5.javmost.com/category/" + tag;
+                            using (HttpClient hc = new HttpClient())
+                            {
+                                html = await hc.GetStringAsync(url);
+                                perPage = Regex.Matches(html, "<!-- begin card -->").Count;
+                                total = int.Parse(Regex.Match(html,
+                                        "<input type=\"hidden\" id=\"page_total\" value=\"([0-9]+)\" \\/>").Groups[1]
+                                    .Value);
+                            }
+                            Match videoMatch;
+                            string[] videoTags = null;
+                            string previewUrl = "";
+                            int nbTry = 0;
+                            do
+                            {
+                                int video = Program.Rnd.Next(0, total);
+                                int pageNumber = video / perPage;
+                                int pageIndex = video % perPage;
+                                if (pageNumber > 0)
+                                {
+                                    using HttpClient hc = new HttpClient();
+                                    html = await hc.GetStringAsync(url + "/page/" + (pageNumber + 1));
+                                }
+                                int index = pageIndex + 1;
+                                string[] arr = html.Split(new[] {"<!-- begin card -->"}, StringSplitOptions.None);
+                                if (index >= arr.Length)
+                                {
+                                    videoMatch = Regex.Match("", "a");
+                                    continue;
+                                }
+                                string videoHtml = arr[index];
+                                videoMatch = Regex.Match(videoHtml,
+                                    "<a href=\"(https:\\/\\/www5\\.javmost\\.com\\/([^\\/]+)\\/)\"");
+                                previewUrl = Regex.Match(videoHtml, "data-src=\"([^\"]+)\"").Groups[1].Value;
+                                if (previewUrl.StartsWith("//"))
+                                    previewUrl = "https:" + previewUrl;
+                                videoTags = Regex
+                                    .Matches(videoHtml,
+                                        "<a href=\"https:\\/\\/www5\\.javmost\\.com\\/category\\/([^\\/]+)\\/\"")
+                                    .Select(x => x.Groups[1].Value).ToArray();
+                                nbTry++;
+                                if (nbTry <= 10) continue;
+                                await ctx.RespondAsync("Not found");
+                                break;
+                            } while (!videoMatch.Success);
+                            await ctx.RespondWithFileAsync($"{val}_img.jpg",
+                                wClient.OpenRead(previewUrl), embed: new DiscordEmbedBuilder
+                                {
+                                    Description =
+                                        $"Tags: {string.Join(", ", videoTags ?? throw new Exception("Unexpected internal val"))}",
+                                    Title = videoMatch.Groups[2].Value,
+                                    Url = videoMatch.Groups[1].Value,
+                                    Footer = new DiscordEmbedBuilder.EmbedFooter
+                                    {
+                                        Text = "Click on the title to access the doujin page."
+                                    }
+                                }.Build());
+                            break;
+                        case DoujinEnumConv.DoujinEnum.Ls:
+                            await ctx.RespondAsync(string.Join("; ", Enum.GetNames(typeof(DoujinEnumConv.DoujinEnum))));
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(source), source, null);
+                    }
+                }
+                else
+                    await ctx.RespondAsync("NSFW Channels only!");
+            }
+        }
+
         [Command("reddit")]
         [Aliases("r")]
         [Description("Shows a post from reddit")]
@@ -216,7 +427,7 @@ namespace Bot.Commands
                 try
                 {
                     string address = jToken["url"].Value<string>();
-                    using Stream s = client.OpenRead(address);
+                    await using Stream s = client.OpenRead(address);
                     await ctx.RespondWithFileAsync(Path.GetFileName(address), s, content, embed: builder.Build());
                 }
                 catch
@@ -224,7 +435,7 @@ namespace Bot.Commands
                     try
                     {
                         string str = jToken["media"]["reddit_video"]["fallback_url"].Value<string>();
-                        using Stream s = client.OpenRead(str);
+                        await using Stream s = client.OpenRead(str);
                         await ctx.RespondWithFileAsync(Path.GetFileName(str), s, content, embed: builder.Build());
                     }
                     catch

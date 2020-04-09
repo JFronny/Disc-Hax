@@ -49,13 +49,13 @@ namespace Booru
             RectangleF screen = Screen.PrimaryScreen.WorkingArea;
             if (s.Width > screen.Width)
             {
-                s.Height = (s.Width / screen.Width) * s.Height;
+                s.Height = s.Width / screen.Width * s.Height;
                 s.Width = screen.Width;
             }
 
             if (s.Height > screen.Height)
             {
-                s.Width = (s.Height / screen.Height) * s.Width;
+                s.Width = s.Height / screen.Height * s.Width;
                 s.Height = screen.Height;
             }
 

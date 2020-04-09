@@ -8,9 +8,9 @@ namespace Shared
 
         public Currency(string currencyName, string currencySymbol, string id)
         {
-            this.CurrencyName = currencyName;
-            this.CurrencySymbol = currencySymbol;
-            this.Id = id;
+            CurrencyName = currencyName;
+            CurrencySymbol = currencySymbol;
+            Id = id;
         }
     }
 }

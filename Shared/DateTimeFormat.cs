@@ -24,7 +24,7 @@ namespace Shared
             int find = cutoff.Keys.ToList()
                 .BinarySearch((long) ts.TotalSeconds);
             // negative values indicate a nearest match
-            int near = find < 0 ? System.Math.Abs(find) - 1 : find;
+            int near = find < 0 ? Math.Abs(find) - 1 : find;
             // use custom formatter to get the string
             return string.Format(
                 new HmsFormatter(),
@@ -34,7 +34,7 @@ namespace Shared
                 ts.Minutes,
                 ts.Seconds);
         }
-        
+
         private class HmsFormatter : ICustomFormatter, IFormatProvider
         {
             private static readonly Dictionary<string, string> TimeFormats = new Dictionary<string, string>

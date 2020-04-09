@@ -49,15 +49,15 @@ namespace Magic8
             size.Y = size.Height / 2;
             g.DrawEllipse(new Pen(Color.FromArgb(100, 80, 80, 80), 6), size);
             //Triangle
-            PointF center = new PointF(size.X + (size.Width / 2), size.Y + (size.Height / 2));
+            PointF center = new PointF(size.X + size.Width / 2, size.Y + size.Height / 2);
             float radius = size.Width / 2f;
-            g.FillPolygon(Brushes.Blue, new PointF(center.X - (0.866f * radius), center.Y - (0.5f * radius)),
-                new PointF(center.X + (0.866f * radius), center.Y - (0.5f * radius)),
+            g.FillPolygon(Brushes.Blue, new PointF(center.X - 0.866f * radius, center.Y - 0.5f * radius),
+                new PointF(center.X + 0.866f * radius, center.Y - 0.5f * radius),
                 new PointF(center.X, center.Y + radius));
             Font font = SystemFonts.Default();
             font = new Font(font.Family, font.Size * (180f / g.MeasureString(font, "QWERTBTESTSTR").Width));
             string answer = AnswerList[Rnd.Next(AnswerList.Length)];
-            size.Top = (int) Math.Round(size.Center.Y - (g.MeasureString(font, answer).Height / 2));
+            size.Top = (int) Math.Round(size.Center.Y - g.MeasureString(font, answer).Height / 2);
             g.DrawText(font, Brushes.White, size, answer, FormattedTextWrapMode.Word, FormattedTextAlignment.Center);
             g.Flush();
             g.Dispose();

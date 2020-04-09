@@ -25,13 +25,11 @@ namespace Fortune
                 filteredFiles.Where(s => !disallowedNames.Contains(s.Name)).Select(s => s.DownloadUrl);
             IEnumerable<string> contents;
             using (WebClient client = new WebClient())
-            {
                 contents = cookies.Select(s =>
                 {
                     Console.WriteLine($"Downloading: {s}");
                     return client.DownloadString(s);
                 });
-            }
             string[] quotes = contents.SelectMany(s => s.Split(new[] {"\n%\n"}, StringSplitOptions.None)).ToArray();
             while (true)
             {

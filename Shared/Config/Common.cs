@@ -6,7 +6,8 @@ namespace Shared.Config
 {
     public static class Common
     {
-        private static readonly string Path = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Cfgs",
+        private static readonly string Path = System.IO.Path.Combine(
+            System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Cfgs",
             "common.xml");
 
         private static XElement _common;

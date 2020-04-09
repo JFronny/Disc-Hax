@@ -20,12 +20,12 @@ namespace Bot
         public HelpFormatter(CommandContext ctx) : base(ctx)
         {
             _builder = new DiscordEmbedBuilder();
-            this._ctx = ctx;
+            _ctx = ctx;
         }
 
         public override BaseHelpFormatter WithCommand(Command command)
         {
-            this._command = command;
+            _command = command;
             _builder.Title = $"{command.QualifiedName} ({(command is CommandGroup ? "Group" : "Command")})";
             if (_ctx.Channel.getMethodEnabled_ext(method: CommandComparer.GetName(command.Name)).FALSE())
                 _builder.Title += " (disabled)";
@@ -48,7 +48,7 @@ namespace Bot
             string text = string.Join("\n", subcommands
                 .Where(s => !s.IsHidden)
                 .Select(s => s is CommandGroup group
-                    ? $"{s.Name}: {string.Join(" ", @group.Children.Where(a => !a.IsHidden).Distinct(new CommandComparer()).Select(a => $"`{a.Name}`"))}"
+                    ? $"{s.Name}: {string.Join(" ", group.Children.Where(a => !a.IsHidden).Distinct(new CommandComparer()).Select(a => $"`{a.Name}`"))}"
                     : $"`{s.Name}`")
             );
             Console.WriteLine(text.Length);
@@ -62,7 +62,8 @@ namespace Bot
             if (_command == null)
                 _builder.AddField("Notes",
                         "You can use \"help [command]\" to get help about a specific command or group")
-                    .AddField($"Current Prefix (`{_ctx.Client.CurrentUser.Mention} a c Prefix` to configure)", _ctx.Channel.Get("Prefix", Common.Prefix))
+                    .AddField($"Current Prefix (`{_ctx.Client.CurrentUser.Mention} a c Prefix` to configure)",
+                        _ctx.Channel.Get("Prefix", Common.Prefix))
                     .WithTitle("Help");
             return new CommandHelpMessage(embed: _builder.Build());
         }
