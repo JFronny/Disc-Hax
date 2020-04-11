@@ -107,7 +107,7 @@ namespace Bot.Commands
                 if (channel == null)
                     channel = ctx.Channel;
                 await ctx.RespondPaginatedIfTooLong(
-                    $"Config:\n{channel.GetStr(CommandArr.GetC())}\n\nProperties:\n{string.Join("\n", typeof(DiscordChannel).GetProperties().Select(s => { try { return $"{s.Name}: {s.GetValue(channel)}"; } catch { return $"Could not read {s.Name}"; } }))}");
+                    $"Config:\n{channel.GetStr(CommandArr.GetCommandNames())}\n\nProperties:\n{string.Join("\n", typeof(DiscordChannel).GetProperties().Select(s => { try { return $"{s.Name}: {s.GetValue(channel)}"; } catch { return $"Could not read {s.Name}"; } }))}");
             }
         }
 
@@ -122,7 +122,7 @@ namespace Bot.Commands
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondPaginatedIfTooLong(
-                    $"Config:\n{ctx.Guild.GetStr(CommandArr.GetC())}\n\nProperties:\n{string.Join("\n", typeof(DiscordGuild).GetProperties().Select(s => { try { return $"{s.Name}: {s.GetValue(ctx.Guild)}"; } catch { return $"Could not read {s.Name}"; } }))}");
+                    $"Config:\n{ctx.Guild.GetStr(CommandArr.GetCommandNames())}\n\nProperties:\n{string.Join("\n", typeof(DiscordGuild).GetProperties().Select(s => { try { return $"{s.Name}: {s.GetValue(ctx.Guild)}"; } catch { return $"Could not read {s.Name}"; } }))}");
             }
         }
     }

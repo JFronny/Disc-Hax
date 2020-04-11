@@ -7,6 +7,7 @@ using CC_Functions.Misc;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using Shared;
 using Shared.Config;
 using static System.Math;
 
@@ -104,13 +105,11 @@ namespace Bot.Commands
         }
 
         [Command("slots")]
-        [Description("Play Slots.")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Slots(CommandContext ctx, [Description("Amount of coinst to bet")]
             decimal bet) => await Slots(ctx, bet, false);
 
         [Command("slots")]
-        [Description("Play Slots.")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Slots(CommandContext ctx, [Description("Amount of coinst to bet")]
             decimal bet, [Description("Whether to skip the animation")]
@@ -185,7 +184,72 @@ namespace Bot.Commands
             1 => ":gem:",
             2 => ":100:",
             3 => ":dollar:",
-            4 => ":moneybag:"
+            4 => ":moneybag:",
+            _ => throw new ArgumentOutOfRangeException()
         };
+
+        [Command("sweeper")]
+        [Aliases("mine", "minesweeper")]
+        [Description("Generate a minesweeper field")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Minesweeper(CommandContext ctx, [Description("The height of the field")] int height = 10, [Description("The width of the field")] int width = 10, [Description("The amount of mines to place")] int mineCount = 5)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                if (height * width < mineCount * 2 || mineCount > 200)
+                {
+                    await ctx.RespondAsync("Too many mines!");
+                    return;
+                }
+                if (mineCount < 1)
+                {
+                    await ctx.RespondAsync("Too few mines!");
+                    return;
+                }
+                if (height > 100 || width > 100)
+                {
+                    await ctx.RespondAsync("Field too big!");
+                    return;
+                }
+                if (height < 3 || width < 3)
+                {
+                    await ctx.RespondAsync("Field too small!");
+                    return;
+                }
+                bool[,] field = new bool[width,height];
+                for (int i = 0; i < mineCount; i++)
+                {
+                    int x;
+                    int y;
+                    do
+                    {
+                        x = Program.Rnd.Next(width);
+                        y = Program.Rnd.Next(height);
+                    } while (field[x, y]);
+                    field[x, y] = true;
+                }
+                string message = "There you go!\n";
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        message += "||";
+                        if (field[x, y])
+                            message += ":boom:";
+                        else
+                        {
+                            int tmp = new[] {x - 1, x, x + 1}.SelectMany(oX => new[] {y - 1, y, y + 1}, (oX, oY) => new {oX, oY})
+                                .Where(t => t.oX >= 0 && t.oX < width && t.oY >= 0 && t.oY < height).Count(s => field[s.oX, s.oY]);
+                            message += tmp.ToString()[0].ToString().Emotify();
+                        }
+                        message += "|| ";
+                    }
+                    message += '\n';
+                }
+                await ctx.RespondAsync(message);
+            }
+        }
     }
 }

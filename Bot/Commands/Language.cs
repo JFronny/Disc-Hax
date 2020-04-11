@@ -30,7 +30,7 @@ namespace Bot.Commands
         [Aliases("u")]
         [Description("Search urban dictionary for a term")]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task Urban(CommandContext ctx, [Description("The term to search")] string term)
+        public async Task Urban(CommandContext ctx, [Description("The term to search"), RemainingText] string term)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
                 .AND(ctx.Channel.GetMethodEnabled()))

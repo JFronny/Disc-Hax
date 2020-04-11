@@ -43,9 +43,9 @@ namespace Bot
             return this;
         }
 
-        public override BaseHelpFormatter WithSubcommands(IEnumerable<Command> subcommands)
+        public override BaseHelpFormatter WithSubcommands(IEnumerable<Command> subCommands)
         {
-            string text = string.Join("\n", subcommands
+            string text = string.Join("\n", subCommands
                 .Where(s => !s.IsHidden)
                 .Select(s => s is CommandGroup group
                     ? $"{s.Name}: {string.Join(" ", group.Children.Where(a => !a.IsHidden).Distinct(new CommandComparer()).Select(a => $"`{a.Name}`"))}"
@@ -61,9 +61,9 @@ namespace Bot
             if (!_ctx.Channel.Get(ConfigManager.Enabled).TRUE()) throw new UnwantedExecutionException();
             if (_command == null)
                 _builder.AddField("Notes",
-                        "You can use \"help [command]\" to get help about a specific command or group")
+                        "You can use \"help [group] [command]\" to get help about a specific command or group")
                     .AddField($"Current Prefix (`{_ctx.Client.CurrentUser.Mention} a c Prefix` to configure)",
-                        _ctx.Channel.Get("Prefix", Common.Prefix))
+                        _ctx.Channel.Get(ConfigManager.Prefix, Common.Prefix))
                     .WithTitle("Help");
             return new CommandHelpMessage(embed: _builder.Build());
         }

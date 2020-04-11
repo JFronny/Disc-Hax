@@ -17,6 +17,7 @@ namespace Bot.Commands
     public class Money : BaseCommandModule
     {
         [Command("balance")]
+        [Aliases("b")]
         [Description("Gets the money you have/someone has")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task GetMoney(CommandContext ctx)

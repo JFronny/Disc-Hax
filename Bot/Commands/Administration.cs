@@ -276,6 +276,17 @@ namespace Bot.Commands
                 Common.Prefix, ctx.CommandsNext.FindCommand(command, out string _)));
         }
 
+        [Command("clean")]
+        [Hidden]
+        [RequireOwner]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public Task Clean(CommandContext ctx)
+        {
+            ctx.Client.DebugLogger.LogMessage(LogLevel.Info, "DiscHax", "Cleaning...", DateTime.Now);
+            Cleanup.Clean(CommandArr.GetCommandNames(), ctx.Client.Guilds.Select(s => new Tuple<string, IEnumerable<string>>(s.Key.ToString(), s.Value.Members.Select(u => u.Key.ToString()))), ctx.Client.Guilds.SelectMany(s => s.Value.Channels).Select(s => s.Key.ToString()));
+            return ctx.RespondAsync("Complete");
+        }
+
         [Command("purge")]
         [Description("Purge commands by user or regex")]
         [RequirePermissions(Permissions.Administrator)]

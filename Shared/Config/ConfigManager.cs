@@ -21,6 +21,7 @@ namespace Shared.Config
         public const string Nsfw = "nsfw";
         public const string Users = "Users";
         public const string Bans = "Bans";
+        public const string Prefix = "prefix";
 
         public static ConfigUpdateEvent ConfigUpdate;
 
@@ -89,6 +90,8 @@ namespace Shared.Config
             };
             return string.Join("\r\n", allowed.Select(element => $"{element}: {Get(id, element)}"));
         }
+
+        public static void Reset(this SnowflakeObject id, string element) => id.Set(element, null);
 
         public static void Set(this SnowflakeObject id, string element, string? val, bool disableFormChecks = false)
         {

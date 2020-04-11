@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Bot.Commands;
@@ -65,7 +66,7 @@ namespace Bot
                     EnableDms = false,
                     PrefixResolver = async msg =>
                     {
-                        string prefix = msg.Channel.Get("Prefix", Common.Prefix);
+                        string prefix = msg.Channel.Get(ConfigManager.Prefix, Common.Prefix);
                         string content = msg.Content;
                         if (content.StartsWith(prefix))
                         {

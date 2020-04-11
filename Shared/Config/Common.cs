@@ -17,13 +17,13 @@ namespace Shared.Config
             get
             {
                 GetXe();
-                if (_common.Element("prefix") == null)
+                if (_common.Element(ConfigManager.Prefix) == null)
                 {
-                    _common.Add(new XElement("prefix"), "!");
+                    _common.Add(new XElement(ConfigManager.Prefix), "!");
                     SaveXe();
                 }
 
-                return _common.Element("prefix").Value;
+                return _common.Element(ConfigManager.Prefix).Value;
             }
         }
 
@@ -57,7 +57,7 @@ namespace Shared.Config
             if (!Directory.Exists(System.IO.Path.GetDirectoryName(Path)))
                 Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Path));
             if (!File.Exists(Path))
-                new XElement("common", new XElement("prefix", "!"), new XElement("guildsBox", false.ToString()),
+                new XElement("common", new XElement(ConfigManager.Prefix, "!"), new XElement("guildsBox", false.ToString()),
                     new XElement("stash")).Save(Path);
             _common = XElement.Load(Path);
         }
