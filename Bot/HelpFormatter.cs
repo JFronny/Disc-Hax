@@ -27,7 +27,7 @@ namespace Bot
         {
             _command = command;
             _builder.Title = $"{command.QualifiedName} ({(command is CommandGroup ? "Group" : "Command")})";
-            if (_ctx.Channel.getMethodEnabled_ext(method: CommandComparer.GetName(command.Name)).FALSE())
+            if (_ctx.Channel.getMethodEnabled_ext(method: command.Name).FALSE())
                 _builder.Title += " (disabled)";
             if (command.Aliases.Any())
                 _builder.AddField("Aliases", string.Join(", ", command.Aliases.Select(s => $"`{s}`")));
@@ -51,7 +51,6 @@ namespace Bot
                     ? $"{s.Name}: {string.Join(" ", group.Children.Where(a => !a.IsHidden).Distinct(new CommandComparer()).Select(a => $"`{a.Name}`"))}"
                     : $"`{s.Name}`")
             );
-            Console.WriteLine(text.Length);
             _builder.AddField("Commands", text);
             return this;
         }
@@ -61,7 +60,7 @@ namespace Bot
             if (!_ctx.Channel.Get(ConfigManager.Enabled).TRUE()) throw new UnwantedExecutionException();
             if (_command == null)
                 _builder.AddField("Notes",
-                        "You can use \"help [group] [command]\" to get help about a specific command or group")
+                        "You can use \"help [group] [command]\" to get help about a specific command or \"help [group]\" for a group")
                     .AddField($"Current Prefix (`{_ctx.Client.CurrentUser.Mention} a c Prefix` to configure)",
                         _ctx.Channel.Get(ConfigManager.Prefix, Common.Prefix))
                     .WithTitle("Help");

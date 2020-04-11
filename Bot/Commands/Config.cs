@@ -132,9 +132,10 @@ namespace Bot.Commands
 
         private async Task ConfigCmd(CommandContext ctx, SnowflakeObject target, string element, string value, bool noComment = false)
         {
-            if (ctx.Channel.Get(ConfigManager.Enabled).TRUE())
+            if (ctx.Channel.Get(ConfigManager.Enabled).TRUE() || ctx.Guild.Channels.All(s => s.Value.Get(ConfigManager.Enabled).FALSE()))
             {
-                await ctx.TriggerTypingAsync();
+                if (!noComment)
+                    await ctx.TriggerTypingAsync();
                 if (string.Equals(element, ConfigManager.Prefix, StringComparison.CurrentCultureIgnoreCase))
                     target.Set(ConfigManager.Prefix, value);
                 else if (CommandArr.GetGroupNames().Contains(element))
@@ -145,7 +146,14 @@ namespace Bot.Commands
                 else
                 {
                     if (target is DiscordGuild guild)
+                    {
+                        if (string.Equals(element, ConfigManager.Enabled, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            await ctx.RespondAsync("Please do not EVER set \"enabled\" to false globally!");
+                            return;
+                        }
                         foreach ((ulong _, DiscordChannel channel) in guild.Channels) await ConfigCmd(ctx, channel, element, value, true);
+                    }
                     target.Set(element, (await ctx.Client.GetCommandsNext().ConvertArgument<bool>(value, ctx)).ToString());
                 }
                 if (!noComment)
