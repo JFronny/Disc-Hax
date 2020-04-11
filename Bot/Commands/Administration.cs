@@ -283,7 +283,11 @@ namespace Bot.Commands
         public Task Clean(CommandContext ctx)
         {
             ctx.Client.DebugLogger.LogMessage(LogLevel.Info, "DiscHax", "Cleaning...", DateTime.Now);
-            Cleanup.Clean(CommandArr.GetCommandNames(), ctx.Client.Guilds.Select(s => new Tuple<string, IEnumerable<string>>(s.Key.ToString(), s.Value.Members.Select(u => u.Key.ToString()))), ctx.Client.Guilds.SelectMany(s => s.Value.Channels).Select(s => s.Key.ToString()));
+            Cleanup.Clean(CommandArr.GetCommandNames(),
+                ctx.Client.Guilds.Select(s =>
+                    new Tuple<string, IEnumerable<string>>(s.Key.ToString(),
+                        s.Value.Members.Select(u => u.Key.ToString()))),
+                ctx.Client.Guilds.SelectMany(s => s.Value.Channels).Select(s => s.Key.ToString()));
             return ctx.RespondAsync("Complete");
         }
 

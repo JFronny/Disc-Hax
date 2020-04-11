@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Minesweeper
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Random rnd = new Random();
             while (true)
@@ -31,7 +30,7 @@ namespace Minesweeper
 
         private static char[,] GenField(int width, int height, int mineCount, Random rnd)
         {
-            bool[,] field = new bool[width,height];
+            bool[,] field = new bool[width, height];
             for (int i = 0; i < mineCount; i++)
             {
                 int x;
@@ -43,15 +42,17 @@ namespace Minesweeper
                 } while (field[x, y]);
                 field[x, y] = true;
             }
-            char[,] resField = new char[width,height];
+            char[,] resField = new char[width, height];
             for (int y = 0; y < height; y++)
             for (int x = 0; x < width; x++)
                 if (field[x, y])
                     resField[x, y] = 'X';
                 else
                 {
-                    int tmp = new[] {x - 1, x, x + 1}.SelectMany(oX => new[] {y - 1, y, y + 1}, (oX, oY) => new {oX, oY})
-                        .Where(t => t.oX >= 0 && t.oX < width && t.oY >= 0 && t.oY < height).Count(s => field[s.oX, s.oY]);
+                    int tmp = new[] {x - 1, x, x + 1}
+                        .SelectMany(oX => new[] {y - 1, y, y + 1}, (oX, oY) => new {oX, oY})
+                        .Where(t => t.oX >= 0 && t.oX < width && t.oY >= 0 && t.oY < height)
+                        .Count(s => field[s.oX, s.oY]);
                     resField[x, y] = tmp == 0 ? ' ' : tmp.ToString().ToCharArray()[0];
                 }
             return resField;

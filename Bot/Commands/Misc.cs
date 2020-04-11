@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -14,7 +13,6 @@ using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.EventHandling;
 using Eto.Drawing;
-using Newtonsoft.Json.Linq;
 using Shared;
 using Shared.Config;
 
@@ -62,6 +60,8 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
+                if (duration > new TimeSpan(0, 1, 0))
+                    throw new ArgumentOutOfRangeException("Please choose a smaller time");
                 DiscordMessage msg = await ctx.RespondAsync(embed: new DiscordEmbedBuilder
                 {
                     Title = "Poll time!",
@@ -86,6 +86,8 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
+                if (time > new TimeSpan(0, 1, 0))
+                    throw new ArgumentOutOfRangeException("Please choose a smaller time");
                 InteractivityExtension interactivity = ctx.Client.GetInteractivity();
                 byte[] codeBytes = new byte[bytes];
                 Program.Rnd.NextBytes(codeBytes);

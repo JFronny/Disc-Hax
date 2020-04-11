@@ -188,20 +188,19 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                SearchResult result = await booru.GetRandomImageAsync(tags);
+                SearchResult result;
                 int triesLeft = 10;
-                while (result.rating != (ctx.Channel.GetEvaluatedNsfw() ? Rating.Explicit : Rating.Safe) &&
-                       !booru.IsSafe())
+                do
                 {
                     if (triesLeft == 0)
                         throw new Exception("Failed to find image in a reasonable amount of tries");
                     result = await booru.GetRandomImageAsync(tags);
                     triesLeft--;
-                }
+                } while (result.rating != (ctx.Channel.GetEvaluatedNsfw() ? Rating.Explicit : Rating.Safe));
                 string val = Program.Rnd.Next(10000, 99999).ToString();
                 using WebClient wClient = new WebClient();
                 await ctx.RespondWithFileAsync($"{val}_img.jpg",
-                    wClient.OpenRead(result.fileUrl), embed: new DiscordEmbedBuilder
+                    wClient.OpenRead(result.fileUrl ?? result.previewUrl), embed: new DiscordEmbedBuilder
                     {
                         Description = $"Tags: {string.Join(", ", result.tags)}",
                         Title = result.source ?? "Unknown source",
@@ -345,7 +344,7 @@ namespace Bot.Commands
                                 if (pageNumber > 0)
                                 {
                                     using HttpClient hc = new HttpClient();
-                                    html = await hc.GetStringAsync($"{url}/page/{(pageNumber + 1)}");
+                                    html = await hc.GetStringAsync($"{url}/page/{pageNumber + 1}");
                                 }
                                 int index = pageIndex + 1;
                                 string[] arr = html.Split(new[] {"<!-- begin card -->"}, StringSplitOptions.None);
@@ -508,20 +507,18 @@ namespace Bot.Commands
                     }
                     string fullHtml = html;
                     html = html.Split(new[] {"<td class=\"resulttablecontent\">"}, StringSplitOptions.None)[1];
-                    /*return new FeatureRequest<Response.BooruSource, Error.SourceBooru>(new Response.BooruSource
-                    {
-                        compatibility = float.Parse(Regex.Match(html, "<div class=\"resultsimilarityinfo\">([0-9]{2,3}\\.[0-9]{1,2})%<\\/div>").Groups[1].Value, CultureInfo.InvariantCulture),
-                        content = Utilities.RemoveHTML(html.Split(new[] { "<div class=\"resultcontentcolumn\">" }, StringSplitOptions.None)[1].Split(new[] { "</div>" }, StringSplitOptions.None)[0]),
-                        url = Regex.Match(fullHtml, "<img title=\"Index #[^\"]+\"( raw-rating=\"[^\"]+\") src=\"(https:\\/\\/img[0-9]+.saucenao.com\\/[^\"]+)\"").Groups[2].Value
-                    }, Error.SourceBooru.None);*/
                     float certitude =
                         float.Parse(
                             Regex.Match(html, "<div class=\"resultsimilarityinfo\">([0-9]{2,3}\\.[0-9]{1,2})%<\\/div>")
                                 .Groups[1].Value, CultureInfo.InvariantCulture);
                     await ctx.RespondAsync(embed: new DiscordEmbedBuilder
                     {
-                        Description = TextProcessor.HtmlToPlainText(html.Split(new[] { "<div class=\"resultcontentcolumn\">" }, StringSplitOptions.None)[1].Split(new[] { "</div>" }, StringSplitOptions.None)[0]),
-                        ImageUrl = Regex.Match(fullHtml, "<img title=\"Index #[^\"]+\"( raw-rating=\"[^\"]+\") src=\"(https:\\/\\/img[0-9]+.saucenao.com\\/[^\"]+)\"").Groups[2].Value,
+                        Description = TextProcessor.HtmlToPlainText(
+                            html.Split(new[] {"<div class=\"resultcontentcolumn\">"}, StringSplitOptions.None)[1]
+                                .Split(new[] {"</div>"}, StringSplitOptions.None)[0]),
+                        ImageUrl = Regex.Match(fullHtml,
+                                "<img title=\"Index #[^\"]+\"( raw-rating=\"[^\"]+\") src=\"(https:\\/\\/img[0-9]+.saucenao.com\\/[^\"]+)\"")
+                            .Groups[2].Value,
                         Color = certitude > 80 ? DiscordColor.Green :
                             certitude > 50 ? DiscordColor.Orange : DiscordColor.Red,
                         Footer = new DiscordEmbedBuilder.EmbedFooter
@@ -546,7 +543,8 @@ namespace Bot.Commands
             {
                 await ctx.TriggerTypingAsync();
                 using WebClient client = new WebClient();
-                int c = Program.Rnd.Next(1, JObject.Parse(client.DownloadString("https://xkcd.com/info.0.json")).Value<int>("num") + 1);
+                int c = Program.Rnd.Next(1,
+                    JObject.Parse(client.DownloadString("https://xkcd.com/info.0.json")).Value<int>("num") + 1);
                 JObject comic = JObject.Parse(client.DownloadString($"https://xkcd.com/{c}/info.0.json"));
                 string val = Program.Rnd.Next(10000, 99999).ToString();
                 await ctx.RespondWithFileAsync($"{val}_img.jpg",
@@ -555,7 +553,8 @@ namespace Bot.Commands
                         Description = $"Transcript: {comic.Value<string>("alt")}",
                         Title = comic.Value<string>("safe_title"),
                         Url = $"https://xkcd.com/{c}/",
-                        Timestamp = new DateTime(int.Parse(comic.Value<string>("year")), int.Parse(comic.Value<string>("month")), int.Parse(comic.Value<string>("day")))
+                        Timestamp = new DateTime(int.Parse(comic.Value<string>("year")),
+                            int.Parse(comic.Value<string>("month")), int.Parse(comic.Value<string>("day")))
                     }.Build());
             }
         }

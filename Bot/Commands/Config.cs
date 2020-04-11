@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -11,7 +10,6 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
 using Shared.Config;
-using static System.String;
 
 namespace Bot.Commands
 {
@@ -20,10 +18,11 @@ namespace Bot.Commands
         [Command("config")]
         [Aliases("cfg", "c")]
         [RequireUserPermissions(Permissions.Administrator)]
-        [Description("Prints or changes the config for this channel/guild (empty for guild). You can also set all commands in a group by using \"group_[NAME]\"")]
+        [Description(
+            "Prints or changes the config for this channel/guild (empty for guild). You can also set all commands in a group by using \"group_[NAME]\"")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public Task ConfigCmd(CommandContext ctx) => ConfigCmd(ctx, ctx.Guild);
-        
+
         [Command("reset-config")]
         [RequireUserPermissions(Permissions.Administrator)]
         [Description("Reverts all configs")]
@@ -31,8 +30,11 @@ namespace Bot.Commands
         public async Task ConfigReset(CommandContext ctx)
         {
             InteractivityExtension interactivity = ctx.Client.GetInteractivity();
-            DiscordMessage msg = await ctx.RespondAsync("Please type out \"yes\" to confirm. All configuration for your server will be reset!");
-            InteractivityResult<DiscordMessage> tmp = await interactivity.WaitForMessageAsync(s => s.Author == ctx.Message.Author, new TimeSpan(0, 0, 30));
+            DiscordMessage msg =
+                await ctx.RespondAsync(
+                    "Please type out \"yes\" to confirm. All configuration for your server will be reset!");
+            InteractivityResult<DiscordMessage> tmp =
+                await interactivity.WaitForMessageAsync(s => s.Author == ctx.Message.Author, new TimeSpan(0, 0, 30));
             if (!tmp.TimedOut || tmp.Result.Content != "yes")
             {
                 string path;
@@ -48,15 +50,18 @@ namespace Bot.Commands
             else
                 await msg.ModifyAsync("Cancelled.");
         }
-        
+
         [Command("reset-config")]
         [RequireUserPermissions(Permissions.Administrator)]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task ConfigReset(CommandContext ctx, [Description("The channel to reset")] DiscordChannel channel)
         {
             InteractivityExtension interactivity = ctx.Client.GetInteractivity();
-            DiscordMessage msg = await ctx.RespondAsync("Please type out \"yes\" to confirm. All configuration for this channel will be reset!");
-            InteractivityResult<DiscordMessage> tmp = await interactivity.WaitForMessageAsync(s => s.Author == ctx.Message.Author, new TimeSpan(0, 0, 30));
+            DiscordMessage msg =
+                await ctx.RespondAsync(
+                    "Please type out \"yes\" to confirm. All configuration for this channel will be reset!");
+            InteractivityResult<DiscordMessage> tmp =
+                await interactivity.WaitForMessageAsync(s => s.Author == ctx.Message.Author, new TimeSpan(0, 0, 30));
             if (!tmp.TimedOut || tmp.Result.Content != "yes")
             {
                 ConfigManager.GetXml(channel.Id.ToString(), ConfigManager.Channel, out string path);
@@ -130,9 +135,11 @@ namespace Bot.Commands
             string element, [Description("New value")] string value) =>
             ConfigCmd(ctx, (SnowflakeObject) channel, element, value);
 
-        private async Task ConfigCmd(CommandContext ctx, SnowflakeObject target, string element, string value, bool noComment = false)
+        private async Task ConfigCmd(CommandContext ctx, SnowflakeObject target, string element, string value,
+            bool noComment = false)
         {
-            if (ctx.Channel.Get(ConfigManager.Enabled).TRUE() || ctx.Guild.Channels.All(s => s.Value.Get(ConfigManager.Enabled).FALSE()))
+            if (ctx.Channel.Get(ConfigManager.Enabled).TRUE() ||
+                ctx.Guild.Channels.All(s => s.Value.Get(ConfigManager.Enabled).FALSE()))
             {
                 if (!noComment)
                     await ctx.TriggerTypingAsync();
@@ -152,9 +159,11 @@ namespace Bot.Commands
                             await ctx.RespondAsync("Please do not EVER set \"enabled\" to false globally!");
                             return;
                         }
-                        foreach ((ulong _, DiscordChannel channel) in guild.Channels) await ConfigCmd(ctx, channel, element, value, true);
+                        foreach ((ulong _, DiscordChannel channel) in guild.Channels)
+                            await ConfigCmd(ctx, channel, element, value, true);
                     }
-                    target.Set(element, (await ctx.Client.GetCommandsNext().ConvertArgument<bool>(value, ctx)).ToString());
+                    target.Set(element,
+                        (await ctx.Client.GetCommandsNext().ConvertArgument<bool>(value, ctx)).ToString());
                 }
                 if (!noComment)
                     await ctx.RespondAsync($"Set {element} to {value}");

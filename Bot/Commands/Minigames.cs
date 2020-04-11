@@ -1,12 +1,17 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using BooruSharp.Booru;
+using BooruSharp.Search.Post;
 using Bot.Converters;
 using CC_Functions.Misc;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using DSharpPlus.Interactivity;
 using Shared;
 using Shared.Config;
 using static System.Math;
@@ -192,7 +197,10 @@ namespace Bot.Commands
         [Aliases("mine", "minesweeper")]
         [Description("Generate a minesweeper field")]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task Minesweeper(CommandContext ctx, [Description("The height of the field")] int height = 10, [Description("The width of the field")] int width = 10, [Description("The amount of mines to place")] int mineCount = 5)
+        public async Task Minesweeper(CommandContext ctx, [Description("The height of the field")]
+            int height = 10, [Description("The width of the field")]
+            int width = 10, [Description("The amount of mines to place")]
+            int mineCount = 5)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
                 .AND(ctx.Channel.GetMethodEnabled()))
@@ -218,7 +226,7 @@ namespace Bot.Commands
                     await ctx.RespondAsync("Field too small!");
                     return;
                 }
-                bool[,] field = new bool[width,height];
+                bool[,] field = new bool[width, height];
                 for (int i = 0; i < mineCount; i++)
                 {
                     int x;
@@ -240,8 +248,10 @@ namespace Bot.Commands
                             message += ":boom:";
                         else
                         {
-                            int tmp = new[] {x - 1, x, x + 1}.SelectMany(oX => new[] {y - 1, y, y + 1}, (oX, oY) => new {oX, oY})
-                                .Where(t => t.oX >= 0 && t.oX < width && t.oY >= 0 && t.oY < height).Count(s => field[s.oX, s.oY]);
+                            int tmp = new[] {x - 1, x, x + 1}
+                                .SelectMany(oX => new[] {y - 1, y, y + 1}, (oX, oY) => new {oX, oY})
+                                .Where(t => t.oX >= 0 && t.oX < width && t.oY >= 0 && t.oY < height)
+                                .Count(s => field[s.oX, s.oY]);
                             message += tmp.ToString()[0].ToString().Emotify();
                         }
                         message += "|| ";
@@ -249,6 +259,70 @@ namespace Bot.Commands
                     message += '\n';
                 }
                 await ctx.RespondAsync(message);
+            }
+        }
+
+        [Command("tag-guesser")]
+        [Aliases("tag", "guesser", "tagguesser", "guess")]
+        [Description("Generate a minesweeper field")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task TagGuesser(CommandContext ctx, [Description("The amount of time the game will run for")] TimeSpan? gameTime = null)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                if (gameTime == null) gameTime = new TimeSpan(0, 1, 0);
+                if (gameTime > new TimeSpan(0, 3, 0))
+                    throw new ArgumentOutOfRangeException("Please choose a smaller time");
+                InteractivityExtension ext = ctx.Client.GetInteractivity();
+                ABooru booru = ImageBoards.BooruDict.Select(s => s.Value)
+                    .Where(s => s.IsSafe() == !ctx.Channel.GetEvaluatedNsfw())
+                    .OrderBy(s => Program.Rnd.NextDouble()).First();
+                SearchResult result = new SearchResult();
+                int triesLeft = 10;
+                do
+                {
+                    if (triesLeft == 0)
+                        throw new Exception("Failed to find image in a reasonable amount of tries");
+                    try
+                    {
+                        result = await booru.GetRandomImageAsync();
+                    }
+                    catch
+                    {
+                        // ignored
+                    }
+                    triesLeft--;
+                } while (result.rating != (ctx.Channel.GetEvaluatedNsfw() ? Rating.Explicit : Rating.Safe));
+                string val = Program.Rnd.Next(10000, 99999).ToString();
+                using WebClient wClient = new WebClient();
+                List<string> found = new List<string>();
+                Dictionary<DiscordUser, int> scores = new Dictionary<DiscordUser, int>();
+                await ctx.RespondWithFileAsync($"{val}_img.jpg",
+                    wClient.OpenRead(result.fileUrl ?? result.previewUrl), embed: new DiscordEmbedBuilder
+                    {
+                        Title = "Guess tags!"
+                    }.Build());
+                string[] tags = result.tags;
+                DateTime tmp = DateTime.Now;
+                do
+                {
+                    InteractivityResult<DiscordMessage> res = await ext.WaitForMessageAsync(s => true, tmp + gameTime - DateTime.Now);
+                    if (res.TimedOut) continue;
+                    if (found.Contains(res.Result.Content.ToLower()) || !tags.Any(s =>
+                        string.Equals(s, res.Result.Content, StringComparison.CurrentCultureIgnoreCase))) continue;
+                    found.Add(res.Result.Content.ToLower());
+                    if (!scores.ContainsKey(res.Result.Author))
+                        scores.Add(res.Result.Author, 0);
+                    scores[res.Result.Author]++;
+                    await ctx.RespondAsync($"+1 for {res.Result.Author.Username}");
+                } while (DateTime.Now - tmp < gameTime);
+                IOrderedEnumerable<KeyValuePair<DiscordUser, int>> orderedScore = scores.OrderByDescending(s => s.Value);
+                if (scores.Count > 3)
+                    await ctx.RespondAsync(string.Join("\n", orderedScore.Take(3).Select(s => $"{s.Key.Username}: {s.Value.ToString().Emotify()}")));
+                else
+                    await ctx.RespondAsync(string.Join("\n", orderedScore.Select(s => $"{s.Key.Username}: {s.Value.ToString().Emotify()}")));
             }
         }
     }

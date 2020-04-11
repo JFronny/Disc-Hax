@@ -57,7 +57,8 @@ namespace Shared.Config
             if (!Directory.Exists(System.IO.Path.GetDirectoryName(Path)))
                 Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Path));
             if (!File.Exists(Path))
-                new XElement("common", new XElement(ConfigManager.Prefix, "!"), new XElement("guildsBox", false.ToString()),
+                new XElement("common", new XElement(ConfigManager.Prefix, "!"),
+                    new XElement("guildsBox", false.ToString()),
                     new XElement("stash")).Save(Path);
             _common = XElement.Load(Path);
         }

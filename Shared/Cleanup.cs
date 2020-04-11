@@ -10,10 +10,12 @@ namespace Shared
 {
     public static class Cleanup
     {
-        public static void Clean(IEnumerable<string> commands, IEnumerable<Tuple<string, IEnumerable<string>>> guilds, IEnumerable<string> channelIds)
+        public static void Clean(IEnumerable<string> commands, IEnumerable<Tuple<string, IEnumerable<string>>> guilds,
+            IEnumerable<string> channelIds)
         {
             string[] allowedNames = {"common.xml"};
-            foreach (string cfg in Directory.GetFiles(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+            foreach (string cfg in Directory.GetFiles(Path.Combine(
+                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 @"Cfgs")).Where(s => !Path.GetFileName(s).StartsWith("keys.secure")))
             {
                 //Clean files
@@ -49,8 +51,9 @@ namespace Shared
                 XElement root = el.Element(ConfigManager.Guild) ??
                                 el.Element(ConfigManager.Channel) ?? el.Element("common");
                 List<string> allowedVars = commands.ToList();
-                allowedVars.AddRange(new []{ConfigManager.Prefix, ConfigManager.Enabled});
-                if (cfg != allowedNames[0]) allowedVars.AddRange(new []{"upperType", "upper", ConfigManager.Users, ConfigManager.Bans});
+                allowedVars.AddRange(new[] {ConfigManager.Prefix, ConfigManager.Enabled});
+                if (cfg != allowedNames[0])
+                    allowedVars.AddRange(new[] {"upperType", "upper", ConfigManager.Users, ConfigManager.Bans});
                 List<XElement> filteredELs =
                     root.Elements().Where(s => allowedVars.Contains(s.Name.LocalName)).ToList();
                 root.RemoveAll();
