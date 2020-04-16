@@ -276,6 +276,12 @@ namespace Bot.Commands
                 Common.Prefix, ctx.CommandsNext.FindCommand(command, out string _)));
         }
 
+        [Command("stop")]
+        [Hidden]
+        [RequireOwner]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Stop(CommandContext ctx) => Program.Exit = true;
+
         [Command("clean")]
         [Hidden]
         [RequireOwner]

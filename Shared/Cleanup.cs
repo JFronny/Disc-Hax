@@ -54,6 +54,8 @@ namespace Shared
                 allowedVars.AddRange(new[] {ConfigManager.Prefix, ConfigManager.Enabled});
                 if (cfg != allowedNames[0])
                     allowedVars.AddRange(new[] {"upperType", "upper", ConfigManager.Users, ConfigManager.Bans});
+                else
+                    allowedVars.Add(ConfigManager.ReactionRoles);
                 List<XElement> filteredELs =
                     root.Elements().Where(s => allowedVars.Contains(s.Name.LocalName)).ToList();
                 root.RemoveAll();

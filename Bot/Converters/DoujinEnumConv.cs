@@ -11,7 +11,7 @@ namespace Bot.Converters
     {
         public enum DoujinEnum
         {
-            JavMost,
+            //JavMost,
             EHentai,
             Nhentai,
             Ls

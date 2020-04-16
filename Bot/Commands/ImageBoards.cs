@@ -37,7 +37,7 @@ namespace Bot.Commands
     {
         public static Dictionary<string, ABooru> BooruDict;
 #if !NO_NSFW
-        private static readonly List<string> JavMostCategories = new List<string>();
+        //private static readonly List<string> JavMostCategories = new List<string>();
 #endif
 
         public ImageBoards()
@@ -50,7 +50,7 @@ namespace Bot.Commands
                 .OrderBy(s => s.ToString().Split('.')[2].ToLower()).ToList()
                 .ToDictionary(s => s.ToString().Split('.')[2].ToLower(), s => s);
             Console.WriteLine(" Finished.");
-#if !NO_NSFW
+/*#if !NO_NSFW
             Console.Write("Instantiating JavMostCategories...");
             JavMostCategories.Add("censor");
             JavMostCategories.Add("uncensor");
@@ -79,7 +79,7 @@ namespace Bot.Commands
             {
             }
             Console.WriteLine(" Finished.");
-#endif
+#endif*/
         }
 #if !NO_NSFW
         [Command("4chan")]
@@ -330,7 +330,7 @@ namespace Bot.Commands
                                     }
                                 }.Build());
                             break;
-                        case DoujinEnumConv.DoujinEnum.JavMost:
+                        /*case DoujinEnumConv.DoujinEnum.JavMost:
                             string tag = tags.Length > 0 ? string.Join(" ", tags).ToLower() : "";
                             if (tags.Length > 0 && !JavMostCategories.Contains(tag))
                             {
@@ -398,7 +398,7 @@ namespace Bot.Commands
                                         Text = "Click on the title to access the doujin page."
                                     }
                                 }.Build());
-                            break;
+                            break;*/
                         case DoujinEnumConv.DoujinEnum.Ls:
                             await ctx.RespondAsync(string.Join("; ", Enum.GetNames(typeof(DoujinEnumConv.DoujinEnum))));
                             break;
