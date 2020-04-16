@@ -66,15 +66,13 @@ namespace Bot.Commands
                 filteredFiles.Where(s => !disallowednames.Contains(s.Name)).Select(s => s.DownloadUrl);
             Console.Write(".");
             IEnumerable<string> contents;
-            using (WebClient client = new WebClient())
+            using WebClient client = new WebClient();
+            contents = cookies.Select(s =>
             {
-                contents = cookies.Select(s =>
-                {
-                    Console.Write(".");
-                    return client.DownloadString(s);
-                });
                 Console.Write(".");
-            }
+                return client.DownloadString(s);
+            });
+            Console.Write(".");
             return contents.SelectMany(s => s.Split(new[] {"\n%\n"}, StringSplitOptions.None)).ToArray();
         }
 
@@ -87,7 +85,11 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                string[] quotes = ctx.Channel.GetEvaluatedNsfw() ? FortunequotesOff : Fortunequotes;
+                string[] quotes =
+#if !NO_NSFW
+                    ctx.Channel.GetEvaluatedNsfw() ? FortunequotesOff : 
+#endif
+                        Fortunequotes;
                 await ctx.RespondAsyncFix(quotes[Program.Rnd.Next(quotes.Length)], true);
             }
         }

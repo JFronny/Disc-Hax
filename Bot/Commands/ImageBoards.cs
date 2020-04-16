@@ -36,7 +36,9 @@ namespace Bot.Commands
     public class ImageBoards : BaseCommandModule
     {
         public static Dictionary<string, ABooru> BooruDict;
+#if !NO_NSFW
         private static readonly List<string> JavMostCategories = new List<string>();
+#endif
 
         public ImageBoards()
         {
@@ -48,6 +50,7 @@ namespace Bot.Commands
                 .OrderBy(s => s.ToString().Split('.')[2].ToLower()).ToList()
                 .ToDictionary(s => s.ToString().Split('.')[2].ToLower(), s => s);
             Console.WriteLine(" Finished.");
+#if !NO_NSFW
             Console.Write("Instantiating JavMostCategories...");
             JavMostCategories.Add("censor");
             JavMostCategories.Add("uncensor");
@@ -76,8 +79,9 @@ namespace Bot.Commands
             {
             }
             Console.WriteLine(" Finished.");
+#endif
         }
-
+#if !NO_NSFW
         [Command("4chan")]
         [Aliases("4", "chan")]
         [Description(
@@ -159,21 +163,26 @@ namespace Bot.Commands
                         "The generated waifus might not be something you want to be looking at at work. You can override this.");
             }
         }
-
+#endif
         [Command("booru")]
         [Aliases("b")]
         [Description("Shows a random Image from your favourite *booru. See \"booru\" for a full list")]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task Booru(CommandContext ctx, [Description("Include questionable content?")]
-            bool qcont)
+        public async Task Booru(CommandContext ctx
+#if !NO_NSFW
+            , [Description("Include questionable content?")] bool qcont
+#endif
+            )
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync(qcont
-                    ? string.Join("; ", BooruDict.Keys)
-                    : string.Join("; ", BooruDict.Keys.Where(s => BooruDict[s].IsSafe())));
+                await ctx.RespondAsync(
+#if !NO_NSFW
+                    qcont ? string.Join("; ", BooruDict.Keys) :
+#endif
+                        string.Join("; ", BooruDict.Keys.Where(s => BooruDict[s].IsSafe())));
             }
         }
 
@@ -196,7 +205,11 @@ namespace Bot.Commands
                         throw new Exception("Failed to find image in a reasonable amount of tries");
                     result = await booru.GetRandomImageAsync(tags);
                     triesLeft--;
-                } while (result.rating != (ctx.Channel.GetEvaluatedNsfw() ? Rating.Explicit : Rating.Safe));
+                } while (result.rating != (
+#if !NO_NSFW
+                    ctx.Channel.GetEvaluatedNsfw() ? Rating.Explicit :
+#endif
+                        Rating.Safe));
                 string val = Program.Rnd.Next(10000, 99999).ToString();
                 using WebClient wClient = new WebClient();
                 await ctx.RespondWithFileAsync($"{val}_img.jpg",
@@ -214,8 +227,13 @@ namespace Bot.Commands
         public async Task Booru(CommandContext ctx,
             [Description("Tags for image selection")]
             params string[] tags) =>
-            await Booru(ctx, ctx.Channel.GetEvaluatedNsfw() ? (ABooru) new Rule34() : new Safebooru(), tags);
-
+            await Booru(ctx,
+#if !NO_NSFW
+                ctx.Channel.GetEvaluatedNsfw() ? (ABooru) new Rule34() :
+#endif
+                    new Safebooru(), tags);
+        
+#if !NO_NSFW
         [Command("nonbooru")]
         [Aliases("d")]
         [Description("Shows a random non-booru from your favourite source. See \"doujinshi ls\" for a full list")]
@@ -392,6 +410,7 @@ namespace Bot.Commands
                     await ctx.RespondAsync("NSFW Channels only!");
             }
         }
+#endif
 
         [Command("reddit")]
         [Aliases("r")]
@@ -410,7 +429,11 @@ namespace Bot.Commands
                 string res =
                     client.DownloadString($"https://www.reddit.com/r/{subreddit}/{(topPost ? "top" : "random")}/.json");
                 JToken jToken = (topPost ? JObject.Parse(res) : JArray.Parse(res)[0])["data"]["children"][0]["data"];
-                while (ctx.Channel.GetEvaluatedNsfw() != jToken["over_18"].Value<bool>())
+                while (
+#if !NO_NSFW
+                    ctx.Channel.GetEvaluatedNsfw() !=
+#endif
+                    jToken["over_18"].Value<bool>())
                 {
                     res = client.DownloadString(
                         $"https://www.reddit.com/r/{subreddit}/{(topPost ? "top" : "random")}/.json");
@@ -463,6 +486,8 @@ namespace Bot.Commands
                 await ctx.RespondWithFileAsync(Path.GetFileName(page), client.OpenRead(page));
             }
         }
+        
+#if !NO_NSFW
 
         [Command("sauce")]
         [Aliases("s", "source")]
@@ -531,6 +556,7 @@ namespace Bot.Commands
                     await ctx.RespondAsync("NSFW Channels only!");
             }
         }
+#endif
 
         [Command("xkcd")]
         [Aliases("x")]

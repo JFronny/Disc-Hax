@@ -28,6 +28,8 @@ namespace Bot.Commands
                 api.ApiKey("trnsl.1.1.20200118T180605Z.654f2ec649458c36.107c6ad38dc02937f25e660aa1f8f4097d6561a8")
                     .Format(ApiDataFormat.Json));
         }
+        
+#if !NO_NSFW
 
         [Command("urban")]
         [Aliases("u")]
@@ -69,6 +71,7 @@ namespace Bot.Commands
                     await ctx.RespondAsync("NSFW Channels only!");
             }
         }
+#endif
 
         [Command("translate")]
         [Aliases("t")]

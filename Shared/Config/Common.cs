@@ -27,31 +27,6 @@ namespace Shared.Config
             }
         }
 
-        public static bool GuildsBox
-        {
-            get
-            {
-                GetXe();
-                if (_common.Element("guildsBox") == null ||
-                    !bool.TryParse(_common.Element("guildsBox").Value, out bool t))
-                {
-                    _common.Add(new XElement("guildsBox", bool.FalseString));
-                    SaveXe();
-                }
-
-                return bool.Parse(_common.Element("guildsBox").Value);
-            }
-            set
-            {
-                GetXe();
-                if (_common.Element("guildsBox") == null)
-                    _common.Add(new XElement("guildsBox", value.ToString()));
-                else
-                    _common.Element("guildsBox").Value = value.ToString();
-                SaveXe();
-            }
-        }
-
         private static void GetXe()
         {
             if (!Directory.Exists(System.IO.Path.GetDirectoryName(Path)))

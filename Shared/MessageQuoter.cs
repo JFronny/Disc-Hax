@@ -8,7 +8,9 @@ namespace Shared
     {
         public static Task<DiscordMessage> Quote(this DiscordMessage msg, CommandContext ctx)
         {
+#if !NO_NSFW
             if (ctx.Channel.GetEvaluatedNsfw() || !msg.Channel.GetEvaluatedNsfw())
+#endif
                 return ctx.RespondAsync(embed: new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor

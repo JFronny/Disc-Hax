@@ -164,7 +164,8 @@ namespace Bot.Commands
                             1 => 2,
                             2 => 2,
                             3 => 3.5,
-                            4 => 7
+                            4 => 7,
+                            _ => throw new ArgumentOutOfRangeException()
                         });
                     else
                         winnings = (decimal) ((double) bet * pool[1] switch
@@ -173,7 +174,8 @@ namespace Bot.Commands
                             1 => 3,
                             2 => 4,
                             3 => 7,
-                            4 => 15
+                            4 => 15,
+                            _ => throw new ArgumentOutOfRangeException()
                         });
                 }
                 winnings -= bet;
@@ -272,12 +274,17 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                if (gameTime == null) gameTime = new TimeSpan(0, 1, 0);
+                gameTime ??= new TimeSpan(0, 1, 0);
                 if (gameTime > new TimeSpan(0, 3, 0))
                     throw new ArgumentOutOfRangeException("Please choose a smaller time");
                 InteractivityExtension ext = ctx.Client.GetInteractivity();
                 ABooru booru = ImageBoards.BooruDict.Select(s => s.Value)
-                    .Where(s => s.IsSafe() == !ctx.Channel.GetEvaluatedNsfw())
+                    .Where(s => 
+                        s.IsSafe()
+#if !NO_NSFW
+                        == !ctx.Channel.GetEvaluatedNsfw()
+#endif
+                        )
                     .OrderBy(s => Program.Rnd.NextDouble()).First();
                 SearchResult result = new SearchResult();
                 int triesLeft = 10;
@@ -294,7 +301,14 @@ namespace Bot.Commands
                         // ignored
                     }
                     triesLeft--;
-                } while (result.rating != (ctx.Channel.GetEvaluatedNsfw() ? Rating.Explicit : Rating.Safe));
+                } while (result.rating !=
+                         (
+#if !NO_NSFW
+                             ctx.Channel.GetEvaluatedNsfw() ? Rating.Explicit :
+#endif
+                             Rating.Safe
+                             )
+                         );
                 string val = Program.Rnd.Next(10000, 99999).ToString();
                 using WebClient wClient = new WebClient();
                 List<string> found = new List<string>();
