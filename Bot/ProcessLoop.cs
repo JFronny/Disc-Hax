@@ -24,13 +24,7 @@ namespace Bot
             }
             catch (Exception e)
             {
-#if NO_TIMED_BAN
-                Bot.DebugLogger.LogMessage(LogLevel.Error, "DiscHax",
-                    $"A crash occured in the main Thread: {e}", DateTime.Now, e);
-#else
-                client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax",
-                    $"A crash occured in the ban-evaluation Thread: {e}", DateTime.Now, e);
-#endif
+                client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax", $"A crash occured in the main Thread: {e}", DateTime.Now, e);
             }
             finally
             {
