@@ -9,7 +9,7 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using Shared.Config;
 
-namespace Bot.Commands
+namespace Bot.Commands.Stats
 {
     [Group("money")]
     [Aliases("$")]

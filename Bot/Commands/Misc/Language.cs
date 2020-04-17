@@ -13,7 +13,7 @@ using Shared;
 using Shared.Config;
 using Yandex.Translator;
 
-namespace Bot.Commands
+namespace Bot.Commands.Misc
 {
     [Group("lang")]
     [Aliases("l")]

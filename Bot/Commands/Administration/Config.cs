@@ -11,7 +11,7 @@ using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
 using Shared.Config;
 
-namespace Bot.Commands
+namespace Bot.Commands.Administration
 {
     public partial class Administration
     {

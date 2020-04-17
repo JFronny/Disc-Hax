@@ -11,7 +11,7 @@ using Octokit;
 using Shared;
 using Shared.Config;
 
-namespace Bot.Commands
+namespace Bot.Commands.Misc
 {
     [Group("quote")]
     [Aliases("q")]

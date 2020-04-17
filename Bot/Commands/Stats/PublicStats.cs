@@ -7,7 +7,7 @@ using DSharpPlus.CommandsNext.Attributes;
 using Shared;
 using Shared.Config;
 
-namespace Bot.Commands
+namespace Bot.Commands.Stats
 {
     [Group("stat")]
     [Aliases("s")]

@@ -10,7 +10,7 @@ using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
 using Shared.Config;
 
-namespace Bot.Commands
+namespace Bot.Commands.Misc
 {
     public partial class Minigames
     {

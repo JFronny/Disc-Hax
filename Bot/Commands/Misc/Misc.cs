@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Bot.Converters;
 using CC_Functions.Misc;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -15,12 +16,12 @@ using Eto.Drawing;
 using Shared;
 using Shared.Config;
 
-namespace Bot.Commands
+namespace Bot.Commands.Misc
 {
     [Group("misc")]
     [Aliases("r")]
     [Description("Random commands that didn't fit into other categories")]
-    public class Misc : BaseCommandModule
+    public partial class Misc : BaseCommandModule
     {
         private static readonly string[] AnswerList =
         {
@@ -202,7 +203,7 @@ namespace Bot.Commands
                 size.Height /= 2;
                 size.X = size.Width / 2;
                 size.Y = size.Height / 2;
-                g.DrawEllipse(new Pen(Color.FromArgb(100, 80, 80, 80), 6), size);
+                g.DrawEllipse(new Pen(Eto.Drawing.Color.FromArgb(100, 80, 80, 80), 6), size);
                 //Triangle
                 PointF center = new PointF(size.X + size.Width / 2, size.Y + size.Height / 2);
                 float radius = size.Width / 2f;
@@ -302,6 +303,42 @@ namespace Bot.Commands
                 await ctx.TriggerTypingAsync();
                 DiscordMessage msg = await ctx.Channel.GetMessageAsync(id);
                 await msg.Quote(ctx);
+            }
+        }
+        
+        [Command("color")]
+        [Aliases("col", "colour")]
+        [Description("Show info about a color. Chooses a random color when none is specified")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Color(CommandContext ctx, [Description("The color")] DiscordColor? color = null)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                color ??= DiscordNamedColorConverter.ColorNames.Values.OrderBy(s => Program.Rnd.NextDouble()).First();
+                //Image
+                Bitmap bmp = new Bitmap(new Size(100, 100), PixelFormat.Format32bppRgb);
+                Graphics g = new Graphics(bmp);
+                Color col = new Color(color.Value.R, color.Value.G, color.Value.B);
+                g.Clear(col);
+                g.Flush();
+                g.Dispose();
+                await using MemoryStream str = new MemoryStream();
+                bmp.Save(str, ImageFormat.Jpeg);
+                str.Position = 0;
+                //Data
+                DiscordEmbedBuilder bld = new DiscordEmbedBuilder {Color = color.Value};
+                if (DiscordNamedColorConverter.ColorNames.Values.Any(s => s.Value == color.Value.Value))
+                    bld.Title = DiscordNamedColorConverter.ColorNames.First(s => s.Value.Value == color.Value.Value)
+                        .Key;
+                bld.AddField("RGB", $"{color.Value.R}, {color.Value.G}, {color.Value.B}", true);
+                bld.AddField("Hex", $"#{color.Value.R:X2}{color.Value.G:X2}{color.Value.B:X2}", true);
+                bld.AddField("RGB Int", color.Value.Value.ToString(), true);
+                bld.AddField("HSB", col.ToHSB().selectO(s => $"{s.H}, {s.S}, {s.B}"), true);
+                bld.AddField("HSL", col.ToHSL().selectO(s => $"{s.H}, {s.S}, {s.L}"), true);
+                bld.AddField("CMYK", col.ToCMYK().selectO(s => $"{s.C}, {s.M}, {s.Y}, {s.K}"), true);
+                await ctx.RespondWithFileAsync("Color.jpg", str, embed: bld.Build());
             }
         }
     }

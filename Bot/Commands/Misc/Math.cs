@@ -12,7 +12,7 @@ using org.mariuszgromada.math.mxparser;
 using Shared;
 using Shared.Config;
 
-namespace Bot.Commands
+namespace Bot.Commands.Misc
 {
     [Group("Math")]
     [Aliases("m", "+")]

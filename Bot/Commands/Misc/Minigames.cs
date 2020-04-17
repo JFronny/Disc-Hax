@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using BooruSharp.Booru;
 using BooruSharp.Search.Post;
+using Bot.Commands.Japan;
 using Bot.Converters;
 using CC_Functions.Misc;
 using DSharpPlus.CommandsNext;
@@ -16,7 +17,7 @@ using Shared;
 using Shared.Config;
 using static System.Math;
 
-namespace Bot.Commands
+namespace Bot.Commands.Misc
 {
     [Group("game")]
     [Aliases("g")]

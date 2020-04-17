@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using BooruSharp.Booru;
 using Bot.Commands;
+using Bot.Commands.Japan;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Converters;
 using DSharpPlus.Entities;

@@ -27,7 +27,7 @@ using Shared;
 using Shared.Config;
 using SearchResult = BooruSharp.Search.Post.SearchResult;
 
-namespace Bot.Commands
+namespace Bot.Commands.Japan
 {
     [Group("board")]
     [Aliases("b")]

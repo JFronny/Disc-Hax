@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 using Shared;
 using Shared.Config;
 
-namespace Bot.Commands
+namespace Bot.Commands.Japan
 {
     [Group("japan")]
     [Aliases("j")]
