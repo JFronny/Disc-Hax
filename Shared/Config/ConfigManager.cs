@@ -245,32 +245,32 @@ namespace Shared.Config
             el.Save(xmlPath);
         }
 
-        public static Dictionary<string, DiscordRole> GetReactionRoles(this DiscordGuild guild)
+        public static Dictionary<string, ulong> GetReactionRoles(this DiscordGuild guild)
         {
             XElement rrRoot = guild.GetRRRoot(out _, out _);
             if (rrRoot.Element(Roles) is null)
                 rrRoot.Add(new XElement(Roles));
-            Dictionary<string, DiscordRole> result = new Dictionary<string, DiscordRole>();
+            Dictionary<string, ulong> result = new Dictionary<string, ulong>();
             foreach (XElement element in rrRoot.Element(Roles).Elements(Role))
                 if (!(element?.Element(Emoticon)?.Value is null) &&
                     !(element?.Element(RoleID)?.Value is null) &&
                     ulong.TryParse(element.Element(RoleID).Value, out ulong roleId))
-                    result.Add(element.Element(Emoticon).Value, guild.GetRole(roleId));
+                    result.Add(element.Element(Emoticon).Value, roleId);
                 else
                     Console.WriteLine("Encountered invalid item!");
             return result;
         }
 
-        public static void SetReactionRoles(this DiscordGuild guild, Dictionary<string, DiscordRole> roles)
+        public static void SetReactionRoles(this DiscordGuild guild, Dictionary<string, ulong> roles)
         {
             XElement rrRoot = guild.GetRRRoot(out string xmlPath, out XElement el);
             if (rrRoot.Element(Roles) is null)
                 rrRoot.Add(new XElement(Roles));
             else
                 rrRoot.Element(Roles).RemoveAll();
-            foreach (KeyValuePair<string, DiscordRole> pair in roles)
+            foreach (KeyValuePair<string, ulong> pair in roles)
                 rrRoot.Element(Roles).Add(new XElement(Role, new XElement(Emoticon, pair.Key),
-                    new XElement(RoleID, pair.Value.Id)));
+                    new XElement(RoleID, pair.Value)));
             el.Save(xmlPath);
         }
 

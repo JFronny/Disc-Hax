@@ -84,15 +84,15 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                Dictionary<string, DiscordRole> roles = ctx.Guild.GetReactionRoles();
+                Dictionary<string, ulong> roles = ctx.Guild.GetReactionRoles();
                 if (roles.Count == 0)
                     await ctx.RespondAsync("No items are bound");
                 else
                 {
                     string text = "";
-                    foreach (KeyValuePair<string, DiscordRole> pair in roles)
+                    foreach (KeyValuePair<string, ulong> pair in roles)
                         //DiscordEmoji emoticon = await ctx.Guild.GetEmojiAsync(pair.Key);
-                        text += $"{pair.Key} - {pair.Value.Name}\n";
+                        text += $"{pair.Key} - {ctx.Guild.GetRole(pair.Value).Name}\n";
                     await ctx.RespondPaginatedIfTooLong(text.Remove(text.Length - 1));
                 }
             }
@@ -110,8 +110,13 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                Dictionary<string, DiscordRole> roles = ctx.Guild.GetReactionRoles();
-                if (roles.ContainsKey(emoji.Name) || roles.ContainsValue(role))
+                Dictionary<string, ulong> roles = ctx.Guild.GetReactionRoles();
+                if (roles.Count > 19)
+                {
+                    await ctx.RespondAsync("Too many roles!");
+                    return;
+                }
+                if (roles.ContainsKey(emoji.Name) || roles.ContainsValue(role.Id))
                 {
                     await ctx.RespondAsync("Element already registered");
                     return;
@@ -123,7 +128,7 @@ namespace Bot.Commands
                     await ctx.RespondAsync("Invalid value");
                     return;
                 }
-                roles.Add(emoji.GetDiscordName(), role);
+                roles.Add(emoji.GetDiscordName(), role.Id);
                 ctx.Guild.SetReactionRoles(roles);
                 await ctx.RespondAsync("Done!");
             }
@@ -140,7 +145,7 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                Dictionary<string, DiscordRole> roles = ctx.Guild.GetReactionRoles();
+                Dictionary<string, ulong> roles = ctx.Guild.GetReactionRoles();
                 roles.Remove(emoji.GetDiscordName());
                 ctx.Guild.SetReactionRoles(roles);
                 await ctx.RespondAsync("Done!");
@@ -156,8 +161,8 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                Dictionary<string, DiscordRole> roles = ctx.Guild.GetReactionRoles();
-                roles.Remove(roles.First(s => s.Value == role).Key);
+                Dictionary<string, ulong> roles = ctx.Guild.GetReactionRoles();
+                roles.Remove(roles.First(s => s.Value == role.Id).Key);
                 ctx.Guild.SetReactionRoles(roles);
                 await ctx.RespondAsync("Done!");
             }
@@ -173,7 +178,7 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                ctx.Guild.SetReactionRoles(new Dictionary<string, DiscordRole>());
+                ctx.Guild.SetReactionRoles(new Dictionary<string, ulong>());
                 await ctx.RespondAsync("Done!");
             }
         }

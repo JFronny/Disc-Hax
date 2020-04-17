@@ -21,7 +21,7 @@ namespace Bot.Commands
     [Group("game")]
     [Aliases("g")]
     [Description("Simple games")]
-    public class Minigames : BaseCommandModule
+    public partial class Minigames : BaseCommandModule
     {
         [Command("rps")]
         [Description("Play Rock-Paper-Scissors")]
@@ -281,9 +281,9 @@ namespace Bot.Commands
                 InteractivityExtension ext = ctx.Client.GetInteractivity();
                 ABooru booru = ImageBoards.BooruDict.Select(s => s.Value)
                     .Where(s =>
-                        s.IsSafe()
+                            s.IsSafe()
 #if !NO_NSFW
-                        == !ctx.Channel.GetEvaluatedNsfw()
+                            == !ctx.Channel.GetEvaluatedNsfw()
 #endif
                     )
                     .OrderBy(s => Program.Rnd.NextDouble()).First();

@@ -51,7 +51,25 @@ namespace Bot
         {
             foreach (KeyValuePair<ulong, DiscordGuild> guild in client.Guilds)
             {
-                Dictionary<string, DiscordRole> roles = guild.Value.GetReactionRoles();
+                Dictionary<string, ulong> roles = guild.Value.GetReactionRoles();
+                if (roles.Values.Count(s => guild.Value.Roles.ContainsKey(s)) != roles.Count)
+                {
+                    guild.Value.SetReactionRoles(roles.Where(s => guild.Value.Roles.ContainsKey(s.Value))
+                        .ToDictionary(s => s.Key, s => s.Value));
+                    roles = guild.Value.GetReactionRoles();
+                }
+                if (roles.GroupBy(s => s.Value).Count() != roles.Count)
+                {
+                    guild.Value.SetReactionRoles(roles.GroupBy(s => s.Value).Select(s => s.First())
+                        .ToDictionary(s => s.Key, s => s.Value));
+                    roles = guild.Value.GetReactionRoles();
+                }
+                if (roles.Count > 20)
+                {
+                    guild.Value.SetReactionRoles(roles.Take(20)
+                        .ToDictionary(s => s.Key, s => s.Value));
+                    roles = guild.Value.GetReactionRoles();
+                }
                 (ulong? channel, ulong? message) =
                     guild.Value.GetReactionRoleMessage() ?? new Tuple<ulong?, ulong?>(0, 0);
                 if (channel == 0 || message == 0) continue;
@@ -59,22 +77,23 @@ namespace Bot
                     client.GetChannelAsync(channel.Value).Result.GetMessageAsync(message.Value).Result;
                 foreach (DiscordEmoji disallowed in msg.Reactions.Where(s => !s.IsMe).Select(s => s.Emoji))
                     msg.DeleteReactionsEmojiAsync(disallowed);
-                foreach (KeyValuePair<string, DiscordRole> role in roles)
+                foreach (KeyValuePair<string, ulong> role in roles)
                 {
                     Func<DiscordReaction, bool> selector = s =>
                         s.IsMe && s.Emoji.GetDiscordName() == role.Key;
                     DiscordEmoji emoji = DiscordEmoji.FromName(client, role.Key);
                     if (!msg.Reactions.Any(selector)) msg.CreateReactionAsync(emoji);
                     IReadOnlyList<DiscordUser> reactions = msg.GetReactionsAsync(emoji).Result;
+                    DiscordRole dRole = guild.Value.GetRole(role.Value);
                     foreach (KeyValuePair<ulong, DiscordMember> member in guild.Value.Members)
                     {
-                        bool inGroup = member.Value.Roles.Contains(role.Value);
+                        bool inGroup = member.Value.Roles.Contains(dRole);
                         bool shouldBeInGroup = reactions.Contains(member.Value);
                         if (inGroup == shouldBeInGroup) continue;
                         if (shouldBeInGroup)
-                            member.Value.GrantRoleAsync(role.Value);
+                            member.Value.GrantRoleAsync(dRole);
                         else
-                            member.Value.RevokeRoleAsync(role.Value);
+                            member.Value.RevokeRoleAsync(dRole);
                     }
                 }
             }
