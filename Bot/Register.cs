@@ -29,6 +29,7 @@ namespace Bot
             client.RegisterConverter(new CurrencyConv());
             client.RegisterConverter(new DiscordNamedColorConverter());
             client.RegisterConverter(new DoujinEnumConv());
+            client.RegisterConverter(new HashTypeConv());
             client.RegisterConverter(new RpsOptionConv());
             client.SetHelpFormatter<HelpFormatter>();
         }

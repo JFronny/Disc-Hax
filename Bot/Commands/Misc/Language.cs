@@ -36,7 +36,7 @@ namespace Bot.Commands.Misc
         [Description("Search urban dictionary for a term")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Urban(CommandContext ctx, [Description("The term to search")] [RemainingText]
-            string term)
+            string text)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
                 .AND(ctx.Channel.GetMethodEnabled()))
@@ -46,7 +46,7 @@ namespace Bot.Commands.Misc
                 {
                     using WebClient c = new WebClient();
                     JObject result = (JObject) JObject.Parse(c.DownloadString(
-                        $"https://api.urbandictionary.com/v0/define?term={Uri.EscapeUriString(term)}"))["list"][0];
+                        $"https://api.urbandictionary.com/v0/define?term={Uri.EscapeUriString(text)}"))["list"][0];
                     string definition = result.Value<string>("definition") ?? "";
                     definition = string.IsNullOrWhiteSpace(definition) ? "Not found" : definition;
                     string example = result.Value<string>("example") ?? "";
@@ -92,19 +92,19 @@ namespace Bot.Commands.Misc
         [Description("Translate a short piece of text")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Translate(CommandContext ctx, [Description("The language to translate to")]
-            string lang, [Description("The term to search")] [RemainingText]
-            string term)
+            string lang, [Description("The text to translate")] [RemainingText]
+            string text)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                if (term.Length > 200)
+                if (text.Length > 200)
                 {
                     await ctx.RespondAsync("Max length is 200");
                     return;
                 }
-                await ctx.RespondAsync(translator.Translate(lang, term).Text);
+                await ctx.RespondAsync(translator.Translate(lang, text).Text);
             }
         }
 
@@ -112,35 +112,35 @@ namespace Bot.Commands.Misc
         [Aliases("c")]
         [Description("Corrupt text by translating it over and over")]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public Task Corrupt(CommandContext ctx, [Description("The term to search")] [RemainingText]
+        public Task Corrupt(CommandContext ctx, [Description("The text to corrupt")] [RemainingText]
             string term) => Corrupt(ctx, false, term);
 
         [Command("corrupt")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Corrupt(CommandContext ctx, [Description("Set to true to fully break the text")]
-            bool breakFully, [Description("The term to search")] [RemainingText]
-            string term)
+            bool breakFully, [Description("The text to corrupt")] [RemainingText]
+            string text)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                if (term.Length > 200)
+                if (text.Length > 200)
                 {
                     await ctx.RespondAsync("Max length is 200");
                     return;
                 }
                 IEnumerable<ITranslationPair> pairs = translator.TranslationPairs()
                     .OrderBy(_ => Program.Rnd.NextDouble());
-                string startLang = translator.Detect(term);
+                string startLang = translator.Detect(text);
                 if (breakFully)
                 {
                     ITranslationPair[] translationPairs = pairs as ITranslationPair[] ?? pairs.ToArray();
                     for (int i = 0; i < 20; i++)
                     {
                         ITranslationPair pair = translationPairs[i];
-                        term = translator
-                            .Translate($"{pair.FromLanguage}-{pair.ToLanguage}", term).Text;
+                        text = translator
+                            .Translate($"{pair.FromLanguage}-{pair.ToLanguage}", text).Text;
                     }
                 }
                 else
@@ -150,11 +150,30 @@ namespace Bot.Commands.Misc
                     {
                         ITranslationPair pair = pairs.First(s => s.FromLanguage == currentLang);
                         currentLang = pair.ToLanguage;
-                        term = translator
-                            .Translate($"{pair.FromLanguage}-{pair.ToLanguage}", term).Text;
+                        text = translator
+                            .Translate($"{pair.FromLanguage}-{pair.ToLanguage}", text).Text;
                     }
                 }
-                await ctx.RespondAsync(translator.Translate(startLang, term).Text);
+                await ctx.RespondAsync(translator.Translate(startLang, text).Text);
+            }
+        }
+
+        [Command("detect")]
+        [Aliases("d")]
+        [Description("Detect the language of the string")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Detect(CommandContext ctx, [Description("The term to search")] [RemainingText] string text)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                if (text.Length > 200)
+                {
+                    await ctx.RespondAsync("Max length is 200");
+                    return;
+                }
+                await ctx.RespondAsync(translator.Detect(text));
             }
         }
     }

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Bot.Converters;
 using CC_Functions.Misc;
@@ -13,8 +15,10 @@ using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.EventHandling;
 using Eto.Drawing;
+using QRCoder;
 using Shared;
 using Shared.Config;
+using Shared.QR;
 
 namespace Bot.Commands.Misc
 {
@@ -180,6 +184,20 @@ namespace Bot.Commands.Misc
                 await ctx.RespondPaginatedIfTooLong(Program.Rnd.Next(minimum, maximum + 1).ToString());
             }
         }
+        
+        [Command("coinflip")]
+        [Aliases("flip")]
+        [Description("Flip a coin")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Coinflip(CommandContext ctx)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                await ctx.RespondPaginatedIfTooLong(Program.Rnd.Next(0, 2) == 0 ? "Head" : "Tail");
+            }
+        }
 
         [Command("magic8")]
         [Description("The answer to your questions")]
@@ -339,6 +357,140 @@ namespace Bot.Commands.Misc
                 bld.AddField("HSL", col.ToHSL().selectO(s => $"{s.H}, {s.S}, {s.L}"), true);
                 bld.AddField("CMYK", col.ToCMYK().selectO(s => $"{s.C}, {s.M}, {s.Y}, {s.K}"), true);
                 await ctx.RespondWithFileAsync("Color.jpg", str, embed: bld.Build());
+            }
+        }
+        
+        [Command("base64")]
+        [Aliases("b64", "base")]
+        [Description("Encode/Decode base64 strings (you can also attach a text file)")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Base64(CommandContext ctx, [Description("Whether to encode (default) or decode")] bool decode, [Description("The text to process"), RemainingText] string text)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                if (string.IsNullOrWhiteSpace(text) && ctx.Message.Attachments.Count > 0)
+                {
+                    using WebClient wc = new WebClient();
+                    text = wc.DownloadString(ctx.Message.Attachments[0].Url);
+                }
+                if (decode)
+                {
+                    byte[] data = Convert.FromBase64String(text);
+                    try
+                    {
+                        await using MemoryStream ms = new MemoryStream(data);
+                        using StreamReader rd = new StreamReader(ms);
+                        await ctx.RespondAsync(await rd.ReadToEndAsync());
+                    }
+                    catch
+                    {
+                        await using MemoryStream ms = new MemoryStream(data);
+                        await ctx.RespondWithFileAsync("blob.bin", ms, "Could not decode to string, using raw data");
+                    }
+                }
+                else
+                    await ctx.RespondAsync(Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(text)));
+            }
+        }
+        
+        [Command("echo")]
+        [Aliases("repeat")]
+        [Description("Repeat a string back to you")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Echo(CommandContext ctx, [Description("The text to echo"), RemainingText] string text)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+                await ctx.RespondAsync(text);
+        }
+        
+        [Command("reverse")]
+        [Aliases("rev")]
+        [Description("Reverse a string")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public Task Reverse(CommandContext ctx, [Description("The text to echo"), RemainingText] string text) => Reverse(ctx, false, text);
+
+        [Command("reverse")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public Task Reverse(CommandContext ctx, bool reverseWords, [Description("The text to echo"), RemainingText] string text)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+                return ctx.RespondAsync(reverseWords ? string.Join(' ', text.Split(' ').Reverse()) : text);
+            else
+                return Task.CompletedTask;
+        }
+        
+        [Command("generate-qr")]
+        [Aliases("gen-qr", "mkqr")]
+        [Description("Generate a QR Code from supplied data (string or attachment)")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task GenerateQR(CommandContext ctx, [Description("The text to echo"), RemainingText] string text)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                Bitmap bmp;
+                if (string.IsNullOrWhiteSpace(text) && ctx.Message.Attachments.Count > 0)
+                {
+                    using WebClient wc = new WebClient();
+                    QRCodeData data = QRGenerator.GenerateQrCode(wc.DownloadData(ctx.Message.Attachments[0].Url), QRGenerator.ECCLevel.Q);
+                    QRCode code = new QRCode(data);
+                    bmp = code.GetGraphic(20);
+                }
+                else
+                {
+                    QRCodeData data = QRGenerator.GenerateQrCode(text, QRGenerator.ECCLevel.Q);
+                    QRCode code = new QRCode(data);
+                    bmp = code.GetGraphic(20);
+                }
+                await using MemoryStream str = new MemoryStream();
+                bmp.Save(str, ImageFormat.Jpeg);
+                str.Position = 0;
+                await ctx.RespondWithFileAsync("Code.jpg", str);
+            }
+        }
+        
+        [Command("hash")]
+        [Aliases("gen-hash")]
+        [Description("Generate a Hash Code from supplied data (string or attachment), no arguments for a list of possible algorithms")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Hash(CommandContext ctx)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                await ctx.RespondAsync(string.Join(", ",
+                    HashTypeConv.Soptions.OfType<HashTypeConv.HashType>().Select(s => s.ToString())));
+            }
+        }
+        
+        [Command("hash")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Hash(CommandContext ctx, [Description("The algorithm to use")] HashTypeConv.HashType algorithm, [Description("The text to echo"), RemainingText] string text)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                byte[] data;
+                using WebClient wc = new WebClient();
+                data = string.IsNullOrWhiteSpace(text) && ctx.Message.Attachments.Count > 0
+                    ? wc.DownloadData(ctx.Message.Attachments[0].Url)
+                    : System.Text.Encoding.UTF8.GetBytes(text);
+                HashAlgorithm impl = algorithm switch
+                {
+                    HashTypeConv.HashType.Md5 => new MD5CryptoServiceProvider(),
+                    HashTypeConv.HashType.Sha1 => new SHA1Managed(),
+                    HashTypeConv.HashType.Sha256 => new SHA256Managed(),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+                byte[] hash = impl.ComputeHash(data);
+                await ctx.RespondAsync(BitConverter.ToString(hash).Replace("-", string.Empty).ToUpper());
             }
         }
     }
