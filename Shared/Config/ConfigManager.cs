@@ -203,6 +203,77 @@ namespace Shared.Config
                 .ToDictionary(s => s.Key, s => GetMoney(id, s.Value));
         }
 
+        private static XElement GetRRRoot(this DiscordGuild guild, out string xmlPath, out XElement el)
+        {
+            el = GetXml(guild.Id.ToString(), Guild, out xmlPath);
+            XElement rrRoot = el.Element(ReactionRoles);
+            if (rrRoot is null)
+            {
+                el.Add(new XElement(ReactionRoles));
+                rrRoot = el.Element(ReactionRoles);
+            }
+            return rrRoot;
+        }
+
+        public static Tuple<ulong?, ulong?>? GetReactionRoleMessage(this DiscordGuild guild)
+        {
+            XElement rrRoot = guild.GetRRRoot(out _, out _);
+            if (rrRoot.Element(Message) is null)
+                rrRoot.Add(new XElement(Message));
+            XElement channel = rrRoot.Element(Message).Element(Channel);
+            XElement message = rrRoot.Element(Message).Element(Message);
+            if (channel?.Value is null || message?.Value is null)
+                return null;
+            ulong id;
+            ulong? channelId = ulong.TryParse(channel.Value, out id) ? (ulong?) id : null;
+            ulong? messageId = ulong.TryParse(message.Value, out id) ? (ulong?) id : null;
+            return new Tuple<ulong?, ulong?>(channelId, messageId);
+        }
+
+        public static void SetReactionRoleMessage(this DiscordGuild guild, DiscordMessage? msg)
+        {
+            XElement rrRoot = guild.GetRRRoot(out string xmlPath, out XElement el);
+            if (rrRoot.Element(Message) is null)
+                rrRoot.Add(new XElement(Message));
+            else
+                rrRoot.Element(Message).RemoveAll();
+            if (!(msg is null))
+            {
+                rrRoot.Element(Message).Add(new XElement(Channel, msg.ChannelId));
+                rrRoot.Element(Message).Add(new XElement(Message, msg.Id));
+            }
+            el.Save(xmlPath);
+        }
+
+        public static Dictionary<string, DiscordRole> GetReactionRoles(this DiscordGuild guild)
+        {
+            XElement rrRoot = guild.GetRRRoot(out _, out _);
+            if (rrRoot.Element(Roles) is null)
+                rrRoot.Add(new XElement(Roles));
+            Dictionary<string, DiscordRole> result = new Dictionary<string, DiscordRole>();
+            foreach (XElement element in rrRoot.Element(Roles).Elements(Role))
+                if (!(element?.Element(Emoticon)?.Value is null) &&
+                    !(element?.Element(RoleID)?.Value is null) &&
+                    ulong.TryParse(element.Element(RoleID).Value, out ulong roleId))
+                    result.Add(element.Element(Emoticon).Value, guild.GetRole(roleId));
+                else
+                    Console.WriteLine("Encountered invalid item!");
+            return result;
+        }
+
+        public static void SetReactionRoles(this DiscordGuild guild, Dictionary<string, DiscordRole> roles)
+        {
+            XElement rrRoot = guild.GetRRRoot(out string xmlPath, out XElement el);
+            if (rrRoot.Element(Roles) is null)
+                rrRoot.Add(new XElement(Roles));
+            else
+                rrRoot.Element(Roles).RemoveAll();
+            foreach (KeyValuePair<string, DiscordRole> pair in roles)
+                rrRoot.Element(Roles).Add(new XElement(Role, new XElement(Emoticon, pair.Key),
+                    new XElement(RoleID, pair.Value.Id)));
+            el.Save(xmlPath);
+        }
+
 #if !NO_TIMED_BAN
         public static void AddTimedBan(this DiscordGuild id, DiscordMember user, TimeSpan span)
         {
@@ -271,74 +342,5 @@ namespace Shared.Config
             el.Save(xmlPath);
         }
 #endif
-
-        private static XElement GetRRRoot(this DiscordGuild guild, out string xmlPath, out XElement el)
-        {
-            el = GetXml(guild.Id.ToString(), Guild, out xmlPath);
-            XElement rrRoot = el.Element(ReactionRoles);
-            if (rrRoot is null)
-            {
-                el.Add(new XElement(ReactionRoles));
-                rrRoot = el.Element(ReactionRoles);
-            }
-            return rrRoot;
-        }
-
-        public static Tuple<ulong?, ulong?>? GetReactionRoleMessage(this DiscordGuild guild)
-        {
-            XElement rrRoot = guild.GetRRRoot(out _, out _);
-            if (rrRoot.Element(Message) is null)
-                rrRoot.Add(new XElement(Message));
-            XElement channel = rrRoot.Element(Message).Element(Channel);
-            XElement message = rrRoot.Element(Message).Element(Message);
-            if (channel?.Value is null || message?.Value is null)
-                return null;
-            ulong id;
-            ulong? channelId = ulong.TryParse(channel.Value, out id) ? (ulong?) id : null;
-            ulong? messageId = ulong.TryParse(message.Value, out id) ? (ulong?) id : null;
-            return new Tuple<ulong?, ulong?>(channelId, messageId);
-        }
-
-        public static void SetReactionRoleMessage(this DiscordGuild guild, DiscordMessage? msg)
-        {
-            XElement rrRoot = guild.GetRRRoot(out string xmlPath, out XElement el);
-            if (rrRoot.Element(Message) is null)
-                rrRoot.Add(new XElement(Message));
-            else
-                rrRoot.Element(Message).RemoveAll();
-            if (!(msg is null))
-            {
-                rrRoot.Element(Message).Add(new XElement(Channel, msg.ChannelId));
-                rrRoot.Element(Message).Add(new XElement(Message, msg.Id));
-            }
-            el.Save(xmlPath);
-        }
-
-        public static Dictionary<string, DiscordRole> GetReactionRoles(this DiscordGuild guild)
-        {
-            XElement rrRoot = guild.GetRRRoot(out _, out _);
-            if (rrRoot.Element(Roles) is null)
-                rrRoot.Add(new XElement(Roles));
-            Dictionary<string, DiscordRole> result = new Dictionary<string, DiscordRole>();
-            foreach (XElement element in rrRoot.Element(Roles).Elements(Role))
-                if (!(element?.Element(Emoticon)?.Value is null) &&
-                    !(element?.Element(RoleID)?.Value is null) &&
-                    ulong.TryParse(element.Element(RoleID).Value, out ulong roleId))
-                    result.Add(element.Element(Emoticon).Value, guild.GetRole(roleId));
-                else
-                    Console.WriteLine("Encountered invalid item!");
-            return result;
-        }
-
-        public static void SetReactionRoles(this DiscordGuild guild, Dictionary<string, DiscordRole> roles)
-        {
-            XElement rrRoot = guild.GetRRRoot(out string xmlPath, out XElement el);
-            if (rrRoot.Element(Roles) is null)
-                rrRoot.Add(new XElement(Roles));
-            else
-                rrRoot.Element(Roles).RemoveAll();
-            foreach (KeyValuePair<string, DiscordRole> pair in roles) rrRoot.Element(Roles).Add(new XElement(Role, new XElement(Emoticon, pair.Key), new XElement(RoleID, pair.Value.Id)));
-            el.Save(xmlPath);
-        }
     }
 }

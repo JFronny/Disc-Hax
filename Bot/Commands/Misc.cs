@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CC_Functions.Misc;
@@ -67,7 +66,7 @@ namespace Bot.Commands
                     Title = "Poll time!",
                     Description = text
                 }.Build());
-                ReadOnlyCollection<PollEmoji> pollResult = await Program.Bot.GetInteractivity()
+                ReadOnlyCollection<PollEmoji> pollResult = await Program.client.GetInteractivity()
                     .DoPollAsync(msg, options, timeout: duration);
                 IEnumerable<string> results = pollResult.Where(xkvp => options.Contains(xkvp.Emoji))
                     .Select(xkvp => $"{xkvp.Emoji}: {xkvp.Voted.Count}");
@@ -131,7 +130,7 @@ namespace Bot.Commands
             }
         }
 
-        [Command("preview")]
+        /*[Command("preview")]
         [Description("Paginates a website for preview")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task PreviewSite(CommandContext ctx, [Description("URL to paginate site from")] [RemainingText]
@@ -155,6 +154,29 @@ namespace Bot.Commands
                     return;
                 }
                 await ctx.RespondPaginatedIfTooLong(TextProcessor.HtmlToPlainText(html));
+            }
+        }*/
+        //Disabled until this doesn't allow access to local devices. I prefer not to be hacked
+
+        [Command("random")]
+        [Aliases("rnd", "rng", "dice", "r")]
+        [Description("Generates a random number")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Random(CommandContext ctx, [Description("The inclusive minimum for the number")]
+            int minimum, [Description("The inclusive maximum for the number")]
+            int maximum)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                if (maximum < minimum)
+                {
+                    int tmp = maximum;
+                    maximum = minimum;
+                    minimum = tmp;
+                }
+                await ctx.RespondPaginatedIfTooLong(Program.Rnd.Next(minimum, maximum + 1).ToString());
             }
         }
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -36,9 +35,6 @@ namespace Bot.Commands
     public class ImageBoards : BaseCommandModule
     {
         public static Dictionary<string, ABooru> BooruDict;
-#if !NO_NSFW
-        //private static readonly List<string> JavMostCategories = new List<string>();
-#endif
 
         public ImageBoards()
         {
@@ -81,98 +77,17 @@ namespace Bot.Commands
             Console.WriteLine(" Finished.");
 #endif*/
         }
-#if !NO_NSFW
-        [Command("4chan")]
-        [Aliases("4", "chan")]
-        [Description(
-            "Sends a random image from the board. If no board is specified, a list of boards will be displayed.")]
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task Chan(CommandContext ctx)
-        {
-            if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
-            {
-                await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync(
-                    $"{string.Join(", ", JsonDeserializer.Deserialize<BoardListModel>(await Internet.DownloadString(@"https://a.4cdn.org/boards.json")).boards.Select(s => $"{s.Title} ({s.ShortName})"))}\r\nUsage: !4chan <ShortName>");
-            }
-        }
 
-        [Command("4chan")]
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task Chan(CommandContext ctx, [Description("Board to select image from")]
-            Board board)
-        {
-            if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
-            {
-                await ctx.TriggerTypingAsync();
-                if (ctx.Channel.GetEvaluatedNsfw())
-                {
-                    Thread[] threads = board.GetThreads().ToArray();
-                    Thread t = threads[Program.Rnd.Next(threads.Length)];
-                    using WebClient wClient = new WebClient();
-                    await ctx.RespondWithFileAsync($"{t.PostNumber}.jpg",
-                        wClient.OpenRead(t.Image.Image),
-                        $"https://boards.4channel.org/{t.Board.BoardId}/thread/{t.PostNumber}",
-                        embed: new DiscordEmbedBuilder
-                        {
-                            Author = new DiscordEmbedBuilder.EmbedAuthor {Name = t.Name},
-                            Timestamp = t.TimeCreated,
-                            Title = string.IsNullOrWhiteSpace(t.Subject) ? "Untitled" : t.Subject,
-                            Description = t.Message
-                        }.Build());
-                }
-                else
-                    await ctx.RespondAsync(
-                        "Due to the way 4chan users behave, this command is only allowed in NSFW channels");
-            }
-        }
-
-        [Command("waifu")]
-        [Aliases("w")]
-        [Description("Shows you a random waifu from thiswaifudoesnotexist.net")]
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task Waifu(CommandContext ctx)
-        {
-            if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
-                await Waifu(ctx, false);
-        }
-
-        [Command("waifu")]
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task Waifu(CommandContext ctx,
-            [Description("Set to true to force execution, even on non-NSFW channels")]
-            bool forceExecution)
-        {
-            if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
-            {
-                await ctx.TriggerTypingAsync();
-                if (ctx.Channel.GetEvaluatedNsfw() || forceExecution)
-                {
-                    int img = Program.Rnd.Next(6000);
-                    using WebClient wClient = new WebClient();
-                    await ctx.RespondWithFileAsync($"{img}.jpg",
-                        wClient.OpenRead($"https://www.thiswaifudoesnotexist.net/example-{img}.jpg"),
-                        "There.");
-                }
-                else
-                    await ctx.RespondAsync(
-                        "The generated waifus might not be something you want to be looking at at work. You can override this.");
-            }
-        }
-#endif
         [Command("booru")]
         [Aliases("b")]
         [Description("Shows a random Image from your favourite *booru. See \"booru\" for a full list")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Booru(CommandContext ctx
 #if !NO_NSFW
-            , [Description("Include questionable content?")] bool qcont
+            , [Description("Include questionable content?")]
+            bool qcont
 #endif
-            )
+        )
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
                 .AND(ctx.Channel.GetMethodEnabled()))
@@ -180,7 +95,9 @@ namespace Bot.Commands
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(
 #if !NO_NSFW
-                    qcont ? string.Join("; ", BooruDict.Keys) :
+                    qcont
+                        ? string.Join("; ", BooruDict.Keys)
+                        :
 #endif
                         string.Join("; ", BooruDict.Keys.Where(s => BooruDict[s].IsSafe())));
             }
@@ -207,7 +124,9 @@ namespace Bot.Commands
                     triesLeft--;
                 } while (result.rating != (
 #if !NO_NSFW
-                    ctx.Channel.GetEvaluatedNsfw() ? Rating.Explicit :
+                    ctx.Channel.GetEvaluatedNsfw()
+                        ? Rating.Explicit
+                        :
 #endif
                         Rating.Safe));
                 string val = Program.Rnd.Next(10000, 99999).ToString();
@@ -229,10 +148,12 @@ namespace Bot.Commands
             params string[] tags) =>
             await Booru(ctx,
 #if !NO_NSFW
-                ctx.Channel.GetEvaluatedNsfw() ? (ABooru) new Rule34() :
+                ctx.Channel.GetEvaluatedNsfw()
+                    ? (ABooru) new Rule34()
+                    :
 #endif
                     new Safebooru(), tags);
-        
+
 #if !NO_NSFW
         [Command("nonbooru")]
         [Aliases("d")]
@@ -486,7 +407,120 @@ namespace Bot.Commands
                 await ctx.RespondWithFileAsync(Path.GetFileName(page), client.OpenRead(page));
             }
         }
-        
+
+        [Command("xkcd")]
+        [Aliases("x")]
+        [Description("Gets a random image from xkcd")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Xkcd(CommandContext ctx)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                using WebClient client = new WebClient();
+                int c = Program.Rnd.Next(1,
+                    JObject.Parse(client.DownloadString("https://xkcd.com/info.0.json")).Value<int>("num") + 1);
+                JObject comic = JObject.Parse(client.DownloadString($"https://xkcd.com/{c}/info.0.json"));
+                string val = Program.Rnd.Next(10000, 99999).ToString();
+                await ctx.RespondWithFileAsync($"{val}_img.jpg",
+                    client.OpenRead(comic.Value<string>("img")), embed: new DiscordEmbedBuilder
+                    {
+                        Description = $"Transcript: {comic.Value<string>("alt")}",
+                        Title = comic.Value<string>("safe_title"),
+                        Url = $"https://xkcd.com/{c}/",
+                        Timestamp = new DateTime(int.Parse(comic.Value<string>("year")),
+                            int.Parse(comic.Value<string>("month")), int.Parse(comic.Value<string>("day")))
+                    }.Build());
+            }
+        }
+#if !NO_NSFW
+        //private static readonly List<string> JavMostCategories = new List<string>();
+#endif
+#if !NO_NSFW
+        [Command("4chan")]
+        [Aliases("4", "chan")]
+        [Description(
+            "Sends a random image from the board. If no board is specified, a list of boards will be displayed.")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Chan(CommandContext ctx)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                await ctx.RespondAsync(
+                    $"{string.Join(", ", JsonDeserializer.Deserialize<BoardListModel>(await Internet.DownloadString(@"https://a.4cdn.org/boards.json")).boards.Select(s => $"{s.Title} ({s.ShortName})"))}\r\nUsage: !4chan <ShortName>");
+            }
+        }
+
+        [Command("4chan")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Chan(CommandContext ctx, [Description("Board to select image from")]
+            Board board)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                if (ctx.Channel.GetEvaluatedNsfw())
+                {
+                    Thread[] threads = board.GetThreads().ToArray();
+                    Thread t = threads[Program.Rnd.Next(threads.Length)];
+                    using WebClient wClient = new WebClient();
+                    await ctx.RespondWithFileAsync($"{t.PostNumber}.jpg",
+                        wClient.OpenRead(t.Image.Image),
+                        $"https://boards.4channel.org/{t.Board.BoardId}/thread/{t.PostNumber}",
+                        embed: new DiscordEmbedBuilder
+                        {
+                            Author = new DiscordEmbedBuilder.EmbedAuthor {Name = t.Name},
+                            Timestamp = t.TimeCreated,
+                            Title = string.IsNullOrWhiteSpace(t.Subject) ? "Untitled" : t.Subject,
+                            Description = t.Message
+                        }.Build());
+                }
+                else
+                    await ctx.RespondAsync(
+                        "Due to the way 4chan users behave, this command is only allowed in NSFW channels");
+            }
+        }
+
+        [Command("waifu")]
+        [Aliases("w")]
+        [Description("Shows you a random waifu from thiswaifudoesnotexist.net")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Waifu(CommandContext ctx)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+                await Waifu(ctx, false);
+        }
+
+        [Command("waifu")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task Waifu(CommandContext ctx,
+            [Description("Set to true to force execution, even on non-NSFW channels")]
+            bool forceExecution)
+        {
+            if (ctx.Channel.Get(ConfigManager.Enabled)
+                .AND(ctx.Channel.GetMethodEnabled()))
+            {
+                await ctx.TriggerTypingAsync();
+                if (ctx.Channel.GetEvaluatedNsfw() || forceExecution)
+                {
+                    int img = Program.Rnd.Next(6000);
+                    using WebClient wClient = new WebClient();
+                    await ctx.RespondWithFileAsync($"{img}.jpg",
+                        wClient.OpenRead($"https://www.thiswaifudoesnotexist.net/example-{img}.jpg"),
+                        "There.");
+                }
+                else
+                    await ctx.RespondAsync(
+                        "The generated waifus might not be something you want to be looking at at work. You can override this.");
+            }
+        }
+#endif
+
 #if !NO_NSFW
 
         [Command("sauce")]
@@ -557,32 +591,5 @@ namespace Bot.Commands
             }
         }
 #endif
-
-        [Command("xkcd")]
-        [Aliases("x")]
-        [Description("Gets a random image from xkcd")]
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task Xkcd(CommandContext ctx)
-        {
-            if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
-            {
-                await ctx.TriggerTypingAsync();
-                using WebClient client = new WebClient();
-                int c = Program.Rnd.Next(1,
-                    JObject.Parse(client.DownloadString("https://xkcd.com/info.0.json")).Value<int>("num") + 1);
-                JObject comic = JObject.Parse(client.DownloadString($"https://xkcd.com/{c}/info.0.json"));
-                string val = Program.Rnd.Next(10000, 99999).ToString();
-                await ctx.RespondWithFileAsync($"{val}_img.jpg",
-                    client.OpenRead(comic.Value<string>("img")), embed: new DiscordEmbedBuilder
-                    {
-                        Description = $"Transcript: {comic.Value<string>("alt")}",
-                        Title = comic.Value<string>("safe_title"),
-                        Url = $"https://xkcd.com/{c}/",
-                        Timestamp = new DateTime(int.Parse(comic.Value<string>("year")),
-                            int.Parse(comic.Value<string>("month")), int.Parse(comic.Value<string>("day")))
-                    }.Build());
-            }
-        }
     }
 }

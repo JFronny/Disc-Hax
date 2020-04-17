@@ -28,7 +28,7 @@ namespace Bot.Commands
                 api.ApiKey("trnsl.1.1.20200118T180605Z.654f2ec649458c36.107c6ad38dc02937f25e660aa1f8f4097d6561a8")
                     .Format(ApiDataFormat.Json));
         }
-        
+
 #if !NO_NSFW
 
         [Command("urban")]
@@ -47,25 +47,39 @@ namespace Bot.Commands
                     using WebClient c = new WebClient();
                     JObject result = (JObject) JObject.Parse(c.DownloadString(
                         $"https://api.urbandictionary.com/v0/define?term={Uri.EscapeUriString(term)}"))["list"][0];
-                    await ctx.RespondAsync(embed: new DiscordEmbedBuilder
+                    string definition = result.Value<string>("definition") ?? "";
+                    definition = string.IsNullOrWhiteSpace(definition) ? "Not found" : definition;
+                    string example = result.Value<string>("example") ?? "";
+                    example = string.IsNullOrWhiteSpace(example) ? "Not found" : example;
+                    string word = result.Value<string>("word") ?? "";
+                    word = string.IsNullOrWhiteSpace(word) ? "Not found" : word;
+                    string author = result.Value<string>("author") ?? "";
+                    author = string.IsNullOrWhiteSpace(author) ? "Not found" : author;
+                    string url =
+                        $"https://www.urbandictionary.com/author.php?author={Uri.EscapeUriString(result.Value<string>("author"))}";
+                    Console.WriteLine(author);
+                    Console.WriteLine(url);
+                    DiscordEmbed embed = new DiscordEmbedBuilder
                         {
-                            Title = result.Value<string>("word"),
+                            Title = word,
                             Author = new DiscordEmbedBuilder.EmbedAuthor
                             {
-                                Name = result.Value<string>("author"),
-                                Url =
-                                    $"https://www.urbandictionary.com/author.php?author={Uri.EscapeUriString(result.Value<string>("author"))}"
+                                Name = author,
+                                //Url = url
                             },
                             Url = result.Value<string>("permalink"),
                             Footer = new DiscordEmbedBuilder.EmbedFooter
                             {
                                 Text = $"{result.Value<string>("thumbs_up")}+ {result.Value<string>("thumbs_down")}-"
                             },
-                            Timestamp = DateTime.TryParse(result.Value<string>("written_on"), out DateTime t) ? t.Date : new DateTime(2000, 1, 1)
+                            Timestamp = DateTime.TryParse(result.Value<string>("written_on"), out DateTime t)
+                                ? t.Date
+                                : new DateTime(2000, 1, 1)
                         }
-                        .AddField("Definition", result.Value<string>("definition"))
-                        .AddField("Example", result.Value<string>("example"))
-                        .Build());
+                        .AddField("Definition", definition)
+                        .AddField("Example", example)
+                        .Build();
+                    await ctx.RespondAsync(embed: embed);
                 }
                 else
                     await ctx.RespondAsync("NSFW Channels only!");

@@ -87,7 +87,9 @@ namespace Bot.Commands
                 await ctx.TriggerTypingAsync();
                 string[] quotes =
 #if !NO_NSFW
-                    ctx.Channel.GetEvaluatedNsfw() ? FortunequotesOff : 
+                    ctx.Channel.GetEvaluatedNsfw()
+                        ? FortunequotesOff
+                        :
 #endif
                         Fortunequotes;
                 await ctx.RespondAsyncFix(quotes[Program.Rnd.Next(quotes.Length)], true);

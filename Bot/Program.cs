@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using Bot.Commands;
-using Bot.Converters;
 using CC_Functions.Misc;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -17,19 +12,17 @@ using Octokit;
 using Shared;
 using Shared.Config;
 using Application = Eto.Forms.Application;
-using Language = Bot.Commands.Language;
-using Math = Bot.Commands.Math;
 
 namespace Bot
 {
     internal static class Program
     {
         public static readonly Random Rnd = new Random();
-        public static DiscordClient? Bot;
+        public static DiscordClient? client;
         public static GitHubClient? Github;
         public static Perspective? Perspective;
         public static DateTime Start = DateTime.Now;
-        public static bool Exit = false;
+        public static bool Exit;
         private static CommandsNextExtension? Commands { get; set; }
 
         [STAThread]
@@ -60,134 +53,57 @@ namespace Bot
 #endif
                 UseInternalLogHandler = false
             };
-            Bot = new DiscordClient(cfg);
-            Commands = Bot.UseCommandsNext(new CommandsNextConfiguration
+            client = new DiscordClient(cfg);
+            Commands = client.UseCommandsNext(new CommandsNextConfiguration
             {
                 StringPrefixes = new string[0],
                 EnableDms = false,
                 PrefixResolver = async msg =>
                 {
+                    if (msg.Author.IsBot)
+                        return -1;
                     string prefix = msg.Channel.Get(ConfigManager.Prefix, Common.Prefix);
-                    string content = msg.Content;
+                    string content = msg.Content.TrimStart(' ');
                     if (content.StartsWith(prefix))
                     {
                         if (content.StartsWith($"{prefix} "))
                             return prefix.Length + 1;
                         return prefix.Length;
                     }
-                    if (!content.StartsWith(Bot.CurrentUser.Mention)) return -1;
-                    if (content.StartsWith($"{Bot.CurrentUser.Mention} "))
-                        return Bot.CurrentUser.Mention.Length + 1;
-                    return Bot.CurrentUser.Mention.Length;
+                    if (!content.StartsWith(client.CurrentUser.Mention)) return -1;
+                    if (content.StartsWith($"{client.CurrentUser.Mention} "))
+                        return client.CurrentUser.Mention.Length + 1;
+                    return client.CurrentUser.Mention.Length;
                 }
             });
             Commands.CommandExecuted += Commands_CommandExecuted;
             Commands.CommandErrored += Commands_CommandErrored;
-            Bot.UseInteractivity(new InteractivityConfiguration
+            client.UseInteractivity(new InteractivityConfiguration
             {
                 PaginationBehaviour = PaginationBehaviour.Ignore,
                 Timeout = TimeSpan.FromMinutes(2)
             });
-            Commands.RegisterCommands<Administration>();
-            Commands.RegisterCommands<ImageBoards>();
-            Commands.RegisterCommands<Japan>();
-            Commands.RegisterCommands<Language>();
-            Commands.RegisterCommands<LocalStats>();
-            Commands.RegisterCommands<Math>();
-            Commands.RegisterCommands<Minigames>();
-            Commands.RegisterCommands<Misc>();
-            Commands.RegisterCommands<Money>();
-            Commands.RegisterCommands<PublicStats>();
-            Commands.RegisterCommands<Quotes>();
-            Commands.RegisterCommands<ReactionRoles>();
-            Commands.RegisterConverter(new BoardConv());
-            Commands.RegisterConverter(new BooruConv());
-            Commands.RegisterConverter(new CurrencyConv());
-            Commands.RegisterConverter(new DoujinEnumConv());
-            Commands.RegisterConverter(new RpsOptionConv());
-            Commands.SetHelpFormatter<HelpFormatter>();
-            Bot.DebugLogger.LogMessageReceived += DebugLogger_LogMessageReceived;
-            Bot.Ready += Bot_Ready;
-            Bot.MessageCreated += AddMessage;
-            Bot.ClientErrored += Bot_ClientErrored;
-            Bot.ConnectAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            Commands.RegisterAll();
+            client.DebugLogger.LogMessageReceived += DebugLogger_LogMessageReceived;
+            client.Ready += ClientReady;
+            client.MessageCreated += AddMessage;
+            client.ClientErrored += ClientClientErrored;
+            client.ConnectAsync().ConfigureAwait(false).GetAwaiter().GetResult();
             while (!Exit)
-                try
-                {
-                    if (Console.KeyAvailable && Console.Read() == 'x')
-                    {
-                        Exit = true;
-                        continue;
-                    }
-                    Thread.Sleep(5000);
-#if !NO_TIMED_BAN
-                    if (Bot == null) return;
-                    foreach (KeyValuePair<ulong, DiscordGuild> guild in Bot.Guilds)
-                        guild.Value.EvalBans();
-#endif
-                }
-                catch (Exception e)
-                {
-#if NO_TIMED_BAN
-                    Bot.DebugLogger.LogMessage(LogLevel.Error, "DiscHax",
-                        $"A crash occured in the main Thread: {e}", DateTime.Now, e);
-#else
-                    Bot.DebugLogger.LogMessage(LogLevel.Error, "DiscHax",
-                        $"A crash occured in the ban-evaluation Thread: {e}", DateTime.Now, e);
-#endif
-                }
-                finally
-                {
-                    try
-                    {
-                        foreach (KeyValuePair<ulong, DiscordGuild> guild in Bot.Guilds)
-                        {
-                            Dictionary<string,DiscordRole> roles = guild.Value.GetReactionRoles();
-                            (ulong? channel, ulong? message) = guild.Value.GetReactionRoleMessage() ?? new Tuple<ulong?, ulong?>(0, 0);
-                            if (channel == 0 || message == 0) continue;
-                            DiscordMessage msg =  
-                                Bot.GetChannelAsync(channel.Value).Result.GetMessageAsync(message.Value).Result;
-                            foreach (DiscordEmoji disallowed in msg.Reactions.Where(s => !s.IsMe).Select(s => s.Emoji))
-                                msg.DeleteReactionsEmojiAsync(disallowed);
-                            foreach (KeyValuePair<string,DiscordRole> role in roles)
-                            {
-                                Func<DiscordReaction, bool> selector = s =>
-                                    s.IsMe && s.Emoji.GetDiscordName() == role.Key;
-                                DiscordEmoji emoji = DiscordEmoji.FromName(Bot, role.Key);
-                                if (!msg.Reactions.Any(selector)) msg.CreateReactionAsync(emoji);
-                                IReadOnlyList<DiscordUser> reactions = msg.GetReactionsAsync(emoji).Result;
-                                foreach (KeyValuePair<ulong,DiscordMember> member in guild.Value.Members)
-                                {
-                                    bool inGroup = member.Value.Roles.Contains(role.Value);
-                                    bool shouldBe = reactions.Contains(member.Value);
-                                    if (inGroup == shouldBe) continue;
-                                    if (shouldBe)
-                                        member.Value.GrantRoleAsync(role.Value);
-                                    else
-                                        member.Value.RevokeRoleAsync(role.Value);
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Bot.DebugLogger.LogMessage(LogLevel.Error, "DiscHax",
-                            $"A crash occured in the reaction-roles Thread: {e}", DateTime.Now, e);
-                    }
-                }
-            Bot?.DisconnectAsync().GetAwaiter().GetResult();
-            Bot?.Dispose();
-            Bot = null;
+                Exit = ProcessLoop.RunIteration(client);
+            client?.DisconnectAsync().GetAwaiter().GetResult();
+            client?.Dispose();
+            client = null;
         }
 
-        private static Task Bot_Ready(ReadyEventArgs e)
+        private static Task ClientReady(ReadyEventArgs e)
         {
-            Bot.DebugLogger.LogMessage(LogLevel.Info, "DiscHax", "Ready!", DateTime.Now);
-            Bot.DebugLogger.LogMessage(LogLevel.Info, "DiscHax",
+            client.DebugLogger.LogMessage(LogLevel.Info, "DiscHax", "Ready!", DateTime.Now);
+            client.DebugLogger.LogMessage(LogLevel.Info, "DiscHax",
                 $"Your invite Link: https://discordapp.com/oauth2/authorize?client_id={e.Client.CurrentApplication.Id}&scope=bot&permissions=8",
                 DateTime.Now);
-            Bot.DebugLogger.LogMessage(LogLevel.Info, "DiscHax", "Enter \"x\" to stop", DateTime.Now);
-            Bot.UpdateStatusAsync(new DiscordActivity("help", ActivityType.ListeningTo));
+            client.DebugLogger.LogMessage(LogLevel.Info, "DiscHax", "Enter \"x\" to stop", DateTime.Now);
+            client.UpdateStatusAsync(new DiscordActivity("help", ActivityType.ListeningTo));
             return Task.CompletedTask;
         }
 
@@ -195,14 +111,14 @@ namespace Bot
         {
             if (!e.Author.IsBot)
                 e.Guild.IncrementMoney(e.Guild.Members[e.Author.Id],
-                    Rnd.Next(0, System.Math.Max(e.Message.Content.Length / 25, 20)));
-            Bot.UpdateStatusAsync(new DiscordActivity("help", ActivityType.ListeningTo));
+                    Rnd.Next(0, Math.Max(e.Message.Content.Length / 25, 20)));
+            client.UpdateStatusAsync(new DiscordActivity("help", ActivityType.ListeningTo));
             return Task.CompletedTask;
         }
 
-        private static Task Bot_ClientErrored(ClientErrorEventArgs e)
+        private static Task ClientClientErrored(ClientErrorEventArgs e)
         {
-            Bot.DebugLogger.LogMessage(LogLevel.Error, "DiscHax", $"Exception in {e.EventName}: {e.Exception}",
+            client.DebugLogger.LogMessage(LogLevel.Error, "DiscHax", $"Exception in {e.EventName}: {e.Exception}",
                 DateTime.Now);
             return Task.CompletedTask;
         }

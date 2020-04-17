@@ -34,7 +34,7 @@ namespace Bot.Commands
             Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
             if (channel.Get(ConfigManager.Enabled).TRUE())
-                await postMessage($"Pong! ({Program.Bot.Ping}ms)", false, null);
+                await postMessage($"Pong! ({Program.client.Ping}ms)", false, null);
         }
 
         [Command("ban")]

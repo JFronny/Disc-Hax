@@ -268,7 +268,8 @@ namespace Bot.Commands
         [Aliases("tag", "guesser", "tagguesser", "guess")]
         [Description("Generate a minesweeper field")]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task TagGuesser(CommandContext ctx, [Description("The amount of time the game will run for")] TimeSpan? gameTime = null)
+        public async Task TagGuesser(CommandContext ctx, [Description("The amount of time the game will run for")]
+            TimeSpan? gameTime = null)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
                 .AND(ctx.Channel.GetMethodEnabled()))
@@ -279,12 +280,12 @@ namespace Bot.Commands
                     throw new ArgumentOutOfRangeException("Please choose a smaller time");
                 InteractivityExtension ext = ctx.Client.GetInteractivity();
                 ABooru booru = ImageBoards.BooruDict.Select(s => s.Value)
-                    .Where(s => 
+                    .Where(s =>
                         s.IsSafe()
 #if !NO_NSFW
                         == !ctx.Channel.GetEvaluatedNsfw()
 #endif
-                        )
+                    )
                     .OrderBy(s => Program.Rnd.NextDouble()).First();
                 SearchResult result = new SearchResult();
                 int triesLeft = 10;
@@ -304,11 +305,13 @@ namespace Bot.Commands
                 } while (result.rating !=
                          (
 #if !NO_NSFW
-                             ctx.Channel.GetEvaluatedNsfw() ? Rating.Explicit :
+                             ctx.Channel.GetEvaluatedNsfw()
+                                 ? Rating.Explicit
+                                 :
 #endif
-                             Rating.Safe
-                             )
-                         );
+                                 Rating.Safe
+                         )
+                );
                 string val = Program.Rnd.Next(10000, 99999).ToString();
                 using WebClient wClient = new WebClient();
                 List<string> found = new List<string>();
@@ -322,7 +325,8 @@ namespace Bot.Commands
                 DateTime tmp = DateTime.Now;
                 do
                 {
-                    InteractivityResult<DiscordMessage> res = await ext.WaitForMessageAsync(s => true, tmp + gameTime - DateTime.Now);
+                    InteractivityResult<DiscordMessage> res =
+                        await ext.WaitForMessageAsync(s => true, tmp + gameTime - DateTime.Now);
                     if (res.TimedOut) continue;
                     if (found.Contains(res.Result.Content.ToLower()) || !tags.Any(s =>
                         string.Equals(s, res.Result.Content, StringComparison.CurrentCultureIgnoreCase))) continue;
@@ -332,11 +336,14 @@ namespace Bot.Commands
                     scores[res.Result.Author]++;
                     await ctx.RespondAsync($"+1 for {res.Result.Author.Username}");
                 } while (DateTime.Now - tmp < gameTime);
-                IOrderedEnumerable<KeyValuePair<DiscordUser, int>> orderedScore = scores.OrderByDescending(s => s.Value);
+                IOrderedEnumerable<KeyValuePair<DiscordUser, int>>
+                    orderedScore = scores.OrderByDescending(s => s.Value);
                 if (scores.Count > 3)
-                    await ctx.RespondAsync(string.Join("\n", orderedScore.Take(3).Select(s => $"{s.Key.Username}: {s.Value.ToString().Emotify()}")));
+                    await ctx.RespondAsync(string.Join("\n",
+                        orderedScore.Take(3).Select(s => $"{s.Key.Username}: {s.Value.ToString().Emotify()}")));
                 else
-                    await ctx.RespondAsync(string.Join("\n", orderedScore.Select(s => $"{s.Key.Username}: {s.Value.ToString().Emotify()}")));
+                    await ctx.RespondAsync(string.Join("\n",
+                        orderedScore.Select(s => $"{s.Key.Username}: {s.Value.ToString().Emotify()}")));
             }
         }
     }

@@ -18,7 +18,7 @@ namespace Shared
         public static bool GetEvaluatedNsfw(this DiscordChannel channel) =>
             channel.IsNSFW || channel.Get(ConfigManager.Nsfw, false).TRUE();
 #endif
-        
+
         public static string Emotify(this string self)
         {
             return string.Join("", self.ToLower().ToCharArray().Select(s =>

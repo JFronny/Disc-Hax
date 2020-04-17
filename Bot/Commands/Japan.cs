@@ -78,8 +78,7 @@ namespace Bot.Commands
                 embed.AddField("Release date",
                     HasValue<string>(att, "startDate")
                         ? HasValue<string>(att, "endDate")
-                            ?
-                            $"{att.Value<string>("startDate")} - {att.Value<string>("endDate")}"
+                            ? $"{att.Value<string>("startDate")} - {att.Value<string>("endDate")}"
                             : att.Value<string>("startDate")
                         : "To be announced", true);
                 string img = att["posterImage"].Value<string>("original");

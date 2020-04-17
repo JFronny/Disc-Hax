@@ -38,7 +38,7 @@ Uptime: {(DateTime.Now - Program.Start).GetReadable()}");
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync($"Currently connected to {Program.Bot.Guilds.Count} Guilds");
+                await ctx.RespondAsync($"Currently connected to {Program.client.Guilds.Count} Guilds");
             }
         }
 

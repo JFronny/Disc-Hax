@@ -22,7 +22,8 @@ namespace Bot.Commands
         [RequirePermissions(Permissions.Administrator)]
         [Description("Bind ReactionRoles to a new guild-wide message")]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task Bind(CommandContext ctx, [Description("Channel to post in, defaults to current")] DiscordChannel? channel = null)
+        public async Task Bind(CommandContext ctx, [Description("Channel to post in, defaults to current")]
+            DiscordChannel? channel = null)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
                 .AND(ctx.Channel.GetMethodEnabled()))
@@ -32,7 +33,7 @@ namespace Bot.Commands
                 await Bind(ctx, await channel.SendMessageAsync("Please react to this message to get your roles"));
             }
         }
-        
+
         [Command("bind")]
         [RequirePermissions(Permissions.Administrator)]
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -46,7 +47,7 @@ namespace Bot.Commands
                 await ctx.RespondAsync("Successfully wrote key");
             }
         }
-        
+
         [Command("unbind")]
         [RequirePermissions(Permissions.Administrator)]
         [Description("Unbind ReactionRoles")]
@@ -57,20 +58,22 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                (ulong? channel, ulong? message) = ctx.Guild.GetReactionRoleMessage() ?? throw new Exception("Most likely already unbound");
+                (ulong? channel, ulong? message) = ctx.Guild.GetReactionRoleMessage() ??
+                                                   throw new Exception("Most likely already unbound");
                 if (!channel.HasValue || !message.HasValue)
                 {
                     await ctx.RespondAsync("Already unbound");
                     return;
                 }
-                DiscordMessage msg = await (await ctx.Client.GetChannelAsync(channel.Value)).GetMessageAsync(message.Value);
+                DiscordMessage msg =
+                    await (await ctx.Client.GetChannelAsync(channel.Value)).GetMessageAsync(message.Value);
                 if (msg.Author.IsCurrent)
                     await msg.DeleteAsync();
                 ctx.Guild.SetReactionRoleMessage(null);
                 await ctx.RespondAsync("Done.");
             }
         }
-        
+
         [Command("list")]
         [Aliases("ls")]
         [Description("List all registered roles")]
@@ -88,21 +91,20 @@ namespace Bot.Commands
                 {
                     string text = "";
                     foreach (KeyValuePair<string, DiscordRole> pair in roles)
-                    {
                         //DiscordEmoji emoticon = await ctx.Guild.GetEmojiAsync(pair.Key);
                         text += $"{pair.Key} - {pair.Value.Name}\n";
-                    }
                     await ctx.RespondPaginatedIfTooLong(text.Remove(text.Length - 1));
                 }
             }
         }
-        
+
         [Command("add")]
         [RequirePermissions(Permissions.Administrator)]
         [Aliases("create")]
         [Description("Binds a new role and emoji to RR")]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task Add(CommandContext ctx, [Description("The emoji to bind")] DiscordEmoji emoji, [Description("The role to bind")] DiscordRole role)
+        public async Task Add(CommandContext ctx, [Description("The emoji to bind")] DiscordEmoji emoji,
+            [Description("The role to bind")] DiscordRole role)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
                 .AND(ctx.Channel.GetMethodEnabled()))
@@ -126,7 +128,7 @@ namespace Bot.Commands
                 await ctx.RespondAsync("Done!");
             }
         }
-        
+
         [Command("remove")]
         [RequirePermissions(Permissions.Administrator)]
         [Aliases("rm", "del")]
@@ -144,7 +146,7 @@ namespace Bot.Commands
                 await ctx.RespondAsync("Done!");
             }
         }
-        
+
         [Command("remove")]
         [RequirePermissions(Permissions.Administrator)]
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -160,7 +162,7 @@ namespace Bot.Commands
                 await ctx.RespondAsync("Done!");
             }
         }
-        
+
         [Command("clear")]
         [RequirePermissions(Permissions.Administrator)]
         [Description("Unbinds all roles from RR")]
@@ -175,7 +177,7 @@ namespace Bot.Commands
                 await ctx.RespondAsync("Done!");
             }
         }
-        
+
         [Command("jumplink")]
         [RequirePermissions(Permissions.Administrator)]
         [Aliases("jump", "link")]
@@ -187,8 +189,11 @@ namespace Bot.Commands
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                (ulong? channel, ulong? message) = ctx.Guild.GetReactionRoleMessage() ?? throw new Exception("No message is configured in your guild");
-                await ctx.RespondAsync((await (await ctx.Client.GetChannelAsync(channel.Value)).GetMessageAsync(message.Value)).JumpLink.AbsoluteUri);
+                (ulong? channel, ulong? message) = ctx.Guild.GetReactionRoleMessage() ??
+                                                   throw new Exception("No message is configured in your guild");
+                await ctx.RespondAsync(
+                    (await (await ctx.Client.GetChannelAsync(channel.Value)).GetMessageAsync(message.Value)).JumpLink
+                    .AbsoluteUri);
             }
         }
     }
