@@ -118,9 +118,7 @@ namespace Bot.Commands.Misc
                 currentPlayerIs1 = !currentPlayerIs1;
                 ReversiBoard.Color player = currentPlayerIs1 ? ReversiBoard.Color.White : ReversiBoard.Color.Black;
                 string renderedBoard = "";
-                renderedBoard += @"```
-    A B C D E F G H
-    ┌─┬─┬─┬─┬─┬─┬─┬─┐";
+                renderedBoard += "```\n  A B C D E F G H\n ┌─┬─┬─┬─┬─┬─┬─┬─┐";
                 for (int y = 0; y < 8; y++)
                 {
                     if (y != 0)
@@ -135,9 +133,7 @@ namespace Bot.Commands.Misc
                             _ => throw new ArgumentOutOfRangeException()
                         } + "│";
                 }
-                renderedBoard += @"
-    └─┴─┴─┴─┴─┴─┴─┴─┘
-    ```";
+                renderedBoard += "\n └─┴─┴─┴─┴─┴─┴─┴─┘\n```";
                 if (!b.HasAnyValidMove(player))
                 {
                     if (!b.HasAnyValidMove(ReversiBoard.Invert(player)))
@@ -166,11 +162,13 @@ namespace Bot.Commands.Misc
                         "Just respond with your column and row within one minute when it is your turn\n(eg: \"A5\")")
                     .Build());
                 bool reading = true;
+
+                DateTime trg = DateTime.Now + new TimeSpan(0, 1, 0);
                 while (reading)
                 {
                     InteractivityResult<DiscordMessage> response =
                         await ctx.Channel.GetNextMessageAsync(currentPlayerIs1 ? player1 : player2,
-                            new TimeSpan(0, 1, 0));
+                            trg - DateTime.Now);
                     if (response.TimedOut)
                     {
                         await ctx.RespondAsync("Timed out.");
