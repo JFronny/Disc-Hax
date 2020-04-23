@@ -116,7 +116,7 @@ namespace Bot.Commands.Misc
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsyncFix(text.Emotify());
+                await ctx.RespondAsync(text.Emotify());
             }
         }
 
