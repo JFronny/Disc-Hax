@@ -121,11 +121,8 @@ namespace Bot.Commands.Administration
         [RequireUserPermissions(Permissions.Administrator)]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public Task ConfigCmd(CommandContext ctx, [Description("Config element to change")]
-            string element, [Description("New value")] string value)
-        {
-            foreach ((ulong _, DiscordChannel channel) in ctx.Guild.Channels) channel.Reset(value);
-            return ConfigCmd(ctx, ctx.Guild, element, value);
-        }
+            string element, [Description("New value")] string value) =>
+            ConfigCmd(ctx, ctx.Guild, element, value);
 
         [Command("config")]
         [RequireUserPermissions(Permissions.Administrator)]
@@ -151,19 +148,16 @@ namespace Bot.Commands.Administration
                 else if (!CommandArr.GetCommandNames().Contains(element))
                     throw new ArgumentException($"Element ({element}) not in CommandArr");
                 else
+                    target.Set(element, (await ctx.Client.GetCommandsNext().ConvertArgument<bool>(value, ctx)).ToString());
+                if (target is DiscordGuild guild)
                 {
-                    if (target is DiscordGuild guild)
+                    if (string.Equals(element, ConfigManager.Enabled, StringComparison.CurrentCultureIgnoreCase))
                     {
-                        if (string.Equals(element, ConfigManager.Enabled, StringComparison.CurrentCultureIgnoreCase))
-                        {
-                            await ctx.RespondAsync("Please do not EVER set \"enabled\" to false globally!");
-                            return;
-                        }
-                        foreach ((ulong _, DiscordChannel channel) in guild.Channels)
-                            await ConfigCmd(ctx, channel, element, value, true);
+                        await ctx.RespondAsync("Please do not EVER set \"enabled\" to false globally!");
+                        return;
                     }
-                    target.Set(element,
-                        (await ctx.Client.GetCommandsNext().ConvertArgument<bool>(value, ctx)).ToString());
+                    foreach ((ulong _, DiscordChannel channel) in guild.Channels)
+                        await ConfigCmd(ctx, channel, element, value, true);
                 }
                 if (!noComment)
                     await ctx.RespondAsync($"Set {element} to {value}");
