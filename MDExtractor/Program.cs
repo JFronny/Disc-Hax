@@ -28,7 +28,7 @@ Features:";
             }
             
             Assembly bot = typeof(Bot.Program).Assembly;
-            IEnumerable<Type> groups = bot.GetTypes().Where(HasAtt<GroupAttribute>);
+            IEnumerable<Type> groups = bot.GetTypes().Where(HasAtt<GroupAttribute>).OrderBy(s => GetAtt<GroupAttribute>(s).Name);
             MD += $@"
 - ~{Math.Round(groups.SelectMany(GetCommands).Count() * 0.1f) * 10} powerful commands (state: {DateTime.Now.ToString(CultureInfo.InvariantCulture.DateTimeFormat.LongDatePattern, CultureInfo.InvariantCulture.DateTimeFormat)})
 ";
@@ -38,8 +38,8 @@ Features:";
                 string ret = $@"  - {GetAtt<GroupAttribute>(s).Name}: {GetAtt<DescriptionAttribute>(s).Description}
 ";
                 ret += string.Join(@"
-", GetCommands(s).Select(s =>
-                    $"    - {s.Name}: {GetAtt<DescriptionAttribute>(s).Description}"));
+", GetCommands(s).OrderBy(s => GetAtt<CommandAttribute>(s).Name).Select(s =>
+                    $"    - {GetAtt<CommandAttribute>(s).Name}: {GetAtt<DescriptionAttribute>(s).Description}"));
                 return ret;
             }));
             MD += @"
