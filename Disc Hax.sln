@@ -42,6 +42,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minesweeper", "Minesweeper\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reversi", "Reversi\Reversi.csproj", "{E9505B84-E120-4A54-B66F-94995048C9D0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MDExtractor", "MDExtractor\MDExtractor.csproj", "{16206D10-EDB6-48F8-8A2F-2EDBBC131FF4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -104,6 +106,10 @@ Global
 		{E9505B84-E120-4A54-B66F-94995048C9D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9505B84-E120-4A54-B66F-94995048C9D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9505B84-E120-4A54-B66F-94995048C9D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16206D10-EDB6-48F8-8A2F-2EDBBC131FF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16206D10-EDB6-48F8-8A2F-2EDBBC131FF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16206D10-EDB6-48F8-8A2F-2EDBBC131FF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16206D10-EDB6-48F8-8A2F-2EDBBC131FF4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -123,6 +129,7 @@ Global
 		{2148E9EB-144A-418A-A8AA-6FC0497FDCB7} = {58AA2CDA-66A3-45F2-96EB-90E3EE355663}
 		{D8232DA6-6B13-4D62-A58C-231FD59BE293} = {58AA2CDA-66A3-45F2-96EB-90E3EE355663}
 		{E9505B84-E120-4A54-B66F-94995048C9D0} = {58AA2CDA-66A3-45F2-96EB-90E3EE355663}
+		{16206D10-EDB6-48F8-8A2F-2EDBBC131FF4} = {58AA2CDA-66A3-45F2-96EB-90E3EE355663}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CAE17A9D-510E-4412-9865-E484487781F7}

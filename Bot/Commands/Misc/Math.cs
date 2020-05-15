@@ -21,7 +21,7 @@ namespace Bot.Commands.Misc
     {
         [Command("calc")]
         [Description(
-            "Calculates a result using mathparser.org\r\nExamples: \"sin(15^2)\", \"15 * (-12)\", \"solve( 2 * x - 4, x, 0, 10 )\", \"log(4, 2)\"\r\nRemember: sin() etc use radians! 2*pi radians equals 360°")]
+            "Calculates a result using mathparser.org. Example: \"sin(15^2)\", \"15 * (-12)\", \"solve( 2 * x - 4, x, 0, 10 )\", \"log(4, 2)\" - Please note: sin() etc use radians! 2*pi radians equals 360°")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Calc(CommandContext ctx, [Description("Equation")] [RemainingText]
             string equation)
@@ -43,7 +43,7 @@ namespace Bot.Commands.Misc
 
         [Command("solve")]
         [Description(
-            "Solve a mathematical function. See calc for extra help.\r\nExample: \"solve x -100 100 3 * x * 2 = 15 * x\"")]
+            "Solve a mathematical function. See calc for extra help. Example: \"solve x -100 100 3 * x * 2 = 15 * x\"")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Solve(CommandContext ctx, [Description("Variable to calculate")] string target,
             [Description("Minimum value for result")]
@@ -65,7 +65,7 @@ namespace Bot.Commands.Misc
 
         [Command("graph")]
         [Description(
-            "Generates a x-based graph (variable x will be set), see \"calc\" for syntax\r\nExample: graph x + 15")]
+            "Generates a x-based graph (variable x will be set), see \"calc\" for syntax. Example: graph x + 15")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Graph(CommandContext ctx, [Description("Equation")] [RemainingText]
             string equation)

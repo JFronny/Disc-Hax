@@ -15,7 +15,7 @@ using Application = Eto.Forms.Application;
 
 namespace Bot
 {
-    internal static class Program
+    public static class Program
     {
         public static readonly Random Rnd = new Random();
         public static DiscordClient? client;

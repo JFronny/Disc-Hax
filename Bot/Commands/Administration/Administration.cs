@@ -119,6 +119,7 @@ namespace Bot.Commands.Administration
         }
 
         [Command("sudo")]
+        [Description("Debug command - don't use!")]
         [Hidden]
         [RequireOwner]
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -137,12 +138,14 @@ namespace Bot.Commands.Administration
         }
 
         [Command("stop")]
+        [Description("Debug command - don't use!")]
         [Hidden]
         [RequireOwner]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task Stop(CommandContext ctx) => Program.Exit = true;
 
         [Command("clean")]
+        [Description("Debug command - don't use!")]
         [Hidden]
         [RequireOwner]
         [MethodImpl(MethodImplOptions.NoInlining)]
