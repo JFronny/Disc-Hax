@@ -1,0 +1,123 @@
+# Disc-Hax
+A powerful multi-purpose discord bot!
+[![CodeFactor](https://www.codefactor.io/repository/github/jfronny/disc-hax/badge)](https://www.codefactor.io/repository/github/jfronny/disc-hax)
+[![Discord](https://img.shields.io/discord/466965965658128384?label=Discord)](https://discord.gg/UjhHBqt)
+
+Features:
+- ~90 powerful commands (state: Saturday, 16 May 2020)
+  - admin: Commands for administration and debugging
+    - announce: Post a message containing the specified text to a channel
+    - avatar: Gets the avatar of the specified user
+    - ban: Bans the selected user
+    - bans: Lists all banned users
+    - clean: Debug command - don't use!
+    - config: Prints or changes the config for this channel/guild (empty for guild). You can also set all commands in a group by using "group_[NAME]"
+    - cooldown: Sets a custom cooldown for this channel
+    - deaf: (Un)Deafen the member
+    - kick: Kicks the member
+    - mute: (Un)Mutes the member
+    - nick: Gives the member a new nickname
+    - ping: Responds with "Pong" if the bot is active
+    - purge: Purge commands by user or regex
+    - remove-bots: Remove the role from all members that are bots
+    - remove-humans: Remove the role from all members that are not bots
+    - reset-config: Reverts all configs
+    - role-color: Set a roles color
+    - role-hoist: Set grouping behaviour
+    - role-mentionable: Change a roles mentionability
+    - role-name: Set a roles name
+    - softban: Kicks the member and deletes their messages
+    - stop: Debug command - don't use!
+    - sudo: Debug command - don't use!
+    - unban: Unbans the selected user
+  - board: Commands to get random images from image-boards around the interwebz
+    - 4chan: Sends a random image from the board. If no board is specified, a list of boards will be displayed.
+    - booru: Shows a random Image from your favourite *booru. See "booru" for a full list
+    - inspirobot: Gets a random image from inspirobot
+    - nonbooru: Shows a random non-booru from your favourite source. See "doujinshi ls" for a full list
+    - reddit: Shows a post from reddit
+    - sauce: Gets the source for an image (provided as an attachment or url)
+    - waifu: Shows you a random waifu from thiswaifudoesnotexist.net
+    - xkcd: Gets a random image from xkcd
+  - game: Simple games
+    - reversi: Play Reversi
+    - rps: Play Rock-Paper-Scissors
+    - slots: Play Slots. No arguments for values
+    - sweeper: Generate a minesweeper field
+    - tag-guesser: Generate a minesweeper field
+  - info: Information that is unique to this server
+    - channel: Prints out information about the specified channel
+    - guild: Prints out information about the current guild
+    - member: Prints out information about the specified member
+    - role: Prints out information about the specified role
+    - user: Prints out information about the specified user
+  - japan: Commands for translation and dictionaries
+    - anime: Give information about an anime
+    - manga: Give information about a manga
+  - lang: Commands for translation and dictionaries
+    - corrupt: Corrupt text by translating it over and over
+    - detect: Detect the language of the string
+    - translate: Translate a short piece of text
+    - urban: Search urban dictionary for a term
+  - Math: Commands for calculating. Also includes money conversion
+    - calc: Calculates a result using mathparser.org. Example: "sin(15^2)", "15 * (-12)", "solve( 2 * x - 4, x, 0, 10 )", "log(4, 2)" - Please note: sin() etc use radians! 2*pi radians equals 360°
+    - currency: Transforms currencies
+    - graph: Generates a x-based graph (variable x will be set), see "calc" for syntax. Example: graph x + 15
+    - solve: Solve a mathematical function. See calc for extra help. Example: "solve x -100 100 3 * x * 2 = 15 * x"
+  - misc: Random commands that didn't fit into other categories
+    - base64: Encode/Decode base64 strings (you can also attach a text file)
+    - coinflip: Flip a coin
+    - color: Show info about a color. Chooses a random color when none is specified
+    - echo: Repeat a string back to you
+    - emotify: Converts your text to emoticons
+    - generate-qr: Generate a QR Code from supplied data (string or attachment)
+    - hash: Generate a Hash Code from supplied data (string or attachment), no arguments for a list of possible algorithms
+    - leetify: Leetifies your text
+    - magic8: The answer to your questions
+    - minecraft: Gets the status of a minecraft server
+    - poll: Run a poll with reactions
+    - quicktype: Waits for a response containing a generated code
+    - quote: Quote a message
+    - random: Generates a random number
+    - reverse: Reverse a string
+    - toxicity: Calculate the specified users toxicity
+    - unshorten: Unshorten a fishy URL
+  - money: Commands to manage your money
+You earn money by sending messages or by gambling (games)
+    - balance: Gets the money you have/someone has
+    - give: Give someone money
+    - scoreboard: Gets the members with the biggest wallet
+  - quote: Random pieces of text from various sources
+    - beemovie: Sends a quote from the bee movie script as TTS
+    - fortune: Spits out a quote
+  - reactionroles: Random pieces of text from various sources
+    - add: Binds a new role and emoji to RR
+    - bind: Bind ReactionRoles to a new guild-wide message
+    - clear: Unbinds all roles from RR
+    - jumplink: Unbinds all roles from RR
+    - list: List all registered roles
+    - remove: Unbinds a role from RR
+    - unbind: Unbind ReactionRoles
+  - stat: Information that is not unique to this server
+    - about: Prints some info about the bot
+    - changelog: Gets the amount of connected Guilds
+    - github: Pastes the github link
+    - guildcount: Gets the amount of connected Guilds
+    - invite: Gets the invite-link
+    - uptime: Prints the bots uptime
+    - website: Pastes the github link
+- Powerful configuration
+  - Custom XML-based layered database
+  - Toggle every single command
+  - Custom prefixes
+  - Locally encrypted API Keys
+- Easy to develop
+  - Experiments for many features
+  - Decently structured solution
+  - Lots of testing
+  - Few external dependencies (you don't need PHP, SQL, Node.JS)
+  - No payed API keys (eg Google Translate)
+  - Modern library
+  - Every group, command and parameter is documented in [help]
+- Fast
+  - My instance runs just fine on a RasPi with minimal specs
