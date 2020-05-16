@@ -17,8 +17,8 @@ jobs:
         dotnet build --verbosity:m -p:Configuration=Release
     - name: Create MD
       run: |
-        mkdir .\publish
-        .\MDExtractor\bin\Release\netcoreapp3.1\MDExtractor.exe .\publish\index.md
+        mkdir publish
+        ./MDExtractor/bin/Release/netcoreapp3.1/MDExtractor ./publish/index.md
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@3.5.1
       with:
