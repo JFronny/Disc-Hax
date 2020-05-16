@@ -24,6 +24,7 @@ namespace Bot.Commands.Stats
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync($@"Webpage: https://jfronny.github.io/home/bot
+Guide: https://jfronny.github.io/Disc-Hax
 Repo: https://github.com/JFronny/Disc-Hax
 Uptime: {(DateTime.Now - Program.Start).GetReadable()}");
             }
@@ -95,7 +96,8 @@ Uptime: {(DateTime.Now - Program.Start).GetReadable()}");
                 .AND(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
-                await ctx.RespondAsync("Webpage: https://jfronny.github.io/home/bot");
+                await ctx.RespondAsync(@"Webpage: https://jfronny.github.io/home/bot
+Guide: https://jfronny.github.io/Disc-Hax");
             }
         }
 
