@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Add DSharpPlus SlimGet
-      run: dotnet nuget add source -n DSharpPlusSlimGet -s https://nuget.emzi0767.com/api/v3/index.json
+      run: dotnet nuget add source https://nuget.emzi0767.com/api/v3/index.json -n DSharpPlusSlimGet
     - name: Build solution
       run: |
         dotnet build --verbosity:m -p:Configuration=Release
