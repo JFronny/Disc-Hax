@@ -1,0 +1,25 @@
+name: GenDocs
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build solution
+      run: |
+        dotnet build --verbosity:m -p:Configuration=Release
+    - name: Create MD
+      run: |
+        mkdir .\publish
+        .\MDExtractor\bin\Release\netcoreapp3.1\MDExtractor.exe .\publish\index.md
+    - name: Deploy to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@v3
+      with:
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        BRANCH: gh-pages # The branch the action should deploy to.
+        FOLDER: publish # The folder the action should deploy.
