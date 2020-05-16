@@ -20,6 +20,11 @@ jobs:
       run: |
         mkdir publish
         ./MDExtractor/bin/Release/netcoreapp3.1/MDExtractor ./publish/index.md
+        cd publish
+        sed -i '1 i\---' index.md
+        sed -i '1 i\layout: home' index.md
+        sed -i '1 i\---' index.md
+        cd ..
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@3.5.1
       with:
