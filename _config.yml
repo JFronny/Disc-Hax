@@ -1,1 +1,3 @@
-theme: jekyll-theme-cayman
+title: JFronny
+markdown: kramdown
+theme: minima
