@@ -1,3 +1,6 @@
+---
+layout: home
+---
 # Disc-Hax
 A powerful multi-purpose discord bot!
 [![CodeFactor](https://www.codefactor.io/repository/github/jfronny/disc-hax/badge)](https://www.codefactor.io/repository/github/jfronny/disc-hax)
