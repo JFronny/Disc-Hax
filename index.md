@@ -5,6 +5,7 @@ layout: home
 A powerful multi-purpose discord bot!
 [![CodeFactor](https://www.codefactor.io/repository/github/jfronny/disc-hax/badge)](https://www.codefactor.io/repository/github/jfronny/disc-hax)
 [![Discord](https://img.shields.io/discord/466965965658128384?label=Discord)](https://discord.gg/UjhHBqt)
+[![GitHub](https://img.shields.io/badge/-GitHub-informational)](https://github.com/JFronny/Disc-Hax)
 
 Features:
 - ~90 powerful commands (state: Saturday, 16 May 2020)
