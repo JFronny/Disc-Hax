@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Add DSharpPlus SlimGet
+      run: dotnet nuget add source -n DSharpPlusSlimGet -s https://nuget.emzi0767.com/api/v3/index.json
     - name: Build solution
       run: |
         dotnet build --verbosity:m -p:Configuration=Release
