@@ -31,7 +31,7 @@ namespace Bot.Commands.Misc
             RpsOptionConv.RpsOption option)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 string output;
@@ -60,7 +60,7 @@ namespace Bot.Commands.Misc
             decimal bet)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (bet > ctx.Guild.GetMoney(ctx.Member) || bet < 0)
@@ -94,7 +94,7 @@ namespace Bot.Commands.Misc
         public async Task Slots(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(@":first_place::first_place::grey_question: - 0.5x
@@ -122,7 +122,7 @@ namespace Bot.Commands.Misc
             bool fast)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (bet > ctx.Guild.GetMoney(ctx.Member) || bet < 0)
@@ -206,7 +206,7 @@ namespace Bot.Commands.Misc
             int mineCount = 5)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (height * width < mineCount * 2 || mineCount > 200)
@@ -273,7 +273,7 @@ namespace Bot.Commands.Misc
             TimeSpan? gameTime = null)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 gameTime ??= new TimeSpan(0, 1, 0);

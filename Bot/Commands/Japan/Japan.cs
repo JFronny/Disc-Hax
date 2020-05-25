@@ -25,7 +25,7 @@ namespace Bot.Commands.Japan
             string name)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
                 await Display(ctx, name, true);
         }
 
@@ -37,7 +37,7 @@ namespace Bot.Commands.Japan
             string name)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
                 await Display(ctx, name, false);
         }
 

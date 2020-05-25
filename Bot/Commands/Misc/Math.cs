@@ -27,7 +27,7 @@ namespace Bot.Commands.Misc
             string equation)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 Expression ex = new Expression(equation);
@@ -52,7 +52,7 @@ namespace Bot.Commands.Misc
             string equation)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 string[] parts = equation.Split('=');
@@ -71,7 +71,7 @@ namespace Bot.Commands.Misc
             string equation)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 Bitmap bmp = new Bitmap(200, 200, PixelFormat.Format24bppRgb);
@@ -110,7 +110,7 @@ namespace Bot.Commands.Misc
             Currency outCurrency, [Description("Amount to convert")] double amount)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(
@@ -123,7 +123,7 @@ namespace Bot.Commands.Misc
         public async Task Currency(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondPaginatedIfTooLong(string.Join(", ",

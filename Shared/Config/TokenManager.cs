@@ -63,7 +63,7 @@ namespace Shared.Config
                 Directory.CreateDirectory(Path.GetDirectoryName(ContainerFile));
             if (!File.Exists(ContainerFile))
                 TokenForm.Show("", "", "", "", true);
-            byte[] bytes = HID.DecryptLocal(File.ReadAllBytes(ContainerFile));
+            byte[] bytes = Hid.DecryptLocal(File.ReadAllBytes(ContainerFile));
             XElement retEl = XElement.Parse(Encoding.UTF8.GetString(bytes));
             if (retEl.Element("discord") == null)
                 retEl.Add(new XElement("discord", ""));
@@ -79,7 +79,7 @@ namespace Shared.Config
         public static void SaveXe(XElement el)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(el.ToString());
-            File.WriteAllBytes(ContainerFile, HID.EncryptLocal(bytes));
+            File.WriteAllBytes(ContainerFile, Hid.EncryptLocal(bytes));
         }
     }
 }

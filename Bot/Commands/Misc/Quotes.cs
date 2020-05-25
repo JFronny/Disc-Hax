@@ -82,7 +82,7 @@ namespace Bot.Commands.Misc
         public async Task Fortune(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 string[] quotes =
@@ -102,7 +102,7 @@ namespace Bot.Commands.Misc
         public async Task Bees(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 int q = Program.Rnd.Next(Beequotes.Length - 2);

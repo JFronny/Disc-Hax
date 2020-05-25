@@ -26,7 +26,7 @@ namespace Bot
         {
             _command = command;
             _builder.Title = $"{command.QualifiedName} ({(command is CommandGroup ? "Group" : "Command")})";
-            if (_ctx.Channel.getMethodEnabled_ext(method: command.Name).FALSE())
+            if (_ctx.Channel.getMethodEnabled_ext(method: command.Name).False())
                 _builder.Title += " (disabled)";
             if (command.Aliases.Any())
                 _builder.AddField("Aliases", string.Join(", ", command.Aliases.Select(s => $"`{s}`")));
@@ -56,7 +56,7 @@ namespace Bot
 
         public override CommandHelpMessage Build()
         {
-            if (!_ctx.Channel.Get(ConfigManager.Enabled).TRUE()) throw new UnwantedExecutionException();
+            if (!_ctx.Channel.Get(ConfigManager.Enabled).True()) throw new UnwantedExecutionException();
             if (_command == null)
                 _builder.AddField("Notes",
                         "You can use \"help [group] [command]\" to get help about a specific command or \"help [group]\" for a group")

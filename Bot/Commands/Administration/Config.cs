@@ -80,7 +80,7 @@ namespace Bot.Commands.Administration
 
         private async Task ConfigCmd(CommandContext ctx, SnowflakeObject target)
         {
-            if (ctx.Channel.Get(ConfigManager.Enabled).TRUE())
+            if (ctx.Channel.Get(ConfigManager.Enabled).True())
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(target.GetStr(CommandArr.GetCommandNames()));
@@ -102,7 +102,7 @@ namespace Bot.Commands.Administration
 
         private async Task ConfigCmd(CommandContext ctx, SnowflakeObject target, string element)
         {
-            if (ctx.Channel.Get(ConfigManager.Enabled).TRUE())
+            if (ctx.Channel.Get(ConfigManager.Enabled).True())
             {
                 await ctx.TriggerTypingAsync();
                 if (string.Equals(element, ConfigManager.Prefix, StringComparison.CurrentCultureIgnoreCase))
@@ -135,8 +135,8 @@ namespace Bot.Commands.Administration
         private async Task ConfigCmd(CommandContext ctx, SnowflakeObject target, string element, string value,
             bool noComment = false)
         {
-            if (ctx.Channel.Get(ConfigManager.Enabled).TRUE() ||
-                ctx.Guild.Channels.All(s => s.Value.Get(ConfigManager.Enabled).FALSE()))
+            if (ctx.Channel.Get(ConfigManager.Enabled).True() ||
+                ctx.Guild.Channels.All(s => s.Value.Get(ConfigManager.Enabled).False()))
             {
                 if (!noComment)
                     await ctx.TriggerTypingAsync();

@@ -131,7 +131,7 @@ namespace Bot
 
         private static async Task Commands_CommandErrored(CommandErrorEventArgs e)
         {
-            if (e.Context.Channel.Get(ConfigManager.Enabled).TRUE())
+            if (e.Context.Channel.Get(ConfigManager.Enabled).True())
             {
                 if (e.Exception is UnwantedExecutionException)
                     return;

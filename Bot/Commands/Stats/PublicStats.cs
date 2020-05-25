@@ -20,7 +20,7 @@ namespace Bot.Commands.Stats
         public async Task About(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync($@"Webpage: https://jfronny.github.io/home/bot
@@ -36,7 +36,7 @@ Uptime: {(DateTime.Now - Program.Start).GetReadable()}");
         public async Task GuildCount(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync($"Currently connected to {Program.client.Guilds.Count} Guilds");
@@ -49,7 +49,7 @@ Uptime: {(DateTime.Now - Program.Start).GetReadable()}");
         public async Task Changelog(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsyncFix((await Program.Github.Repository.Commit.GetAll("JFronny", "Disc-Hax"))[0]
@@ -64,7 +64,7 @@ Uptime: {(DateTime.Now - Program.Start).GetReadable()}");
         public async Task Invite(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(
@@ -79,7 +79,7 @@ Uptime: {(DateTime.Now - Program.Start).GetReadable()}");
         public async Task Github(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync("Repo Link: https://github.com/JFronny/Disc-Hax");
@@ -93,7 +93,7 @@ Uptime: {(DateTime.Now - Program.Start).GetReadable()}");
         public async Task Website(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(@"Webpage: https://jfronny.github.io/home/bot
@@ -108,7 +108,7 @@ Guide: https://jfronny.github.io/Disc-Hax");
         public async Task Uptime(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync($"Up for {(DateTime.Now - Program.Start).GetReadable()}");

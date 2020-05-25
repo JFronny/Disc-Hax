@@ -42,7 +42,7 @@ namespace Bot.Commands.Administration
         public async Task Announce(CommandContext ctx, [Description("Role to mention")] DiscordRole mention, [Description("Channel to post in")] DiscordChannel target, [RemainingText, Description("The message to announce")] string text)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 DiscordMember author = await ctx.Guild.GetMemberAsync(ctx.Message.Author.Id);
@@ -78,7 +78,7 @@ namespace Bot.Commands.Administration
         public static async Task Ping(DiscordChannel channel,
             Func<string, bool, DiscordEmbed, Task<DiscordMessage>> postMessage)
         {
-            if (channel.Get(ConfigManager.Enabled).TRUE())
+            if (channel.Get(ConfigManager.Enabled).True())
                 await postMessage($"Pong! ({Program.client.Ping}ms)", false, null);
         }
 
@@ -89,7 +89,7 @@ namespace Bot.Commands.Administration
         public async Task Cooldown(CommandContext ctx, int cooldown)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (cooldown <= 21600 && cooldown >= 0)
@@ -169,7 +169,7 @@ namespace Bot.Commands.Administration
             int span = 50, [Description("Reason for deletion")] string? reason = null)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 IEnumerable<DiscordMessage> messages = await ctx.Channel.GetMessagesAsync(span);
@@ -187,7 +187,7 @@ namespace Bot.Commands.Administration
             int span, [Description("Reason for deletion")] string? reason = null)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 IEnumerable<DiscordMessage> messages = await ctx.Channel.GetMessagesAsync(span);

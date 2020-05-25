@@ -26,7 +26,7 @@ namespace Bot.Commands
             DiscordChannel? channel = null)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 channel ??= ctx.Channel;
@@ -40,7 +40,7 @@ namespace Bot.Commands
         public async Task Bind(CommandContext ctx, [Description("Message to bind")] DiscordMessage msg)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 ctx.Guild.SetReactionRoleMessage(msg);
@@ -55,7 +55,7 @@ namespace Bot.Commands
         public async Task Unbind(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 (ulong? channel, ulong? message) = ctx.Guild.GetReactionRoleMessage() ??
@@ -81,7 +81,7 @@ namespace Bot.Commands
         public async Task List(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 Dictionary<string, ulong> roles = ctx.Guild.GetReactionRoles();
@@ -107,7 +107,7 @@ namespace Bot.Commands
             [Description("The role to bind")] DiscordRole role)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 Dictionary<string, ulong> roles = ctx.Guild.GetReactionRoles();
@@ -142,7 +142,7 @@ namespace Bot.Commands
         public async Task Remove(CommandContext ctx, [Description("The emoji to unbind")] DiscordEmoji emoji)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 Dictionary<string, ulong> roles = ctx.Guild.GetReactionRoles();
@@ -158,7 +158,7 @@ namespace Bot.Commands
         public async Task Remove(CommandContext ctx, [Description("The role to unbind")] DiscordRole role)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 Dictionary<string, ulong> roles = ctx.Guild.GetReactionRoles();
@@ -175,7 +175,7 @@ namespace Bot.Commands
         public async Task Clear(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 ctx.Guild.SetReactionRoles(new Dictionary<string, ulong>());
@@ -191,7 +191,7 @@ namespace Bot.Commands
         public async Task JumpLink(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 (ulong? channel, ulong? message) = ctx.Guild.GetReactionRoleMessage() ??

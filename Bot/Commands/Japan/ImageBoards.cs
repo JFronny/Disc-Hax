@@ -90,7 +90,7 @@ namespace Bot.Commands.Japan
         )
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(
@@ -111,7 +111,7 @@ namespace Bot.Commands.Japan
             params string[] tags)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 SearchResult result;
@@ -165,7 +165,7 @@ namespace Bot.Commands.Japan
             params string[] tags)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (ctx.Channel.GetEvaluatedNsfw())
@@ -343,7 +343,7 @@ namespace Bot.Commands.Japan
             string subreddit = "random")
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 using WebClient client = new WebClient();
@@ -398,7 +398,7 @@ namespace Bot.Commands.Japan
             bool xmas = false)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 using WebClient client = new WebClient();
@@ -415,7 +415,7 @@ namespace Bot.Commands.Japan
         public async Task Xkcd(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 using WebClient client = new WebClient();
@@ -446,7 +446,7 @@ namespace Bot.Commands.Japan
         public async Task Chan(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(
@@ -460,7 +460,7 @@ namespace Bot.Commands.Japan
             Board board)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (ctx.Channel.GetEvaluatedNsfw())
@@ -492,7 +492,7 @@ namespace Bot.Commands.Japan
         public async Task Waifu(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
                 await Waifu(ctx, false);
         }
 
@@ -503,7 +503,7 @@ namespace Bot.Commands.Japan
             bool forceExecution)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (ctx.Channel.GetEvaluatedNsfw() || forceExecution)
@@ -530,7 +530,7 @@ namespace Bot.Commands.Japan
         public async Task Sauce(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (ctx.Channel.GetEvaluatedNsfw())
@@ -550,7 +550,7 @@ namespace Bot.Commands.Japan
         public async Task Sauce(CommandContext ctx, [Description("The images url")] string url)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (ctx.Channel.GetEvaluatedNsfw())

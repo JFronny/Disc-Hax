@@ -25,7 +25,7 @@ namespace Bot.Commands.Administration
             string reason)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await member.BanAsync(reason: reason);
@@ -43,7 +43,7 @@ namespace Bot.Commands.Administration
             string reason)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.Guild.BanMemberAsync(member, reason: $"{reason}\nBanned until {DateTime.Now + time:g}");
@@ -63,7 +63,7 @@ namespace Bot.Commands.Administration
             string reason)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.Guild.UnbanMemberAsync(user, reason);
@@ -82,7 +82,7 @@ namespace Bot.Commands.Administration
         public async Task Bans(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
 #if NO_TIMED_BAN
@@ -108,7 +108,7 @@ namespace Bot.Commands.Administration
             string reason)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await member.BanAsync(7, reason);
@@ -127,7 +127,7 @@ namespace Bot.Commands.Administration
             string reason)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await member.RemoveAsync(reason);
@@ -143,7 +143,7 @@ namespace Bot.Commands.Administration
             [Description("Member to softban")] DiscordMember? member = null)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (member == null)
@@ -172,7 +172,7 @@ namespace Bot.Commands.Administration
             string reason)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await member.SetMuteAsync(mute, reason);
@@ -192,7 +192,7 @@ namespace Bot.Commands.Administration
             string reason)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await member.SetDeafAsync(deafen, reason);

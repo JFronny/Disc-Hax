@@ -21,7 +21,7 @@ namespace Bot.Commands.Administration
         public async Task SetColor(CommandContext ctx, [Description("The role to modify")] DiscordRole role, [Description("The new color")] DiscordColor color, [Description("Reason for the action"), RemainingText] string reason)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 DiscordMember member = await ctx.Guild.GetMemberAsync(ctx.Message.Author.Id);
@@ -43,7 +43,7 @@ namespace Bot.Commands.Administration
         public async Task SetMentionable(CommandContext ctx, [Description("The role to modify")] DiscordRole role, [Description("Whether it can be mentioned")] bool mentionable, [Description("Reason for the action"), RemainingText] string reason)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 DiscordMember member = await ctx.Guild.GetMemberAsync(ctx.Message.Author.Id);
@@ -65,7 +65,7 @@ namespace Bot.Commands.Administration
         public async Task SetHoist(CommandContext ctx, [Description("The role to modify")] DiscordRole role, [Description("Whether to group members by this role")] bool hoist, [Description("Reason for the action"), RemainingText] string reason)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 DiscordMember member = await ctx.Guild.GetMemberAsync(ctx.Message.Author.Id);
@@ -87,7 +87,7 @@ namespace Bot.Commands.Administration
         public async Task SetName(CommandContext ctx, [Description("The role to modify")] DiscordRole role, [Description("The new name")] string name, [Description("Reason for the action"), RemainingText] string reason)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 DiscordMember member = await ctx.Guild.GetMemberAsync(ctx.Message.Author.Id);
@@ -109,7 +109,7 @@ namespace Bot.Commands.Administration
         public async Task RemoveBots(CommandContext ctx, [Description("The role to modify")] DiscordRole role, [Description("Reason for the action"), RemainingText] string reason)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 DiscordMember member = await ctx.Guild.GetMemberAsync(ctx.Message.Author.Id);
@@ -126,7 +126,7 @@ namespace Bot.Commands.Administration
         public async Task RemoveHumans(CommandContext ctx, [Description("The role to modify")] DiscordRole role, [Description("Reason for the action"), RemainingText] string reason)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 DiscordMember member = await ctx.Guild.GetMemberAsync(ctx.Message.Author.Id);

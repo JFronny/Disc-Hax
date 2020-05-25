@@ -23,7 +23,7 @@ namespace Bot.Commands.Misc
             bool keepMsgs = false)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 DiscordMessage invite = await ctx.RespondAsync("Waiting 1 minute for Player 2 to react with :ok:...");
@@ -59,7 +59,7 @@ namespace Bot.Commands.Misc
             bool keepMsgs = false)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (bet > ctx.Guild.GetMoney(ctx.Member) || bet < 0)

@@ -23,7 +23,7 @@ namespace Bot.Commands.Stats
         public async Task GetMoney(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync($"You have {ctx.Guild.GetMoney(ctx.Member)} coins");
@@ -36,7 +36,7 @@ namespace Bot.Commands.Stats
             DiscordMember user)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(
@@ -52,7 +52,7 @@ namespace Bot.Commands.Stats
             DiscordMember user, [Description("New value")] decimal money)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 decimal original = ctx.Guild.GetMoney(user);
@@ -69,7 +69,7 @@ namespace Bot.Commands.Stats
         public async Task Scoreboard(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 KeyValuePair<ulong, decimal>[] tmp = ctx.Guild.GetAllMoney()
@@ -87,7 +87,7 @@ namespace Bot.Commands.Stats
             [Description("Money to give")] decimal money)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (money > ctx.Guild.GetMoney(ctx.Member) || money < 0)

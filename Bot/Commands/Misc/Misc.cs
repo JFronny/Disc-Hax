@@ -61,7 +61,7 @@ namespace Bot.Commands.Misc
             params DiscordEmoji[] options)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (duration > new TimeSpan(0, 1, 0))
@@ -87,7 +87,7 @@ namespace Bot.Commands.Misc
             int bytes, [Description("Time before exiting")] TimeSpan time)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (time > new TimeSpan(0, 1, 0))
@@ -113,7 +113,7 @@ namespace Bot.Commands.Misc
             string text)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(text.Emotify());
@@ -128,7 +128,7 @@ namespace Bot.Commands.Misc
             string text)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsyncFix(text.Leetify());
@@ -172,7 +172,7 @@ namespace Bot.Commands.Misc
             int maximum)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (maximum < minimum)
@@ -192,7 +192,7 @@ namespace Bot.Commands.Misc
         public async Task Coinflip(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondPaginatedIfTooLong(Program.Rnd.Next(0, 2) == 0 ? "Head" : "Tail");
@@ -206,7 +206,7 @@ namespace Bot.Commands.Misc
             string question)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 Rectangle size = new Rectangle(0, 0, 400, 400);
@@ -249,7 +249,7 @@ namespace Bot.Commands.Misc
         public async Task Unshorten(CommandContext ctx, [Description("URL to unshorten")] Uri url)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsyncFix($"Response is: {url.Unshorten().AbsoluteUri}");
@@ -263,7 +263,7 @@ namespace Bot.Commands.Misc
         public async Task Toxicity(CommandContext ctx, [Description("Member to calculate")] DiscordMember member)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 IReadOnlyList<DiscordMessage> msg = await ctx.Channel.GetMessagesAsync();
@@ -287,7 +287,7 @@ namespace Bot.Commands.Misc
         public async Task Minecraft(CommandContext ctx, [Description("IP of the server")] string ip)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 string[] parsedIp = ip.Split(':');
@@ -303,7 +303,7 @@ namespace Bot.Commands.Misc
         public async Task Quote(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 DiscordMessage msg = (await ctx.Channel.GetMessagesAsync()).Skip(1).First(s => !s.Author.IsBot);
@@ -316,7 +316,7 @@ namespace Bot.Commands.Misc
         public async Task Quote(CommandContext ctx, [Description("The messages ID")] ulong id)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 DiscordMessage msg = await ctx.Channel.GetMessageAsync(id);
@@ -331,7 +331,7 @@ namespace Bot.Commands.Misc
         public async Task Color(CommandContext ctx, [Description("The color")] DiscordColor? color = null)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 color ??= DiscordNamedColorConverter.ColorNames.Values.OrderBy(s => Program.Rnd.NextDouble()).First();
@@ -353,9 +353,9 @@ namespace Bot.Commands.Misc
                 bld.AddField("RGB", $"{color.Value.R}, {color.Value.G}, {color.Value.B}", true);
                 bld.AddField("Hex", $"#{color.Value.R:X2}{color.Value.G:X2}{color.Value.B:X2}", true);
                 bld.AddField("RGB Int", color.Value.Value.ToString(), true);
-                bld.AddField("HSB", col.ToHSB().selectO(s => $"{s.H}, {s.S}, {s.B}"), true);
-                bld.AddField("HSL", col.ToHSL().selectO(s => $"{s.H}, {s.S}, {s.L}"), true);
-                bld.AddField("CMYK", col.ToCMYK().selectO(s => $"{s.C}, {s.M}, {s.Y}, {s.K}"), true);
+                bld.AddField("HSB", col.ToHSB().SelectO(s => $"{s.H}, {s.S}, {s.B}"), true);
+                bld.AddField("HSL", col.ToHSL().SelectO(s => $"{s.H}, {s.S}, {s.L}"), true);
+                bld.AddField("CMYK", col.ToCMYK().SelectO(s => $"{s.C}, {s.M}, {s.Y}, {s.K}"), true);
                 await ctx.RespondWithFileAsync("Color.jpg", str, embed: bld.Build());
             }
         }
@@ -367,7 +367,7 @@ namespace Bot.Commands.Misc
         public async Task Base64(CommandContext ctx, [Description("Whether to encode (default) or decode")] bool decode, [Description("The text to process"), RemainingText] string text)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (string.IsNullOrWhiteSpace(text) && ctx.Message.Attachments.Count > 0)
@@ -402,7 +402,7 @@ namespace Bot.Commands.Misc
         public async Task Echo(CommandContext ctx, [Description("The text to echo"), RemainingText] string text)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
                 await ctx.RespondAsync(text);
         }
         
@@ -417,7 +417,7 @@ namespace Bot.Commands.Misc
         public Task Reverse(CommandContext ctx, bool reverseWords, [Description("The text to echo"), RemainingText] string text)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
                 return ctx.RespondAsync(reverseWords ? string.Join(' ', text.Split(' ').Reverse()) : text);
             else
                 return Task.CompletedTask;
@@ -430,7 +430,7 @@ namespace Bot.Commands.Misc
         public async Task GenerateQR(CommandContext ctx, [Description("The text to echo"), RemainingText] string text)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 Bitmap bmp;
@@ -461,7 +461,7 @@ namespace Bot.Commands.Misc
         public async Task Hash(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(string.Join(", ",
@@ -474,7 +474,7 @@ namespace Bot.Commands.Misc
         public async Task Hash(CommandContext ctx, [Description("The algorithm to use")] HashTypeConv.HashType algorithm, [Description("The text to echo"), RemainingText] string text)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 byte[] data;

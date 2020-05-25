@@ -22,7 +22,7 @@ namespace Bot.Commands.Stats
         public async Task User(CommandContext ctx, [Description("User to print")] DiscordUser user)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondPaginatedIfTooLong(string.Join("\n",
@@ -48,7 +48,7 @@ namespace Bot.Commands.Stats
         public async Task Member(CommandContext ctx, [Description("Member to print")] DiscordMember member)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondPaginatedIfTooLong(string.Join("\n",
@@ -74,7 +74,7 @@ namespace Bot.Commands.Stats
         public async Task Role(CommandContext ctx, [Description("Role to print")] DiscordRole role)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondPaginatedIfTooLong(string.Join("\n",
@@ -101,7 +101,7 @@ namespace Bot.Commands.Stats
             DiscordChannel? channel = null)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (channel == null)
@@ -118,7 +118,7 @@ namespace Bot.Commands.Stats
         public async Task Guild(CommandContext ctx)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondPaginatedIfTooLong(

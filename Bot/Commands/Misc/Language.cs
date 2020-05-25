@@ -39,7 +39,7 @@ namespace Bot.Commands.Misc
             string text)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (ctx.Channel.GetEvaluatedNsfw())
@@ -96,7 +96,7 @@ namespace Bot.Commands.Misc
             string text)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (text.Length > 200)
@@ -122,7 +122,7 @@ namespace Bot.Commands.Misc
             string text)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (text.Length > 200)
@@ -165,7 +165,7 @@ namespace Bot.Commands.Misc
         public async Task Detect(CommandContext ctx, [Description("The term to search")] [RemainingText] string text)
         {
             if (ctx.Channel.Get(ConfigManager.Enabled)
-                .AND(ctx.Channel.GetMethodEnabled()))
+                .And(ctx.Channel.GetMethodEnabled()))
             {
                 await ctx.TriggerTypingAsync();
                 if (text.Length > 200)
