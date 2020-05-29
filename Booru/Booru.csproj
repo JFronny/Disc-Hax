@@ -6,7 +6,7 @@
     </PropertyGroup>
     <ItemGroup>
       <PackageReference Include="BooruSharp" Version="2.0.3" />
-      <PackageReference Include="Eto.Forms" Version="2.5.1" />
+      <PackageReference Include="Eto.Forms" Version="2.5.2" />
       <PackageReference Include="Eto.Platform.Gtk" Version="2.5.2" />
     </ItemGroup>
 </Project>
