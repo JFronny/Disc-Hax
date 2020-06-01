@@ -8,7 +8,7 @@ A powerful multi-purpose discord bot!
 [![GitHub](https://img.shields.io/badge/-GitHub-informational)](https://github.com/JFronny/Disc-Hax)
 
 Features:
-- ~90 powerful commands (state: Friday, 29 May 2020)
+- ~90 powerful commands (state: Monday, 01 June 2020)
   - admin: Commands for administration and debugging
     - announce: Post a message containing the specified text to a channel
     - avatar: Gets the avatar of the specified user
