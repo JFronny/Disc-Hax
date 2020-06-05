@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BooruSharp" Version="2.0.3" />
+    <PackageReference Include="BooruSharp" Version="2.1.0" />
     <PackageReference Include="MathParser.org-mXparser" Version="4.4.2" />
     <PackageReference Include="NHentaiSharp" Version="1.0.7" />
     <PackageReference Include="Octokit" Version="0.47.0" />
