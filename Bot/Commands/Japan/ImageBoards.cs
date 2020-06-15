@@ -156,7 +156,7 @@ namespace Bot.Commands.Japan
 
 #if !NO_NSFW
         [Command("nonbooru")]
-        [Aliases("d")]
+        [Aliases("d", "nb")]
         [Description("Shows a random non-booru from your favourite source. See \"doujinshi ls\" for a full list")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task NonBooru(CommandContext ctx, [Description("Source to select image from (ls for a list)")]
@@ -450,7 +450,7 @@ namespace Bot.Commands.Japan
             {
                 await ctx.TriggerTypingAsync();
                 await ctx.RespondAsync(
-                    $"{string.Join(", ", JsonDeserializer.Deserialize<BoardListModel>(await Internet.DownloadString(@"https://a.4cdn.org/boards.json")).boards.Select(s => $"{s.Title} ({s.ShortName})"))}\r\nUsage: !4chan <ShortName>");
+                    string.Join(", ", JsonDeserializer.Deserialize<BoardListModel>(await Internet.DownloadString(@"https://a.4cdn.org/boards.json")).boards.Select(s => $"{s.Title} ({s.ShortName})")));
             }
         }
 
